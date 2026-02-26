@@ -4,3 +4,4 @@ secrets/
 *.token
 .claude/
 venv/
+.venv/
