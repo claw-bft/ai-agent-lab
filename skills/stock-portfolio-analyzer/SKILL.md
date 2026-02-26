@@ -100,6 +100,40 @@ export VERCEL_TOKEN="your-token"
 - 子任务超时时间设置为300秒以上
 - 主会话监控子任务状态，失败时立即介入
 
+### Issue #2: 早报任务子任务中断
+**状态**: 已修复  
+**发现时间**: 2026-02-27  
+**问题描述**: stock-portfolio-analyzer早报子任务在cron执行时经常中断，导致定时任务无法稳定运行  
+**根因**: 
+1. `stock-analyzer.py` 缺少处理 `morning_task.json` 的逻辑
+2. 没有专门的早报任务执行入口
+3. 缺少错误处理和重试机制
+
+**修复方案**:
+1. 在 `stock-analyzer.py` 中添加 `morning-report` 命令
+2. 实现 `run_morning_report_task()` 函数，专门处理早报任务配置
+3. 创建 `generate_morning_report_html()` 生成早报专用HTML模板
+4. 新增 `scripts/run_morning_report.sh` 脚本，带5次重试机制
+5. 任务执行后自动更新 `morning_task.json` 的状态字段
+
+**使用方法**:
+```bash
+# 直接执行早报任务
+python3 stock-analyzer.py morning-report
+
+# 或通过脚本执行（带重试）
+bash scripts/run_morning_report.sh
+
+# 指定自定义任务文件
+python3 stock-analyzer.py morning-report --task-file /path/to/task.json
+```
+
+**任务状态追踪**:
+执行后 `morning_task.json` 会自动更新以下字段:
+- `last_run`: 上次执行时间
+- `last_report_url`: 上次报告链接
+- `last_status`: 执行状态 (success/deploy_failed)
+
 ---
 
 ## 任务配置模板

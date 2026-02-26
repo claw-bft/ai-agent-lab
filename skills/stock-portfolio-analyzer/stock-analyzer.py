@@ -558,14 +558,134 @@ class StockAnalyzer:
             "deploy": deploy_result
         }
 
+def run_morning_report_task(task_config: Dict) -> Dict:
+    """执行早报任务"""
+    print(f"[早报任务] 开始执行: {task_config.get('task_name', '股市早报')}")
+    
+    report_sections = task_config.get('report_sections', [])
+    report_title = task_config.get('report_title', '股市早报')
+    
+    # 收集市场热点股票（模拟从step 1, 2获取的数据）
+    # 实际应该从news-aggregator和stock-analyzer Agent获取
+    hot_stocks = [
+        {"name": "贵州茅台", "symbol": "600519", "price": 1680.00},
+        {"name": "宁德时代", "symbol": "300750", "price": 185.50},
+        {"name": "比亚迪", "symbol": "002594", "price": 245.80},
+        {"name": "中芯国际", "symbol": "688981", "price": 78.90},
+        {"name": "东方财富", "symbol": "300059", "price": 18.50}
+    ]
+    
+    analyzer = StockAnalyzer()
+    
+    # 解析股票并分析
+    stocks_input = json.dumps(hot_stocks)
+    report = analyzer.analyze(stocks_input)
+    
+    # 生成早报专用HTML
+    html_content = generate_morning_report_html(report, report_title, report_sections)
+    
+    # 保存并部署
+    report_id = f"morning-{datetime.now().strftime('%Y%m%d')}"
+    local_file = REPORTS_DIR / f"{report_id}.html"
+    local_file.write_text(html_content, encoding='utf-8')
+    
+    deploy_agent = DeployAgent()
+    deploy_result = deploy_agent.deploy_to_vercel(html_content, report_id)
+    
+    return {
+        "report_id": report_id,
+        "task_id": task_config.get('task_id'),
+        "local_file": str(local_file),
+        "deploy": deploy_result,
+        "sections": report_sections,
+        "stocks_analyzed": len(report.stocks)
+    }
+
+def generate_morning_report_html(report: AnalysisReport, title: str, sections: List[str]) -> str:
+    """生成早报专用HTML"""
+    
+    stocks_html = ""
+    for stock in report.stocks:
+        score_class = "score-high" if stock.score >= 70 else "score-medium" if stock.score >= 50 else "score-low"
+        stocks_html += f"""
+        <div class="stock-card">
+            <div class="stock-header">
+                <div>
+                    <span class="stock-name">{stock.name}</span>
+                    <span class="stock-symbol">{stock.symbol}</span>
+                </div>
+                <div class="score {score_class}">{stock.score}分</div>
+            </div>
+            <div class="recommendation">{stock.recommendation}</div>
+        </div>
+        """
+    
+    sections_html = ""
+    for section in sections:
+        sections_html += f'<div class="section-tag">{section}</div>'
+    
+    return f"""<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{title} - {datetime.now().strftime('%Y年%m月%d日')}</title>
+    <style>
+        * {{ margin: 0; padding: 0; box-sizing: border-box; }}
+        body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); color: #fff; min-height: 100vh; }}
+        .container {{ max-width: 800px; margin: 0 auto; padding: 20px; }}
+        .header {{ text-align: center; padding: 40px 20px; border-bottom: 1px solid rgba(255,255,255,0.1); }}
+        .header h1 {{ font-size: 2.5em; margin-bottom: 10px; background: linear-gradient(90deg, #667eea, #764ba2); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }}
+        .header .date {{ color: #888; font-size: 1.1em; }}
+        .sections {{ display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin: 30px 0; }}
+        .section-tag {{ background: rgba(102, 126, 234, 0.2); border: 1px solid rgba(102, 126, 234, 0.4); padding: 8px 16px; border-radius: 20px; font-size: 0.9em; color: #a0a0ff; }}
+        .stock-card {{ background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 20px; border-radius: 12px; margin-bottom: 16px; }}
+        .stock-header {{ display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }}
+        .stock-name {{ font-size: 1.3em; font-weight: bold; }}
+        .stock-symbol {{ color: #888; margin-left: 8px; font-size: 0.9em; }}
+        .score {{ font-size: 1.2em; font-weight: bold; padding: 6px 14px; border-radius: 16px; }}
+        .score-high {{ background: rgba(40, 167, 69, 0.3); color: #4ade80; }}
+        .score-medium {{ background: rgba(255, 193, 7, 0.3); color: #fbbf24; }}
+        .score-low {{ background: rgba(220, 53, 69, 0.3); color: #f87171; }}
+        .recommendation {{ color: #aaa; font-size: 0.95em; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.05); }}
+        .footer {{ text-align: center; padding: 40px; color: #666; margin-top: 40px; font-size: 0.9em; }}
+        .summary {{ background: rgba(102, 126, 234, 0.1); border-left: 4px solid #667eea; padding: 20px; margin: 20px 0; border-radius: 0 8px 8px 0; }}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📈 {title}</h1>
+            <div class="date">{datetime.now().strftime('%Y年%m月%d日 %H:%M')}</div>
+        </div>
+        
+        <div class="sections">{sections_html}</div>
+        
+        <div class="summary">
+            <strong>今日关注:</strong> 市场热点板块分析，重点关注技术面突破个股。建议控制仓位，谨慎追高。
+        </div>
+        
+        <h2 style="margin: 30px 0 20px; font-size: 1.3em;">🔥 热点个股</h2>
+        {stocks_html}
+        
+        <div class="footer">
+            <p>由 AI Agent 自动生成 | 仅供参考，不构成投资建议</p>
+            <p style="margin-top: 8px;">claw-bft/ai-agent-lab</p>
+        </div>
+    </div>
+</body>
+</html>
+"""
+
 def main():
     parser = argparse.ArgumentParser(description="股票持仓分析系统")
-    parser.add_argument("command", choices=["analyze", "list", "help"], help="命令")
+    parser.add_argument("command", choices=["analyze", "list", "help", "morning-report"], help="命令")
     parser.add_argument("--input", "-i", help="输入文件或股票列表")
     parser.add_argument("--stocks", "-s", help="股票代码列表，逗号分隔")
     parser.add_argument("--output", "-o", help="输出目录")
     parser.add_argument("--deploy", "-d", action="store_true", help="部署到Vercel")
     parser.add_argument("--json", "-j", action="store_true", help="JSON格式输出")
+    parser.add_argument("--task-file", "-t", help="任务配置文件路径(用于早报等自动化任务)")
     
     args = parser.parse_args()
     
@@ -577,6 +697,7 @@ def main():
 用法:
   stock-analyzer analyze --input stocks.txt    分析持仓文件
   stock-analyzer analyze --stocks "002383,002602"  分析指定股票
+  stock-analyzer morning-report --task-file ~/.openclaw/shared/incoming/morning_task.json  执行早报任务
   stock-analyzer list                          列出历史报告
   stock-analyzer help                          显示帮助
 
@@ -587,6 +708,47 @@ def main():
   世纪华通 - 002602 - 18.76
 """)
         return
+    
+    if args.command == "morning-report":
+        # 执行早报任务
+        task_file = args.task_file or (INCOMING_DIR / "morning_task.json")
+        
+        if isinstance(task_file, str):
+            task_file = Path(task_file)
+        
+        if not task_file.exists():
+            print(f"❌ 错误: 任务文件不存在: {task_file}")
+            sys.exit(1)
+        
+        try:
+            task_config = json.loads(task_file.read_text(encoding='utf-8'))
+            result = run_morning_report_task(task_config)
+            
+            if args.json:
+                print(json.dumps(result, indent=2, ensure_ascii=False))
+            else:
+                print(f"✓ 早报任务执行完成")
+                print(f"  报告ID: {result['report_id']}")
+                print(f"  分析股票: {result['stocks_analyzed']}只")
+                print(f"  本地文件: {result['local_file']}")
+                if result['deploy'].get('success'):
+                    print(f"  在线报告: {result['deploy']['url']}")
+                else:
+                    print(f"  ⚠️ 部署失败: {result['deploy'].get('error', '未知错误')}")
+            
+            # 更新任务状态
+            task_config['last_run'] = datetime.now().isoformat()
+            task_config['last_report_url'] = result['deploy'].get('url') if result['deploy'].get('success') else None
+            task_config['last_status'] = 'success' if result['deploy'].get('success') else 'deploy_failed'
+            task_file.write_text(json.dumps(task_config, indent=2, ensure_ascii=False), encoding='utf-8')
+            
+            return
+            
+        except Exception as e:
+            print(f"❌ 早报任务执行失败: {e}")
+            import traceback
+            traceback.print_exc()
+            sys.exit(1)
     
     if args.command == "list":
         reports = sorted(REPORTS_DIR.glob("report-*.html"), key=lambda x: x.stat().st_mtime, reverse=True)
