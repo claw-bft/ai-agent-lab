@@ -49,3 +49,39 @@ research-pro search --query "最新AI编程工具发布" --sources news,blog,twi
 # 竞品监控
 research-pro monitor --competitors "OpenAI,Anthropic,Google" --alerts product-launch
 ```
+
+## 配置说明
+
+### Tavily API (推荐)
+获取 API Key: https://tavily.com
+
+```bash
+export TAVILY_API_KEY="tvly-xxxxxxxx"
+python research_pro.py search --query "AI最新进展"
+```
+
+### Brave Search (备选)
+获取 API Key: https://brave.com/search/api
+
+```bash
+export BRAVE_API_KEY="BSxxxxxxxx"
+python research_pro.py search --query "AI最新进展"
+```
+
+### 使用 SearchAdapter
+```python
+from search_adapter import SearchAdapter, search
+
+# 自动检测可用后端
+adapter = SearchAdapter()
+print(adapter.get_status())
+
+# 执行搜索
+results = search("Python异步编程", limit=5)
+for r in results:
+    print(f"{r['title']}: {r['url']}")
+
+# 批量搜索
+from search_adapter import batch_search
+results = batch_search(["Python", "Go", "Rust"], limit=3)
+```
