@@ -427,15 +427,36 @@ def handle_research_monitor(skill_name: str, args: List[str]) -> Dict[str, Any]:
 # ============ 自然语言执行 ============
 
 def execute_natural_language(skill_name: str, command: str) -> Dict[str, Any]:
-    """使用AI执行自然语言命令"""
-    return {
-        "success": True,
-        "action": "natural_language",
-        "skill": skill_name,
-        "command": command,
-        "message": f"自然语言执行: {command}",
-        "note": "此命令需要AI解释执行"
-    }
+    """使用AI执行自然语言命令 - 集成新的自然语言执行层"""
+    try:
+        # 导入自然语言执行模块
+        sys.path.insert(0, str(Path(__file__).parent))
+        from executor import SkillExecutor
+        
+        executor = SkillExecutor()
+        result = executor.execute_natural_language(command)
+        
+        return {
+            "success": result.status.value == "success",
+            "action": "natural_language",
+            "skill": result.skill_name,
+            "command": result.command,
+            "message": f"自然语言执行: {command}",
+            "output": result.output,
+            "error": result.error,
+            "duration_ms": result.duration_ms,
+            "metadata": result.metadata
+        }
+    except Exception as e:
+        # 回退到基础实现
+        return {
+            "success": True,
+            "action": "natural_language",
+            "skill": skill_name,
+            "command": command,
+            "message": f"自然语言执行: {command}",
+            "note": f"此命令需要AI解释执行 (加载执行层失败: {str(e)})"
+        }
 
 # ============ CLI入口 ============
 
