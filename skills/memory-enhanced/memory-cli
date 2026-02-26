@@ -1,0 +1,273 @@
+#!/usr/bin/env python3
+"""
+Memory Enhanced CLI - 记忆增强系统命令行工具
+"""
+
+import argparse
+import sys
+import json
+from datetime import datetime
+
+from memory_system import (
+    create_memory_agent, MemoryType, MemoryPriority,
+    MemoryStore, SimpleEmbedding
+)
+
+
+def format_timestamp(ts: float) -> str:
+    """格式化时间戳"""
+    return datetime.fromtimestamp(ts).strftime("%Y-%m-%d %H:%M:%S")
+
+
+def cmd_store(args):
+    """存储记忆"""
+    agent = create_memory_agent(args.agent or "default")
+    
+    memory_id = agent.remember(
+        content=args.content,
+        memory_type=args.type,
+        priority=args.priority,
+        **(json.loads(args.meta) if args.meta else {})
+    )
+    
+    print(f"✓ 记忆已存储")
+    print(f"  ID: {memory_id}")
+    print(f"  类型: {args.type}")
+    print(f"  优先级: {args.priority}")
+
+
+def cmd_search(args):
+    """搜索记忆"""
+    agent = create_memory_agent(args.agent or "default")
+    
+    results = agent.recall(args.query, top_k=args.limit)
+    
+    if not results:
+        print("未找到相关记忆")
+        return
+    
+    print(f"找到 {len(results)} 条相关记忆:\n")
+    for i, r in enumerate(results, 1):
+        print(f"{i}. [{r['type']}] 相似度: {r['similarity']}")
+        print(f"   内容: {r['content'][:100]}{'...' if len(r['content']) > 100 else ''}")
+        print(f"   时间: {format_timestamp(r['timestamp'])}")
+        print()
+
+
+def cmd_list(args):
+    """列出记忆"""
+    agent = create_memory_agent(args.agent or "default")
+    store = agent.memory
+    
+    if args.type:
+        entries = store.get_by_type(MemoryType(args.type), limit=args.limit)
+    else:
+        # 获取所有记忆
+        entries = sorted(
+            store.memories.values(),
+            key=lambda e: e.timestamp,
+            reverse=True
+        )[:args.limit]
+    
+    if not entries:
+        print("暂无记忆")
+        return
+    
+    print(f"共 {len(entries)} 条记忆:\n")
+    for e in entries:
+        status = "✓" if not e.is_expired() else "✗"
+        print(f"{status} [{e.memory_type.value}] [{e.priority.name}] {e.memory_id[:8]}")
+        print(f"   内容: {e.content[:80]}{'...' if len(e.content) > 80 else ''}")
+        print(f"   时间: {format_timestamp(e.timestamp)} | 访问: {e.access_count}次")
+        print()
+
+
+def cmd_stats(args):
+    """显示统计"""
+    agent = create_memory_agent(args.agent or "default")
+    stats = agent.stats()
+    
+    print("=== 记忆统计 ===\n")
+    print(f"总记忆数: {stats['total_memories']}")
+    print(f"活跃记忆: {stats['active_memories']}")
+    print(f"过期记忆: {stats['expired_memories']}")
+    print(f"词汇表大小: {stats['vocab_size']}")
+    
+    if stats['by_type']:
+        print("\n按类型分布:")
+        for t, count in sorted(stats['by_type'].items()):
+            print(f"  {t}: {count}")
+    
+    if stats['by_priority']:
+        print("\n按优先级分布:")
+        for p, count in sorted(stats['by_priority'].items(), reverse=True):
+            print(f"  {p}: {count}")
+
+
+def cmd_preferences(args):
+    """显示用户偏好"""
+    agent = create_memory_agent(args.agent or "default")
+    prefs = agent.get_preferences()
+    
+    if not prefs:
+        print("暂无用户偏好记录")
+        return
+    
+    print("=== 用户偏好 ===\n")
+    for key, value in prefs.items():
+        print(f"  {key}: {value}")
+
+
+def cmd_context(args):
+    """显示近期上下文"""
+    agent = create_memory_agent(args.agent or "default")
+    context = agent.get_recent_context(hours=args.hours)
+    
+    if not context:
+        print(f"过去{args.hours}小时内无上下文记录")
+        return
+    
+    print(f"=== 过去{args.hours}小时的上下文 ===\n")
+    for c in context:
+        print(f"[{c['type']}] {format_timestamp(c['timestamp'])}")
+        print(f"  {c['content'][:100]}{'...' if len(c['content']) > 100 else ''}")
+        print()
+
+
+def cmd_forget(args):
+    """删除记忆"""
+    agent = create_memory_agent(args.agent or "default")
+    
+    if args.all:
+        # 清理所有过期记忆
+        count = agent.memory.cleanup_expired()
+        print(f"✓ 已清理 {count} 条过期记忆")
+    elif args.id:
+        deleted = agent.forget(args.id)
+        if deleted:
+            print(f"✓ 记忆 {args.id} 已删除")
+        else:
+            print(f"✗ 未找到记忆 {args.id}")
+    else:
+        print("请指定 --id 或 --all")
+
+
+def cmd_demo(args):
+    """运行演示"""
+    print("=== 记忆增强系统演示 ===\n")
+    
+    agent = create_memory_agent("demo")
+    
+    # 存储示例记忆
+    print("1. 存储记忆...")
+    agent.remember("用户是Python开发者", "fact", "high")
+    agent.remember("偏好使用VS Code编辑器", "preference", "high", 
+                   preferences={"editor": "VS Code", "language": "Python"})
+    agent.remember("正在开发AI Agent项目", "context", "critical")
+    agent.remember("每天早上检查邮件", "preference", "medium",
+                   preferences={"routine": "morning_email"})
+    print("   ✓ 已存储4条记忆\n")
+    
+    # 语义搜索
+    print("2. 语义搜索 '编程'...")
+    results = agent.recall("编程", top_k=3)
+    for r in results:
+        print(f"   - [{r['type']}] {r['content'][:50]}... (相似度: {r['similarity']})")
+    print()
+    
+    # 获取偏好
+    print("3. 用户偏好汇总:")
+    prefs = agent.get_preferences()
+    for k, v in prefs.items():
+        print(f"   - {k}: {v}")
+    print()
+    
+    # 统计
+    print("4. 记忆统计:")
+    stats = agent.stats()
+    print(f"   - 总记忆: {stats['total_memories']}")
+    print(f"   - 按类型: {stats['by_type']}")
+    print("\n演示完成!")
+
+
+def main():
+    parser = argparse.ArgumentParser(
+        description="Memory Enhanced System CLI",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+示例:
+  %(prog)s store "Python是最好的语言" --type preference --priority high
+  %(prog)s search "编程语言" --limit 5
+  %(prog)s list --type fact --limit 10
+  %(prog)s stats
+  %(prog)s demo
+        """
+    )
+    
+    parser.add_argument("--agent", "-a", help="Agent ID (默认: default)")
+    
+    subparsers = parser.add_subparsers(dest="command", help="可用命令")
+    
+    # store
+    store_parser = subparsers.add_parser("store", help="存储记忆")
+    store_parser.add_argument("content", help="记忆内容")
+    store_parser.add_argument("--type", default="fact", 
+                             choices=[t.value for t in MemoryType],
+                             help="记忆类型")
+    store_parser.add_argument("--priority", default="medium",
+                             choices=[p.name.lower() for p in MemoryPriority],
+                             help="优先级")
+    store_parser.add_argument("--meta", help="JSON格式的元数据")
+    store_parser.set_defaults(func=cmd_store)
+    
+    # search
+    search_parser = subparsers.add_parser("search", help="搜索记忆")
+    search_parser.add_argument("query", help="搜索查询")
+    search_parser.add_argument("--limit", "-n", type=int, default=5,
+                              help="返回结果数量")
+    search_parser.set_defaults(func=cmd_search)
+    
+    # list
+    list_parser = subparsers.add_parser("list", help="列出记忆")
+    list_parser.add_argument("--type", "-t", choices=[t.value for t in MemoryType],
+                            help="按类型过滤")
+    list_parser.add_argument("--limit", "-n", type=int, default=20,
+                            help="返回数量")
+    list_parser.set_defaults(func=cmd_list)
+    
+    # stats
+    stats_parser = subparsers.add_parser("stats", help="显示统计")
+    stats_parser.set_defaults(func=cmd_stats)
+    
+    # preferences
+    prefs_parser = subparsers.add_parser("preferences", help="显示用户偏好")
+    prefs_parser.set_defaults(func=cmd_preferences)
+    
+    # context
+    context_parser = subparsers.add_parser("context", help="显示近期上下文")
+    context_parser.add_argument("--hours", "-h", type=int, default=24,
+                               help="时间范围(小时)")
+    context_parser.set_defaults(func=cmd_context)
+    
+    # forget
+    forget_parser = subparsers.add_parser("forget", help="删除记忆")
+    forget_parser.add_argument("--id", help="记忆ID")
+    forget_parser.add_argument("--all", action="store_true",
+                              help="清理所有过期记忆")
+    forget_parser.set_defaults(func=cmd_forget)
+    
+    # demo
+    demo_parser = subparsers.add_parser("demo", help="运行演示")
+    demo_parser.set_defaults(func=cmd_demo)
+    
+    args = parser.parse_args()
+    
+    if not args.command:
+        parser.print_help()
+        sys.exit(1)
+    
+    args.func(args)
+
+
+if __name__ == "__main__":
+    main()
