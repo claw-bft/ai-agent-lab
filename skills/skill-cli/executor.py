@@ -282,7 +282,17 @@ class SkillRouter:
 
 
 class FinanceProHandler(SkillHandler):
-    """金融专业包处理器"""
+    """金融专业包处理器 - 使用真实数据适配器"""
+    
+    def __init__(self):
+        self._adapter = None
+    
+    def _get_adapter(self):
+        """懒加载数据适配器"""
+        if self._adapter is None:
+            from data_adapter import get_finance_adapter
+            self._adapter = get_finance_adapter()
+        return self._adapter
     
     def can_handle(self, intent: ParsedIntent) -> bool:
         return intent.skill_name == "finance-pro"
@@ -292,51 +302,61 @@ class FinanceProHandler(SkillHandler):
         
         action = intent.action
         params = intent.parameters
+        adapter = self._get_adapter()
         
-        # 导入finance-pro模块 - 直接使用mock模块避免网络问题
-        import importlib.util
-        
-        spec = importlib.util.spec_from_file_location('finance_pro', str(SKILLS_DIR / 'finance-pro' / 'finance_pro_mock.py'))
-        finance_pro = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(finance_pro)
-        
-        # 执行对应的动作
         try:
             if action == "quote":
                 symbol = params.get("symbol", "000001.SZ")
-                result = finance_pro.get_stock_quote_a_share(symbol)
+                result = adapter.get_stock_quote(symbol)
                 return ExecutionResult(
-                    status=ExecutionStatus.SUCCESS if result.get("success") else ExecutionStatus.FAILED,
+                    status=ExecutionStatus.SUCCESS if result.success else ExecutionStatus.FAILED,
                     skill_name="finance-pro",
                     command=intent.raw_command,
-                    output=result,
-                    error=result.get("error"),
-                    duration_ms=int((time.time() - start_time) * 1000)
+                    output=result.data,
+                    error=result.error,
+                    duration_ms=result.latency_ms or int((time.time() - start_time) * 1000),
+                    metadata={"source": result.source}
                 )
             
             elif action == "analyze":
                 symbol = params.get("symbol", "000001.SZ")
                 indicators = params.get("indicators", "MA,RSI").split(",")
-                result = finance_pro.technical_analysis(symbol, indicators)
+                result = adapter.technical_analysis(symbol, indicators)
                 return ExecutionResult(
-                    status=ExecutionStatus.SUCCESS if result.get("success") else ExecutionStatus.FAILED,
+                    status=ExecutionStatus.SUCCESS if result.success else ExecutionStatus.FAILED,
                     skill_name="finance-pro",
                     command=intent.raw_command,
-                    output=result,
-                    error=result.get("error"),
-                    duration_ms=int((time.time() - start_time) * 1000)
+                    output=result.data,
+                    error=result.error,
+                    duration_ms=result.latency_ms or int((time.time() - start_time) * 1000),
+                    metadata={"source": result.source}
                 )
             
             elif action == "financial":
                 symbol = params.get("symbol", "000001.SZ")
-                result = finance_pro.get_financial_report(symbol)
+                result = adapter.get_financial_report(symbol)
                 return ExecutionResult(
-                    status=ExecutionStatus.SUCCESS if result.get("success") else ExecutionStatus.FAILED,
+                    status=ExecutionStatus.SUCCESS if result.success else ExecutionStatus.FAILED,
                     skill_name="finance-pro",
                     command=intent.raw_command,
-                    output=result,
-                    error=result.get("error"),
-                    duration_ms=int((time.time() - start_time) * 1000)
+                    output=result.data,
+                    error=result.error,
+                    duration_ms=result.latency_ms or int((time.time() - start_time) * 1000),
+                    metadata={"source": result.source}
+                )
+            
+            elif action == "history":
+                symbol = params.get("symbol", "000001.SZ")
+                period = params.get("period", "1mo")
+                result = adapter.get_stock_history(symbol, period)
+                return ExecutionResult(
+                    status=ExecutionStatus.SUCCESS if result.success else ExecutionStatus.FAILED,
+                    skill_name="finance-pro",
+                    command=intent.raw_command,
+                    output=result.data,
+                    error=result.error,
+                    duration_ms=result.latency_ms or int((time.time() - start_time) * 1000),
+                    metadata={"source": result.source}
                 )
             
             else:
@@ -550,7 +570,17 @@ product-pro 支持的动作:
 
 
 class ResearchProHandler(SkillHandler):
-    """研究专业包处理器"""
+    """研究专业包处理器 - 使用数据适配器"""
+    
+    def __init__(self):
+        self._adapter = None
+    
+    def _get_adapter(self):
+        """懒加载数据适配器"""
+        if self._adapter is None:
+            from data_adapter import get_research_adapter
+            self._adapter = get_research_adapter()
+        return self._adapter
     
     def can_handle(self, intent: ParsedIntent) -> bool:
         return intent.skill_name == "research-pro"
@@ -560,71 +590,83 @@ class ResearchProHandler(SkillHandler):
         
         action = intent.action
         params = intent.parameters
+        adapter = self._get_adapter()
         
-        if action == "deep":
-            topic = params.get("topic", "AI发展趋势")
+        try:
+            if action == "deep":
+                topic = params.get("topic", "AI发展趋势")
+                depth = params.get("depth", "comprehensive")
+                result = adapter.deep_research(topic, depth)
+                return ExecutionResult(
+                    status=ExecutionStatus.SUCCESS if result.success else ExecutionStatus.FAILED,
+                    skill_name="research-pro",
+                    command=intent.raw_command,
+                    output=result.data,
+                    error=result.error,
+                    duration_ms=result.latency_ms or int((time.time() - start_time) * 1000),
+                    metadata={"source": result.source}
+                )
+            
+            elif action == "search":
+                query = params.get("query", params.get("topic", "最新AI新闻"))
+                sources = params.get("sources", ["news", "blog"])
+                result = adapter.realtime_search(query, sources)
+                return ExecutionResult(
+                    status=ExecutionStatus.SUCCESS if result.success else ExecutionStatus.FAILED,
+                    skill_name="research-pro",
+                    command=intent.raw_command,
+                    output=result.data,
+                    error=result.error,
+                    duration_ms=result.latency_ms or int((time.time() - start_time) * 1000),
+                    metadata={"source": result.source}
+                )
+            
+            elif action == "analyze":
+                file_path = params.get("file", "data.csv")
+                return ExecutionResult(
+                    status=ExecutionStatus.SUCCESS,
+                    skill_name="research-pro",
+                    command=intent.raw_command,
+                    output={
+                        "action": "data_analysis",
+                        "file": file_path,
+                        "query": params.get("query", "统计分析"),
+                        "note": "数据分析需要接入文件系统"
+                    },
+                    duration_ms=int((time.time() - start_time) * 1000)
+                )
+            
+            elif action == "monitor":
+                competitors = params.get("competitors", ["竞争对手"])
+                return ExecutionResult(
+                    status=ExecutionStatus.SUCCESS,
+                    skill_name="research-pro",
+                    command=intent.raw_command,
+                    output={
+                        "action": "competitor_monitor",
+                        "competitors": competitors,
+                        "alerts": ["产品发布", "融资", "重大更新"]
+                    },
+                    duration_ms=int((time.time() - start_time) * 1000)
+                )
+            
+            else:
+                return ExecutionResult(
+                    status=ExecutionStatus.FAILED,
+                    skill_name="research-pro",
+                    command=intent.raw_command,
+                    error=f"未知动作: {action}",
+                    duration_ms=int((time.time() - start_time) * 1000)
+                )
+                
+        except Exception as e:
             return ExecutionResult(
-                status=ExecutionStatus.SUCCESS,
+                status=ExecutionStatus.FAILED,
                 skill_name="research-pro",
                 command=intent.raw_command,
-                output={
-                    "action": "deep_research",
-                    "topic": topic,
-                    "depth": params.get("depth", "comprehensive"),
-                    "sources": ["新闻", "论文", "报告"]
-                },
+                error=str(e),
                 duration_ms=int((time.time() - start_time) * 1000)
             )
-        
-        elif action == "analyze":
-            file_path = params.get("file", "data.csv")
-            return ExecutionResult(
-                status=ExecutionStatus.SUCCESS,
-                skill_name="research-pro",
-                command=intent.raw_command,
-                output={
-                    "action": "data_analysis",
-                    "file": file_path,
-                    "query": params.get("query", "统计分析")
-                },
-                duration_ms=int((time.time() - start_time) * 1000)
-            )
-        
-        elif action == "search":
-            query = params.get("query", params.get("topic", "最新AI新闻"))
-            return ExecutionResult(
-                status=ExecutionStatus.SUCCESS,
-                skill_name="research-pro",
-                command=intent.raw_command,
-                output={
-                    "action": "realtime_search",
-                    "query": query,
-                    "sources": params.get("sources", ["news", "blog"])
-                },
-                duration_ms=int((time.time() - start_time) * 1000)
-            )
-        
-        elif action == "monitor":
-            competitors = params.get("competitors", ["竞争对手"])
-            return ExecutionResult(
-                status=ExecutionStatus.SUCCESS,
-                skill_name="research-pro",
-                command=intent.raw_command,
-                output={
-                    "action": "competitor_monitor",
-                    "competitors": competitors,
-                    "alerts": ["产品发布", "融资", "重大更新"]
-                },
-                duration_ms=int((time.time() - start_time) * 1000)
-            )
-        
-        return ExecutionResult(
-            status=ExecutionStatus.FAILED,
-            skill_name="research-pro",
-            command=intent.raw_command,
-            error=f"未知动作: {action}",
-            duration_ms=int((time.time() - start_time) * 1000)
-        )
     
     def get_help(self) -> str:
         return """

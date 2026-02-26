@@ -14,6 +14,7 @@ description: 技能包CLI执行器 - 将SKILL.md定义转化为可执行命令�
 - **技能发现**: 自动扫描并注册技能包
 - **JSON输出**: 支持程序化调用
 - **AI桥接**: 自然语言到技能命令的智能转换
+- **真实数据接入**: ✅ 已接入 finance-pro 真实数据源
 
 ## 安装
 
@@ -78,12 +79,12 @@ research = quick_research("AI发展趋势")
 
 ## 支持的技能
 
-| 技能包 | 状态 | 自然语言示例 | 命令行示例 |
-|--------|------|--------------|------------|
-| finance-pro | ✅ 已实现 | "分析一下茅台股票" | `finance-pro quote --symbol 600519.SH` |
-| coding-pro | ✅ 已实现 | "生成一个Python爬虫" | `coding-pro generate --prompt "Python爬虫"` |
-| product-pro | ✅ 已实现 | "分析AI代码助手竞品" | `product-pro competitor --product "AI助手"` |
-| research-pro | ✅ 已实现 | "深度研究AI发展趋势" | `research-pro deep --topic "AI趋势"` |
+| 技能包 | 状态 | 数据类型 | 自然语言示例 | 命令行示例 |
+|--------|------|----------|--------------|------------|
+| finance-pro | ✅ 已实现 | **真实数据** (akshare) | "分析一下茅台股票" | `finance-pro quote --symbol 600519.SH` |
+| coding-pro | ✅ 已实现 | mock | "生成一个Python爬虫" | `coding-pro generate --prompt "Python爬虫"` |
+| product-pro | ✅ 已实现 | mock | "分析AI代码助手竞品" | `product-pro competitor --product "AI助手"` |
+| research-pro | ✅ 已实现 | mock | "深度研究AI发展趋势" | `research-pro deep --topic "AI趋势"` |
 
 ## 架构
 
@@ -91,10 +92,18 @@ research = quick_research("AI发展趋势")
 skill-cli/
 ├── skill-cli          # Bash入口脚本
 ├── skill-cli.py       # Python核心实现
-├── ai_bridge.py       # AI桥接层 ⭐新增
+├── ai_bridge.py       # AI桥接层
 ├── executor.py        # 执行引擎
+├── data_adapter.py    # 数据适配器 ⭐新增 - 连接真实数据源
 └── SKILL.md           # 本文档
 ```
+
+### 数据适配器 (data_adapter.py)
+
+核心组件：
+- **FinanceDataAdapter**: 连接 finance_pro.py 真实数据源
+- **ResearchDataAdapter**: 研究数据适配（预留扩展）
+- **自动降级**: 真实数据不可用时自动切换到mock模式
 
 ### AI桥接层 (ai_bridge.py)
 
@@ -108,17 +117,18 @@ skill-cli/
 
 1. 在 `executor.py` 的 `SkillRouter._register_handlers()` 中添加处理器
 2. 实现对应的 `SkillHandler` 子类
-3. 在 `ai_bridge.py` 的 `_preprocess_input()` 中添加意图映射
-4. 更新 SKILL.md 文档
-
-## 技术债务
-
-- [x] 自然语言命令接入AI执行 ✅ 已完成
-- [ ] 真正的数据获取实现(股票/搜索等) - 当前使用mock数据
-- [ ] 添加配置管理和凭证安全存储
-- [ ] 添加测试覆盖率
+3. 如需真实数据，在 `data_adapter.py` 中创建对应适配器
+4. 在 `ai_bridge.py` 的 `_preprocess_input()` 中添加意图映射
+5. 更新 SKILL.md 文档
 
 ## 更新日志
+
+### 2026-02-27
+- ✅ 实现数据适配器层 (data_adapter.py)
+- ✅ 接入 finance-pro 真实数据源 (akshare)
+- ✅ 支持自动降级到mock模式
+- ✅ 添加数据源状态追踪
+- ✅ 更新 executor.py 使用适配器模式
 
 ### 2026-02-27
 - ✅ 实现AI桥接层 (ai_bridge.py)
