@@ -3,3 +3,4 @@ USER.md
 secrets/
 *.token
 .claude/
+venv/
