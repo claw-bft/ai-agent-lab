@@ -1,51 +1,28 @@
 """
-ACP - Agent Collaboration Protocol
-
-多Agent协作协议Python实现
+Agent Collaboration Protocol (ACP) - 主入口
 """
-
-__version__ = "0.2.0"
-__author__ = "AI Agent Lab"
-
-from .core import (
-    ACPMessage,
-    ACPRegistry,
-    ACPAgent,
-    AgentInfo,
-    TaskRequest,
-    TaskResult,
-    MessageType,
-    TaskStatus,
-    AgentStatus
+from .message import (
+    Message, MessageType, AgentInfo, TaskRequest, TaskResponse,
+    TaskStatus, Priority, StatusUpdate,
+    create_task_request_message, create_task_response_message,
+    create_status_update_message, create_discovery_message
 )
+from .message_bus import MessageBus, InMemoryMessageBus, RedisMessageBus, MessageBusFactory
+from .agent import Agent
+from .workflow import WorkflowEngine, ParallelWorkflowEngine, Workflow, WorkflowStep, WorkflowStatus
 
-from .transport import (
-    TransportAdapter,
-    HTTPTransportAdapter,
-    RedisTransportAdapter,
-    ACPTransport
-)
-
+__version__ = "0.1.0"
 __all__ = [
-    # 版本
-    "__version__",
-    
-    # 核心类
-    "ACPMessage",
-    "ACPRegistry",
-    "ACPAgent",
-    "AgentInfo",
-    "TaskRequest",
-    "TaskResult",
-    
-    # 枚举
-    "MessageType",
-    "TaskStatus",
-    "AgentStatus",
-    
-    # 传输层
-    "TransportAdapter",
-    "HTTPTransportAdapter",
-    "RedisTransportAdapter",
-    "ACPTransport"
+    # 消息类型
+    "Message", "MessageType", "AgentInfo", "TaskRequest", "TaskResponse",
+    "TaskStatus", "Priority", "StatusUpdate",
+    # 消息工厂函数
+    "create_task_request_message", "create_task_response_message",
+    "create_status_update_message", "create_discovery_message",
+    # 消息总线
+    "MessageBus", "InMemoryMessageBus", "RedisMessageBus", "MessageBusFactory",
+    # Agent
+    "Agent",
+    # 工作流
+    "WorkflowEngine", "ParallelWorkflowEngine", "Workflow", "WorkflowStep", "WorkflowStatus",
 ]
