@@ -1,0 +1,21 @@
+{
+  "name": "ai-agent-self-monitor",
+  "version": "1.0.0",
+  "description": "AI Agent自我监控系统 - 让AI能观察自己的生理状态",
+  "main": "monitor.py",
+  "scripts": {
+    "monitor": "python3 monitor.py",
+    "test": "python3 -m pytest tests/"
+  },
+  "keywords": [
+    "ai-agent",
+    "monitoring",
+    "self-awareness",
+    "system-metrics"
+  ],
+  "author": "AI Agent",
+  "license": "MIT",
+  "dependencies": {
+    "psutil": "^5.9.0"
+  }
+}
