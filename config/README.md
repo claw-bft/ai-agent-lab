@@ -1,43 +1,30 @@
-# AI Agent Lab 配置管理
+# 统一配置管理系统
 
-## 配置目录结构
+集中管理所有凭证和配置，替代分散在 ~/.bashrc 中的环境变量。
+
+## 目录结构
 
 ```
-~/.openclaw/config/
-├── skills.json          # 技能包全局配置
-├── credentials.json     # API密钥和凭证 (gitignore)
-└── README.md           # 本文档
-```
-
-## 配置说明
-
-### skills.json
-技能包的全局配置，包含启用状态和功能开关。
-
-### credentials.json
-敏感凭证存储，**不应提交到Git仓库**。
-
-示例格式：
-```json
-{
-  "tushare_token": "your_token_here",
-  "openai_api_key": "your_key_here",
-  "tavily_api_key": "your_key_here"
-}
+config/
+├── credentials.yaml      # 加密存储的敏感凭证
+├── settings.yaml         # 普通配置
+├── config_manager.py     # 配置管理核心模块
+├── security.py           # 加密/解密工具
+├── migrate.py            # 从 ~/.bashrc 迁移配置
+└── validate.py           # 配置验证脚本
 ```
 
 ## 使用方法
 
 ```python
-from pathlib import Path
-import json
+from config.config_manager import ConfigManager
 
-config_dir = Path.home() / ".openclaw/config"
-skills_config = json.loads((config_dir / "skills.json").read_text())
+config = ConfigManager()
+vercel_token = config.get_credential('vercel', 'token')
 ```
 
-## 安全提醒
+## 安全说明
 
-- credentials.json 已添加到 .gitignore
-- 永远不要将真实API密钥提交到代码仓库
-- 定期轮换API密钥
+- 敏感凭证使用 Fernet 对称加密存储
+- 密钥存储在 ~/.openclaw/.config_key
+- 首次使用时自动生成密钥

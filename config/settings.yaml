@@ -1,0 +1,26 @@
+# 普通配置项（非敏感）
+# 此文件由 config_manager.py 自动管理
+
+# 系统配置
+system:
+  timezone: Asia/Shanghai
+  log_level: info
+  auto_update: false
+
+# 技能包配置
+skills:
+  default_timeout: 300
+  max_retries: 3
+  enable_cache: true
+
+# 网络配置
+network:
+  request_timeout: 30
+  max_connections: 10
+  verify_ssl: true
+
+# 监控配置
+monitor:
+  enabled: true
+  interval_seconds: 60
+  alert_threshold: 3
