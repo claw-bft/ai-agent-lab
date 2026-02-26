@@ -74,8 +74,8 @@ class IntentParser:
     # 技能关键词映射
     SKILL_KEYWORDS = {
         "finance-pro": [
-            "股票", "行情", "股价", "分析", "财报", "K线", "MACD", "RSI",
-            "quote", "analyze", "stock", "price", "financial", "report",
+            "股票", "行情", "股价", "财报", "K线", "MACD", "RSI",
+            "quote", "stock", "price", "financial", "report",
             "茅台", "腾讯", "阿里", "000001", "600519"
         ],
         "coding-pro": [
@@ -86,7 +86,7 @@ class IntentParser:
         "product-pro": [
             "产品", "PRD", "竞品", "PPT", "需求", "feature",
             "product", "competitor", "roadmap", "user research",
-            "market", "analysis"
+            "market", "analysis", "分析"
         ],
         "research-pro": [
             "研究", "搜索", "调研", "监控", "report",

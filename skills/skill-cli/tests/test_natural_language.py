@@ -106,7 +106,8 @@ def test_executor():
         print(f"   状态: {result.status.value}")
         print(f"   耗时: {result.duration_ms:.1f}ms")
         if result.output:
-            print(f"   输出预览: {result.output[:150]}...")
+            output_str = str(result.output)
+            print(f"   输出预览: {output_str[:150]}...")
     
     return True
 
