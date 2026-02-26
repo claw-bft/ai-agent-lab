@@ -221,8 +221,13 @@ class TestAICodeGenerator(unittest.TestCase):
     def test_estimate_complexity_high(self):
         """Test high complexity estimation"""
         complexity = self.generator._estimate_complexity(
-            "Create a full-featured e-commerce platform with user authentication, "
-            "payment processing, inventory management, and real-time notifications"
+            "Create a comprehensive full-featured enterprise-grade e-commerce platform with user authentication, "
+            "secure payment processing, advanced inventory management, real-time notifications, "
+            "powerful admin dashboard, multi-language internationalization support, advanced search and filtering features, "
+            "AI-powered recommendations engine, extensive social media integration, detailed analytics dashboard, "
+            "native mobile app support, extensive third-party API integrations, blockchain payment support, "
+            "custom machine learning models, high-quality video streaming capabilities, comprehensive IoT device management, "
+            "and enterprise-grade security features"
         )
         self.assertEqual(complexity, "high")
     

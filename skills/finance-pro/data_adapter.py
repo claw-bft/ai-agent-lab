@@ -97,18 +97,18 @@ class AkshareProvider(DataProvider):
                 "symbol": symbol,
                 "code": code,
                 "name": str(row.get('名称', 'N/A')),
-                "price": float(row.get('最新价', 0)) if pd.notna(row.get('最新价')) else 0,
-                "change_percent": float(row.get('涨跌幅', 0)) if pd.notna(row.get('涨跌幅')) else 0,
-                "change_amount": float(row.get('涨跌额', 0)) if pd.notna(row.get('涨跌额')) else 0,
-                "volume": int(row.get('成交量', 0)) if pd.notna(row.get('成交量')) else 0,
-                "amount": float(row.get('成交额', 0)) if pd.notna(row.get('成交额')) else 0,
-                "high": float(row.get('最高', 0)) if pd.notna(row.get('最高')) else 0,
-                "low": float(row.get('最低', 0)) if pd.notna(row.get('最低')) else 0,
-                "open": float(row.get('今开', 0)) if pd.notna(row.get('今开')) else 0,
-                "prev_close": float(row.get('昨收', 0)) if pd.notna(row.get('昨收')) else 0,
-                "pe_ttm": float(row.get('市盈率-动态', 0)) if pd.notna(row.get('市盈率-动态')) else None,
-                "pb": float(row.get('市净率', 0)) if pd.notna(row.get('市净率')) else None,
-                "market_cap": float(row.get('总市值', 0)) if pd.notna(row.get('总市值')) else None,
+                "price": float(row.get('最新价', 0)) if self._pd.notna(row.get('最新价')) else 0,
+                "change_percent": float(row.get('涨跌幅', 0)) if self._pd.notna(row.get('涨跌幅')) else 0,
+                "change_amount": float(row.get('涨跌额', 0)) if self._pd.notna(row.get('涨跌额')) else 0,
+                "volume": int(row.get('成交量', 0)) if self._pd.notna(row.get('成交量')) else 0,
+                "amount": float(row.get('成交额', 0)) if self._pd.notna(row.get('成交额')) else 0,
+                "high": float(row.get('最高', 0)) if self._pd.notna(row.get('最高')) else 0,
+                "low": float(row.get('最低', 0)) if self._pd.notna(row.get('最低')) else 0,
+                "open": float(row.get('今开', 0)) if self._pd.notna(row.get('今开')) else 0,
+                "prev_close": float(row.get('昨收', 0)) if self._pd.notna(row.get('昨收')) else 0,
+                "pe_ttm": float(row.get('市盈率-动态', 0)) if self._pd.notna(row.get('市盈率-动态')) else None,
+                "pb": float(row.get('市净率', 0)) if self._pd.notna(row.get('市净率')) else None,
+                "market_cap": float(row.get('总市值', 0)) if self._pd.notna(row.get('总市值')) else None,
                 "timestamp": datetime.now().isoformat()
             }
         except Exception as e:
@@ -185,8 +185,8 @@ class AkshareProvider(DataProvider):
                     {
                         "code": str(row['代码']),
                         "name": str(row['名称']),
-                        "price": float(row.get('最新价', 0)) if pd.notna(row.get('最新价')) else 0,
-                        "change": float(row.get('涨跌幅', 0)) if pd.notna(row.get('涨跌幅')) else 0
+                        "price": float(row.get('最新价', 0)) if self._pd.notna(row.get('最新价')) else 0,
+                        "change": float(row.get('涨跌幅', 0)) if self._pd.notna(row.get('涨跌幅')) else 0
                     }
                     for _, row in results.iterrows()
                 ]

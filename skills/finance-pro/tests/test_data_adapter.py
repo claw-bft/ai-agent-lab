@@ -79,32 +79,29 @@ class TestAkshareProvider(unittest.TestCase):
         
         # Mock akshare module
         mock_ak = Mock()
-        mock_df = Mock()
-        mock_df.empty = False
         
-        # Create mock row data
-        mock_row = Mock()
-        mock_row.get.side_effect = lambda key, default: {
-            '名称': '贵州茅台',
-            '最新价': 1800.50,
-            '涨跌幅': 1.5,
-            '涨跌额': 26.5,
-            '成交量': 10000,
-            '成交额': 18000000,
-            '最高': 1810.0,
-            '最低': 1790.0,
-            '今开': 1795.0,
-            '昨收': 1774.0,
-            '市盈率-动态': 30.5,
-            '市净率': 8.2,
-            '总市值': 2200000000000
-        }.get(key, default)
-        
-        mock_df.iloc = [mock_row]
-        mock_df.__getitem__ = Mock(return_value=mock_df)
+        # Create a proper mock DataFrame that behaves like pandas
+        import pandas as pd
+        mock_df = pd.DataFrame({
+            '代码': ['600519'],
+            '名称': ['贵州茅台'],
+            '最新价': [1800.50],
+            '涨跌幅': [1.5],
+            '涨跌额': [26.5],
+            '成交量': [10000],
+            '成交额': [18000000],
+            '最高': [1810.0],
+            '最低': [1790.0],
+            '今开': [1795.0],
+            '昨收': [1774.0],
+            '市盈率-动态': [30.5],
+            '市净率': [8.2],
+            '总市值': [2200000000000]
+        })
         mock_ak.stock_zh_a_spot_em.return_value = mock_df
         
         self.provider._ak = mock_ak
+        self.provider._pd = pd
         
         result = self.provider.get_stock_quote("600519.SH")
         self.assertTrue(result["success"])
@@ -152,23 +149,20 @@ class TestAkshareProvider(unittest.TestCase):
         """Test stock search"""
         mock_available.return_value = True
         
+        import pandas as pd
         mock_ak = Mock()
-        mock_df = Mock()
         
-        # Mock pandas str.contains
-        mock_series = Mock()
-        mock_series.str = Mock()
-        mock_series.str.contains = Mock(return_value=Mock())
-        
-        mock_df.__getitem__ = Mock(return_value=mock_df)
-        mock_df.head.return_value = mock_df
-        mock_df.iterrows.return_value = iter([
-            (0, {"代码": "600519", "名称": "贵州茅台", "最新价": 1800.0, "涨跌幅": 1.5})
-        ])
+        # Create a proper mock DataFrame for search
+        mock_df = pd.DataFrame({
+            '代码': ['600519', '000001'],
+            '名称': ['贵州茅台', '平安银行'],
+            '最新价': [1800.0, 10.5],
+            '涨跌幅': [1.5, -0.5]
+        })
         mock_ak.stock_zh_a_spot_em.return_value = mock_df
         
         self.provider._ak = mock_ak
-        self.provider._pd = Mock()
+        self.provider._pd = pd
         
         result = self.provider.search_stocks("茅台")
         self.assertTrue(result["success"])
