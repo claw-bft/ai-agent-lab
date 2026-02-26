@@ -1,0 +1,58 @@
+# AI Agent Lab - 测试自动化体系
+
+name: Test Suite
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+  schedule:
+    # 每小时运行一次测试
+    - cron: '0 * * * *'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.10', '3.11', '3.12']
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest pytest-cov
+          # 安装各技能的依赖
+          for skill in skill-cli finance-pro coding-pro product-pro research-pro; do
+            if [ -f "skills/$skill/requirements.txt" ]; then
+              pip install -r "skills/$skill/requirements.txt"
+            fi
+          done
+
+      - name: Run tests with pytest
+        run: |
+          python tests/run_all_tests.py
+
+      - name: Upload coverage report
+        if: matrix.python-version == '3.12'
+        uses: codecov/codecov-action@v3
+        with:
+          file: ./coverage.xml
+          fail_ci_if_error: false
+
+      - name: Archive test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-${{ matrix.python-version }}
+          path: |
+            tests/test_report.json
+            **/pytest-report.xml

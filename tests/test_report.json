@@ -1,0 +1,58 @@
+{
+  "timestamp": "2026-02-27T01:31:07.346763",
+  "summary": {
+    "total_passed": 0,
+    "total_failed": 0,
+    "total_errors": 0,
+    "total_tests": 0
+  },
+  "results": [
+    {
+      "skill": "skills/skill-cli",
+      "tests_found": true,
+      "passed": 0,
+      "failed": 0,
+      "errors": 0,
+      "duration_ms": 15,
+      "output": "/usr/bin/python3: No module named pytest\n",
+      "success": false
+    },
+    {
+      "skill": "skills/finance-pro",
+      "tests_found": false,
+      "passed": 0,
+      "failed": 0,
+      "errors": 0,
+      "duration_ms": 0,
+      "output": "No tests directory found"
+    },
+    {
+      "skill": "skills/coding-pro",
+      "tests_found": false,
+      "passed": 0,
+      "failed": 0,
+      "errors": 0,
+      "duration_ms": 0,
+      "output": "No tests directory found"
+    },
+    {
+      "skill": "skills/product-pro",
+      "tests_found": false,
+      "passed": 0,
+      "failed": 0,
+      "errors": 0,
+      "duration_ms": 0,
+      "output": "No tests directory found"
+    },
+    {
+      "skill": "skills/research-pro",
+      "tests_found": true,
+      "passed": 0,
+      "failed": 0,
+      "errors": 0,
+      "duration_ms": 15,
+      "output": "/usr/bin/python3: No module named pytest\n",
+      "success": false
+    }
+  ]
+}

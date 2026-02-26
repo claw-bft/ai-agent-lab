@@ -293,30 +293,37 @@ class FinanceProHandler(SkillHandler):
         action = intent.action
         params = intent.parameters
         
-        # 导入finance-pro模块
+        # 导入finance-pro模块 - 直接使用mock模块避免网络问题
+        import importlib.util
+        
+        spec = importlib.util.spec_from_file_location('finance_pro', str(SKILLS_DIR / 'finance-pro' / 'finance_pro_mock.py'))
+        finance_pro = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(finance_pro)
+        
+        # 执行对应的动作
         try:
-            sys.path.insert(0, str(SKILLS_DIR / "finance-pro"))
-            import finance_pro
-            
             if action == "quote":
                 symbol = params.get("symbol", "000001.SZ")
-                result = finance_pro.get_stock_quote(symbol)
+                result = finance_pro.get_stock_quote_a_share(symbol)
                 return ExecutionResult(
-                    status=ExecutionStatus.SUCCESS,
+                    status=ExecutionStatus.SUCCESS if result.get("success") else ExecutionStatus.FAILED,
                     skill_name="finance-pro",
                     command=intent.raw_command,
                     output=result,
+                    error=result.get("error"),
                     duration_ms=int((time.time() - start_time) * 1000)
                 )
             
             elif action == "analyze":
                 symbol = params.get("symbol", "000001.SZ")
-                result = finance_pro.analyze_stock(symbol)
+                indicators = params.get("indicators", "MA,RSI").split(",")
+                result = finance_pro.technical_analysis(symbol, indicators)
                 return ExecutionResult(
-                    status=ExecutionStatus.SUCCESS,
+                    status=ExecutionStatus.SUCCESS if result.get("success") else ExecutionStatus.FAILED,
                     skill_name="finance-pro",
                     command=intent.raw_command,
                     output=result,
+                    error=result.get("error"),
                     duration_ms=int((time.time() - start_time) * 1000)
                 )
             
@@ -324,10 +331,11 @@ class FinanceProHandler(SkillHandler):
                 symbol = params.get("symbol", "000001.SZ")
                 result = finance_pro.get_financial_report(symbol)
                 return ExecutionResult(
-                    status=ExecutionStatus.SUCCESS,
+                    status=ExecutionStatus.SUCCESS if result.get("success") else ExecutionStatus.FAILED,
                     skill_name="finance-pro",
                     command=intent.raw_command,
                     output=result,
+                    error=result.get("error"),
                     duration_ms=int((time.time() - start_time) * 1000)
                 )
             
