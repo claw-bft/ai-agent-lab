@@ -8,7 +8,7 @@ import unittest
 from pathlib import Path
 
 # 添加被测代码路径
-sys.path.insert(0, str(Path(__file__).parent.parent / "skill-cli"))
+sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from executor import (
     IntentParser, SkillRouter, SkillExecutor,
