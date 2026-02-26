@@ -11,7 +11,7 @@
 ### VERCEL_TOKEN
 - **状态**: ✅ 已配置
 - **位置**: ~/.bashrc 第103行
-- **值**: vcp_8CnZxMGVDbcYde49qIp77UmmDu7Df67MPf9dhGSsZfWWAH7SKX1Ag5GK
+- **值**: [REDACTED]
 - **验证**: `grep "VERCEL" ~/.bashrc`
 - **CLI**: vercel --version 可用
 - **警告**: 用户极度厌恶重复询问此配置

@@ -18,7 +18,7 @@ _这是你的档案，我会持续更新。_
 ### 已配置的服务
 - **Vercel**: 已配置 TOKEN
   - Token位置: `~/.bashrc` 第103行
-  - Token值: `vcp_8CnZxMGVDbcYde49qIp77UmmDu7Df67MPf9dhGSsZfWWAH7SKX1Ag5GK`
+  - Token值: `[REDACTED]`
   - CLI版本: 50.23.2
   - 验证方式: `vercel --version` 可正常识别
   
