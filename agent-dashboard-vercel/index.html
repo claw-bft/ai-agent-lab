@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agent Dashboard</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg-primary: #0d1117;
+            --bg-secondary: #161b22;
+            --bg-tertiary: #21262d;
+            --text-primary: #c9d1d9;
+            --text-secondary: #8b949e;
+            --accent-primary: #58a6ff;
+            --accent-success: #238636;
+            --accent-warning: #d29922;
+            --accent-danger: #da3633;
+            --border-color: #30363d;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+        .header {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header h1 { font-size: 1.5rem; font-weight: 600; display: flex; align-items: center; gap: 0.5rem; }
+        .header h1::before { content: '🤖'; }
+        .status-bar {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+        .status-bar .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--accent-success);
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        .container { max-width: 1400px; margin: 0 auto; padding: 2rem; }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        .stat-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+        }
+        .stat-card .label { font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 0.5rem; }
+        .stat-card .value { font-size: 2rem; font-weight: 700; color: var(--accent-primary); }
+        .sessions-table {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .sessions-table table { width: 100%; border-collapse: collapse; }
+        .sessions-table th, .sessions-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .sessions-table th {
+            background: var(--bg-tertiary);
+            font-weight: 600;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+        .sessions-table tr:hover { background: rgba(255,255,255,0.05); }
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        .badge-success { background: rgba(35, 134, 54, 0.2); color: var(--accent-success); }
+        .badge-warning { background: rgba(210, 153, 34, 0.2); color: var(--accent-warning); }
+        .badge-danger { background: rgba(218, 54, 51, 0.2); color: var(--accent-danger); }
+        .last-update { font-size: 0.75rem; color: var(--text-secondary); }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Agent Dashboard</h1>
+        <div class="status-bar">
+            <span class="dot"></span>
+            <span>已连接</span>
+            <span class="last-update" id="lastUpdate"></span>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="label">总会话数</div>
+                <div class="value" id="totalSessions">-</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">活跃会话</div>
+                <div class="value" id="activeSessions">-</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">已完成</div>
+                <div class="value" id="completedSessions">-</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">总Token数</div>
+                <div class="value" id="totalTokens">-</div>
+            </div>
+        </div>
+        
+        <div class="sessions-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>类型</th>
+                        <th>状态</th>
+                        <th>更新时间</th>
+                    </tr>
+                </thead>
+                <tbody id="sessionsBody">
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // 嵌入的数据
+        const DATA = {"stats": {"totalSessions": 22, "activeSessions": 0, "completedSessions": 22, "totalTokens": 0, "lastUpdate": "2026-02-26T10:19:39.173497"}, "sessions": [{"id": "af0a5295-21db-4308-bced-703e76e88eff", "status": "completed"}, {"id": "a3e8b48f-ea60-49fc-9a09-5768b6c83672", "status": "completed"}, {"id": "e92172cd-503d-4f1a-af63-edd8f04fae48", "status": "completed"}, {"id": "62c86f37-4d46-465e-bd21-dcd12915fa38", "status": "completed"}, {"id": "5275419b-d2e8-4ac6-be74-9e746a4d7452", "status": "completed"}, {"id": "143aad64-31f6-448b-a996-76fb940850c9", "status": "completed"}, {"id": "95adcedc-a27c-4784-81e9-82b3e0a99990", "status": "completed"}, {"id": "f7797916-2ee6-4906-aa36-afffbdc2aeb7", "status": "completed"}, {"id": "d0154b02-4e05-45ff-ba83-83e035adbfc0", "status": "completed"}, {"id": "491fda6f-2f4c-4361-817c-a78a83d67e33", "status": "completed"}, {"id": "796594bd-b663-4d80-8a4b-1ea0f4228783", "status": "active"}, {"id": "19bfc5e4-d13a-4466-bd85-cfe3ce15e8d8", "status": "active"}, {"id": "e24f3cdc-3eb2-42f9-8418-cd0d7aa6915d", "status": "completed"}, {"id": "ca9ff6db-bb33-45cc-a522-23856ac52f94", "status": "completed"}, {"id": "a5c0930d-0713-457a-badc-7dd7f0c37d08", "status": "active"}, {"id": "c917aaf8-0926-4761-b274-f9002773e44b", "status": "completed"}, {"id": "b7a27cb7-ea91-4220-8ff8-f93868d01340", "status": "completed"}, {"id": "42c9efdb-7515-4541-a70d-946d5ae031fa", "status": "completed"}, {"id": "39446ab5-0e4e-4663-a7a7-12f742bbed21", "status": "completed"}, {"id": "42119ac4-3b32-42a4-8ab0-6bec088305cd", "status": "completed"}, {"id": "329f2cfc-f2a2-4ac1-a906-aac3588d7f71", "status": "completed"}, {"id": "8e5a7a8e-a9eb-41eb-9703-897eebbadc45", "status": "completed"}]};
+        
+        // 渲染数据
+        document.getElementById('totalSessions').textContent = DATA.stats.totalSessions;
+        document.getElementById('activeSessions').textContent = DATA.stats.activeSessions;
+        document.getElementById('completedSessions').textContent = DATA.stats.completedSessions;
+        document.getElementById('totalTokens').textContent = DATA.stats.totalTokens;
+        
+        document.getElementById('lastUpdate').textContent = '更新于 ' + new Date(DATA.stats.lastUpdate).toLocaleTimeString('zh-CN');
+        
+        const tbody = document.getElementById('sessionsBody');
+        tbody.innerHTML = DATA.sessions.map(s => `
+            <tr>
+                <td>${s.id.substring(0, 12)}...</td>
+                <td>${s.kind || 'session'}</td>
+                <td><span class="badge ${s.status === 'active' ? 'badge-success' : 'badge-warning'}">${s.status}</span></td>
+                <td>${s.updatedAtFormatted || '-'}</td>
+            </tr>
+        `).join('');
+    </script>
+</body>
+</html>

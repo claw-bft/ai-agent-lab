@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LLM Coding Benchmark 2026 | AI编程能力全景对比</title>    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0a0a0f; --bg-secondary: #12121a; --bg-card: #1a1a25;
+            --border: #2a2a3a; --text: #e8e8f0; --text-muted: #8888a0;
+            --accent: #6366f1; --accent-light: #818cf8;
+            --success: #10b981; --warning: #f59e0b; --danger: #ef4444;
+            --claude: #d97757; --gpt: #10a37f; --gemini: #4285f4; --grok: #ff6b6b; --kimi: #ff6b35;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', 'Noto Sans SC', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg); color: var(--text); line-height: 1.6; min-height: 100vh;
+        }
+        .container { max-width: 1400px; margin: 0 auto; padding: 0 1.5rem; }
+        header {
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg) 100%);
+            border-bottom: 1px solid var(--border); padding: 1.5rem 0;
+            position: sticky; top: 0; z-index: 100; backdrop-filter: blur(10px);
+        }
+        .header-content { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
+        .logo { display: flex; align-items: center; gap: 0.75rem; }
+        .logo-icon {
+            width: 42px; height: 42px;
+            background: linear-gradient(135deg, var(--accent) 0%, #8b5cf6 100%);
+            border-radius: 12px; display: flex; align-items: center; justify-content: center;
+            font-size: 1.25rem;
+        }
+        .logo-text { font-size: 1.25rem; font-weight: 700; background: linear-gradient(135deg, #fff 0%, var(--accent-light) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .nav-tabs { display: flex; gap: 0.5rem; background: var(--bg-card); padding: 0.25rem; border-radius: 10px; }
+        .nav-tab { padding: 0.5rem 1rem; border-radius: 8px; cursor: pointer; font-size: 0.875rem; font-weight: 500; transition: all 0.2s; border: none; background: transparent; color: var(--text-muted); }
+        .nav-tab:hover { color: var(--text); } .nav-tab.active { background: var(--accent); color: white; }
+        .hero { padding: 3rem 0; text-align: center; }
+        .hero h1 { font-size: 2.5rem; font-weight: 700; margin-bottom: 1rem; background: linear-gradient(135deg, #fff 0%, var(--accent-light) 50%, #a78bfa 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .hero p { color: var(--text-muted); font-size: 1.125rem; max-width: 600px; margin: 0 auto; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin: 2rem 0; }
+        .stat-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 1.5rem; text-align: center; transition: transform 0.2s, box-shadow 0.2s; }
+        .stat-card:hover { transform: translateY(-2px); box-shadow: 0 10px 40px rgba(99, 102, 241, 0.1); }
+        .stat-value { font-size: 2rem; font-weight: 700; margin-bottom: 0.25rem; }
+        .stat-label { color: var(--text-muted); font-size: 0.875rem; }
+        .section { display: none; padding: 2rem 0; } .section.active { display: block; }
+        .section-title { font-size: 1.5rem; font-weight: 600; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem; }
+        .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 1.5rem; margin-bottom: 1.5rem; }
+        .card-title { font-size: 1.125rem; font-weight: 600; margin-bottom: 1rem; }
+        .chart-container { position: relative; height: 400px; margin: 1rem 0; }
+        .model-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1rem; }
+        .model-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 1.25rem; transition: all 0.2s; cursor: pointer; }
+        .model-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+        .model-card.selected { border-color: var(--accent); background: rgba(99, 102, 241, 0.1); }
+        .model-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem; }
+        .model-name { font-weight: 600; font-size: 1.1rem; }
+        .model-provider { font-size: 0.75rem; padding: 0.25rem 0.5rem; border-radius: 4px; font-weight: 500; }
+        .provider-claude { background: rgba(217, 119, 87, 0.2); color: var(--claude); }
+        .provider-gpt { background: rgba(16, 163, 127, 0.2); color: var(--gpt); }
+        .provider-gemini { background: rgba(66, 133, 244, 0.2); color: var(--gemini); }
+        .provider-grok { background: rgba(255, 107, 107, 0.2); color: var(--grok); }
+        .provider-kimi { background: rgba(255, 107, 53, 0.2); color: var(--kimi); }
+        .model-stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
+        .model-stat { background: rgba(255, 255, 255, 0.03); padding: 0.75rem; border-radius: 8px; }
+        .model-stat-value { font-size: 1.25rem; font-weight: 700; color: var(--accent-light); }
+        .model-stat-label { font-size: 0.75rem; color: var(--text-muted); }
+        .filters { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
+        .filter-btn { padding: 0.5rem 1rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px; color: var(--text-muted); cursor: pointer; transition: all 0.2s; font-size: 0.875rem; }
+        .filter-btn:hover, .filter-btn.active { background: var(--accent); border-color: var(--accent); color: white; }
+        .calc-input { display: flex; gap: 1rem; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; }
+        .calc-input label { font-weight: 500; }
+        .calc-input input { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 0.75rem 1rem; color: var(--text); font-size: 1rem; width: 200px; }
+        .calc-input input:focus { outline: none; border-color: var(--accent); }
+        .cost-table { width: 100%; border-collapse: collapse; }
+        .cost-table th, .cost-table td { padding: 1rem; text-align: left; border-bottom: 1px solid var(--border); }
+        .cost-table th { color: var(--text-muted); font-weight: 500; font-size: 0.875rem; }
+        .cost-table tr:hover { background: rgba(255, 255, 255, 0.02); }
+        .cost-value { font-weight: 600; color: var(--success); } .cost-value.expensive { color: var(--danger); }
+        .recommendation-card { background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%); border: 1px solid rgba(99, 102, 241, 0.3); border-radius: 16px; padding: 1.5rem; margin-top: 1rem; }
+        .recommendation-title { font-weight: 600; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem; }
+        footer { text-align: center; padding: 2rem 0; border-top: 1px solid var(--border); color: var(--text-muted); font-size: 0.875rem; margin-top: 2rem; }
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 1.75rem; } .nav-tabs { overflow-x: auto; width: 100%; }
+            .chart-container { height: 300px; } .model-grid { grid-template-columns: 1fr; }
+            .cost-table { font-size: 0.875rem; } .cost-table th, .cost-table td { padding: 0.75rem 0.5rem; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <div class="logo-icon">🤖</div>
+                    <div class="logo-text">LLM Coding Benchmark</div>
+                </div>
+                <nav class="nav-tabs">
+                    <button class="nav-tab active" onclick="showSection('overview')">概览</button>
+                    <button class="nav-tab" onclick="showSection('comparison')">对比分析</button>
+                    <button class="nav-tab" onclick="showSection('calculator')">成本计算</button>
+                    <button class="nav-tab" onclick="showSection('recommend')">智能推荐</button>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="container">
+            <h1>2026 LLM 编程能力全景对比</h1>
+            <p>基于 LiveCodeBench、SWE-bench、Aider Polyglot 等权威评测数据，帮你找到最适合的编程 AI</p>
+            <div class="stats-grid">
+                <div class="stat-card"><div class="stat-value" style="color: var(--success)">15+</div><div class="stat-label">评测模型</div></div>
+                <div class="stat-card"><div class="stat-value" style="color: var(--accent-light)">4</div><div class="stat-label">核心指标</div></div>
+                <div class="stat-card"><div class="stat-value" style="color: var(--warning)">10M</div><div class="stat-label">最大上下文</div></div>
+                <div class="stat-card"><div class="stat-value" style="color: var(--danger)">$75</div><div class="stat-label">最高输出单价/1M</div></div>
+            </div>
+        </div>
+    </section>
+
+    <main class="container">
+        <div id="overview" class="section active">
+            <div class="card">
+                <div class="card-title">🏆 编程能力综合排名 (SWE-bench)</div>
+                <div class="chart-container"><canvas id="rankingChart"></canvas></div>
+            </div>
+            <div class="card">
+                <div class="card-title">📊 各维度能力分布</div>
+                <div class="chart-container"><canvas id="radarChart"></canvas></div>
+            </div>
+            <div class="section-title">🤖 热门模型</div>
+            <div class="model-grid" id="modelGrid"></div>
+        </div>
+
+        <div id="comparison" class="section">
+            <div class="card">
+                <div class="card-title">🔍 选择要对比的模型 (最多5个)</div>
+                <div class="filters" id="providerFilters">
+                    <button class="filter-btn active" onclick="filterModels('all')">全部</button>
+                    <button class="filter-btn" onclick="filterModels('claude')">Claude</button>
+                    <button class="filter-btn" onclick="filterModels('gpt')">GPT</button>
+                    <button class="filter-btn" onclick="filterModels('gemini')">Gemini</button>
+                    <button class="filter-btn" onclick="filterModels('grok')">Grok</button>
+                    <button class="filter-btn" onclick="filterModels('kimi')">Kimi</button>
+                </div>
+                <div class="model-grid" id="compareModelGrid"></div>
+            </div>
+            <div class="card" id="comparisonChartCard" style="display: none;">
+                <div class="card-title">📈 对比图表</div>
+                <div class="chart-container"><canvas id="comparisonChart"></canvas></div>
+            </div>
+        </div>
+
+        <div id="calculator" class="section">
+            <div class="card">
+                <div class="card-title">💰 API 成本计算器</div>
+                <div class="calc-input">
+                    <label>输入 Token 数量（百万）:</label>
+                    <input type="number" id="tokenInput" value="1" min="0.1" step="0.1" onchange="calculateCosts()">
+                </div>
+                <div class="calc-input">
+                    <label>输出 Token 数量（百万）:</label>
+                    <input type="number" id="outputTokenInput" value="0.5" min="0.1" step="0.1" onchange="calculateCosts()">
+                </div>
+                <table class="cost-table">
+                    <thead><tr><th>模型</th><th>输入成本</th><th>输出成本</th><th>总成本</th><th>性价比</th></tr></thead>
+                    <tbody id="costTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="recommend" class="section">
+            <div class="card">
+                <div class="card-title">🎯 使用场景推荐</div>
+                <div class="filters">
+                    <button class="filter-btn active" onclick="showRecommendation('agentic')">Agentic Coding</button>
+                    <button class="filter-btn" onclick="showRecommendation('daily')">日常开发</button>
+                    <button class="filter-btn" onclick="showRecommendation('cost')">高性价比</button>
+                    <button class="filter-btn" onclick="showRecommendation('complex')">复杂推理</button>
+                </div>
+                <div id="recommendationContent"></div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>数据来源: Vellum AI, LiveCodeBench, SWE-bench, Aider Polyglot | 最后更新: 2026年2月</p>
+        </div>
+    </footer>
+
+    <script>
+        const models = [
+            { id: 'claude-opus-4.5', name: 'Claude Opus 4.5', provider: 'claude', livecode: null, sweBench: 80.9, aider: 89.4, hle: null, context: 200000, inputCost: 5, outputCost: 25, description: '代码编辑能力最强，适合复杂重构' },
+            { id: 'claude-sonnet-4.5', name: 'Claude Sonnet 4.5', provider: 'claude', livecode: null, sweBench: 82, aider: null, hle: null, context: 200000, inputCost: 3, outputCost: 15, description: 'SWE-bench 冠军，Agentic Coding 首选' },
+            { id: 'gpt-5.2', name: 'GPT 5.2', provider: 'gpt', livecode: null, sweBench: 80, aider: null, hle: null, context: 400000, inputCost: 1.5, outputCost: 14, description: '大上下文窗口，适合大型代码库' },
+            { id: 'gpt-5', name: 'GPT-5', provider: 'gpt', livecode: null, sweBench: 74.9, aider: 88, hle: 35.2, context: 400000, inputCost: 1.25, outputCost: 10, description: '综合能力均衡，Aider 表现优秀' },
+            { id: 'gemini-3-pro', name: 'Gemini 3 Pro', provider: 'gemini', livecode: 79.7, sweBench: 76.2, aider: null, hle: 45.8, context: 10000000, inputCost: 2, outputCost: 12, description: '超大上下文，综合推理最强' },
+            { id: 'gemini-2.5-pro', name: 'Gemini 2.5 Pro', provider: 'gemini', livecode: 69, sweBench: 59.6, aider: 82.2, hle: 21.6, context: 1000000, inputCost: 1.25, outputCost: 10, description: '高性价比，Aider 能力突出' },
+            { id: 'kimi-k2', name: 'Kimi K2 Thinking', provider: 'kimi', livecode: 83.1, sweBench: 71.3, aider: null, hle: 44.9, context: 256000, inputCost: 0.6, outputCost: 2.5, description: 'LiveCodeBench 冠军，性价比之王' },
+            { id: 'grok-4', name: 'Grok 4', provider: 'grok', livecode: 79, sweBench: 75, aider: null, hle: 25.4, context: 256000, inputCost: null, outputCost: null, description: 'LiveCodeBench 表现优秀' },
+            { id: 'grok-3', name: 'Grok 3 [Beta]', provider: 'grok', livecode: 79.4, sweBench: null, aider: null, hle: null, context: null, inputCost: null, outputCost: null, description: '实时编程能力强' },
+            { id: 'o3', name: 'OpenAI o3', provider: 'gpt', livecode: null, sweBench: 69.1, aider: 81.3, hle: null, context: 200000, inputCost: 10, outputCost: 40, description: '推理能力强，但价格昂贵' },
+            { id: 'o3-mini', name: 'OpenAI o3-mini', provider: 'gpt', livecode: 74.1, sweBench: 61, aider: 60.4, hle: null, context: 200000, inputCost: 1.1, outputCost: 4.4, description: '轻量级推理模型，性价比高' }
+        ];
+
+        let selectedModels = [];
+        let rankingChart, radarChart, comparisonChart;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderModelGrid();
+            renderCompareModelGrid();
+            initCharts();
+            calculateCosts();
+            showRecommendation('agentic');
+        });
+
+        function showSection(sectionId) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+            document.getElementById(sectionId).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        function renderModelGrid() {
+            const grid = document.getElementById('modelGrid');
+            const topModels = models.slice(0, 6);
+            grid.innerHTML = topModels.map(model => `
+                <div class="model-card">
+                    <div class="model-header">
+                        <div class="model-name">${model.name}</div>
+                        <span class="model-provider provider-${model.provider}">${model.provider.toUpperCase()}</span>
+                    </div>
+                    <p style="color: var(--text-muted); font-size: 0.875rem; margin-bottom: 1rem;">${model.description}</p>
+                    <div class="model-stats">
+                        <div class="model-stat"><div class="model-stat-value">${model.sweBench || '-'}</div><div class="model-stat-label">SWE-bench</div></div>
+                        <div class="model-stat"><div class="model-stat-value">${model.livecode || '-'}</div><div class="model-stat-label">LiveCode</div></div>
+                        <div class="model-stat"><div class="model-stat-value">${model.aider || '-'}</div><div class="model-stat-label">Aider</div></div>
+                        <div class="model-stat"><div class="model-stat-value">${model.context ? (model.context / 1000).toFixed(0) + 'k' : '-'}</div><div class="model-stat-label">上下文</div></div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderCompareModelGrid() {
+            const grid = document.getElementById('compareModelGrid');
+            grid.innerHTML = models.map(model => `
+                <div class="model-card ${selectedModels.includes(model.id) ? 'selected' : ''}" 
+                     onclick="toggleCompareModel('${model.id}')"
+                     data-provider="${model.provider}">
+                    <div class="model-header">
+                        <div class="model-name">${model.name}</div>
+                        <span class="model-provider provider-${model.provider}">${model.provider.toUpperCase()}</span>
+                    </div>
+                    <p style="color: var(--text-muted); font-size: 0.875rem;">${model.description}</p>
+                </div>
+            `).join('');
+        }
+
+        function toggleCompareModel(id) {
+            const index = selectedModels.indexOf(id);
+            if (index > -1) {
+                selectedModels.splice(index, 1);
+            } else if (selectedModels.length < 5) {
+                selectedModels.push(id);
+            }
+            renderCompareModelGrid();
+            updateComparisonChart();
+        }
+
+        function filterModels(provider) {
+            document.querySelectorAll('#providerFilters .filter-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            const cards = document.querySelectorAll('#compareModelGrid .model-card');
+            cards.forEach(card => {
+                card.style.display = (provider === 'all' || card.dataset.provider === provider) ? 'block' : 'none';
+            });
+        }
+
+        function initCharts() {
+            const rankingCtx = document.getElementById('rankingChart').getContext('2d');
+            const sortedModels = [...models].sort((a, b) => (b.sweBench || 0) - (a.sweBench || 0)).slice(0, 8);
+            
+            rankingChart = new Chart(rankingCtx, {
+                type: 'bar',
+                data: {
+                    labels: sortedModels.map(m => m.name),
+                    datasets: [{
+                        label: 'SWE-bench (%)',
+                        data: sortedModels.map(m => m.sweBench),
+                        backgroundColor: sortedModels.map(m => {
+                            const colors = { claude: 'rgba(217, 119, 87, 0.8)', gpt: 'rgba(16, 163, 127, 0.8)', gemini: 'rgba(66, 133, 244, 0.8)', grok: 'rgba(255, 107, 107, 0.8)', kimi: 'rgba(255, 107, 53, 0.8)' };
+                            return colors[m.provider];
+                        }),
+                        borderRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: true, max: 100, grid: { color: 'rgba(255, 255, 255, 0.05)' }, ticks: { color: '#8888a0' } },
+                        x: { grid: { display: false }, ticks: { color: '#8888a0', maxRotation: 45 } }
+                    }
+                }
+            });
+
+            const radarCtx = document.getElementById('radarChart').getContext('2d');
+            const topModels = models.filter(m => m.sweBench && m.livecode && m.aider).slice(0, 4);
+            
+            radarChart = new Chart(radarCtx, {
+                type: 'radar',
+                data: {
+                    labels: ['SWE-bench', 'LiveCodeBench', 'Aider Polyglot', 'Humanity\'s Last Exam'],
+                    datasets: topModels.map((model, i) => ({
+                        label: model.name,
+                        data: [model.sweBench || 0, model.livecode || 0, model.aider || 0, model.hle || 0],
+                        borderColor: ['#d97757', '#10a37f', '#4285f4', '#ff6b35'][i],
+                        backgroundColor: ['rgba(217, 119, 87, 0.2)', 'rgba(16, 163, 127, 0.2)', 'rgba(66, 133, 244, 0.2)', 'rgba(255, 107, 53, 0.2)'][i],
+                        pointBackgroundColor: ['#d97757', '#10a37f', '#4285f4', '#ff6b35'][i]
+                    }))
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    scales: {
+                        r: { beginAtZero: true, max: 100, grid: { color: 'rgba(255, 255, 255, 0.1)' }, pointLabels: { color: '#e8e8f0' }, ticks: { color: '#8888a0', backdropColor: 'transparent' } }
+                    },
+                    plugins: { legend: { labels: { color: '#e8e8f0' } } }
+                }
+            });
+        }
+
+        function updateComparisonChart() {
+            const card = document.getElementById('comparisonChartCard');
+            if (selectedModels.length === 0) { card.style.display = 'none'; return; }
+            card.style.display = 'block';
+            const selected = models.filter(m => selectedModels.includes(m.id));
+            
+            if (comparisonChart) comparisonChart.destroy();
+            const ctx = document.getElementById('comparisonChart').getContext('2d');
+            comparisonChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: selected.map(m => m.name),
+                    datasets: [
+                        { label: 'SWE-bench', data: selected.map(m => m.sweBench || 0), backgroundColor: 'rgba(99, 102, 241, 0.8)' },
+                        { label: 'LiveCodeBench', data: selected.map(m => m.livecode || 0), backgroundColor: 'rgba(139, 92, 246, 0.8)' },
+                        { label: 'Aider', data: selected.map(m => m.aider || 0), backgroundColor: 'rgba(16, 185, 129, 0.8)' }
+                    ]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { labels: { color: '#e8e8f0' } } },
+                    scales: {
+                        y: { beginAtZero: true, max: 100, grid: { color: 'rgba(255, 255, 255, 0.05)' }, ticks: { color: '#8888a0' } },
+                        x: { grid: { display: false }, ticks: { color: '#8888a0' } }
+                    }
+                }
+            });
+        }
+
+        function calculateCosts() {
+            const inputTokens = parseFloat(document.getElementById('tokenInput').value) || 0;
+            const outputTokens = parseFloat(document.getElementById('outputTokenInput').value) || 0;
+            const tbody = document.getElementById('costTableBody');
+            const modelsWithCost = models.filter(m => m.inputCost && m.outputCost);
+            
+            const costData = modelsWithCost.map(model => {
+                const inputCost = model.inputCost * inputTokens;
+                const outputCost = model.outputCost * outputTokens;
+                const total = inputCost + outputCost;
+                const avgScore = ((model.sweBench || 0) + (model.livecode || 0) + (model.aider || 0)) / 
+                    ((model.sweBench ? 1 : 0) + (model.livecode ? 1 : 0) + (model.aider ? 1 : 0) || 1);
+                const valueScore = avgScore / (total || 1);
+                return { ...model, inputCost, outputCost, total, valueScore };
+            }).sort((a, b) => a.total - b.total);
+
+            tbody.innerHTML = costData.map(m => `
+                <tr>
+                    <td><strong>${m.name}</strong><br><span style="font-size: 0.75rem; color: var(--text-muted)">${m.provider.toUpperCase()}</span></td>
+                    <td>$${m.inputCost.toFixed(2)}</td>
+                    <td>$${m.outputCost.toFixed(2)}</td>
+                    <td class="cost-value ${m.total > 20 ? 'expensive' : ''}">$${m.total.toFixed(2)}</td>
+                    <td>${m.valueScore > 5 ? '⭐⭐⭐' : m.valueScore > 3 ? '⭐⭐' : '⭐'}</td>
+                </tr>
+            `).join('');
+        }
+
+        function showRecommendation(type) {
+            document.querySelectorAll('#recommend .filter-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            const content = document.getElementById('recommendationContent');
+            const recommendations = {
+                agentic: {
+                    title: '🏆 Agentic Coding 首选',
+                    model: 'Claude Sonnet 4.5',
+                    reason: 'SWE-bench 82% 排名第一，在解决 GitHub Issues 方面表现最强。适合自动化代码修复、智能 Agent 开发。',
+                    alternative: '替代方案: Claude Opus 4.5 (SWE-bench 80.9%)，代码编辑能力更强'
+                },
+                daily: {
+                    title: '💻 日常开发推荐',
+                    model: 'GPT-5 或 Gemini 2.5 Pro',
+                    reason: 'GPT-5: Aider 88%，综合能力均衡，400k 上下文适合大型代码库。Gemini 2.5 Pro: Aider 82.2%，性价比更高。',
+                    alternative: '预算充足选 GPT-5，追求性价比选 Gemini 2.5 Pro'
+                },
+                cost: {
+                    title: '💰 高性价比之选',
+                    model: 'Kimi K2 Thinking',
+                    reason: 'LiveCodeBench 83.1% 冠军，输入 $0.6/1M tokens，输出 $2.5/1M tokens，性价比之王。',
+                    alternative: '备选: Gemini 2.5 Pro (输入 $1.25/1M) 或 o3-mini (输入 $1.1/1M)'
+                },
+                complex: {
+                    title: '🧠 复杂推理任务',
+                    model: 'Gemini 3 Pro',
+                    reason: 'Humanity\'s Last Exam 45.8% 排名第一，综合推理能力最强，1000万上下文窗口。',
+                    alternative: '备选: Kimi K2 Thinking (HLE 44.9%)，性价比更高'
+                }
+            };
+
+            const rec = recommendations[type];
+            content.innerHTML = `
+                <div class="recommendation-card">
+                    <div class="recommendation-title">${rec.title}</div>
+                    <h3 style="margin-bottom: 1rem; color: var(--accent-light)">${rec.model}</h3>
+                    <p style="color: var(--text-muted); margin-bottom: 1rem;">${rec.reason}</p>
+                    <div style="padding: 1rem; background: rgba(255,255,255,0.03); border-radius: 8px;">
+                        <strong style="color: var(--success)">${rec.alternative}</strong>
+                    </div>
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>

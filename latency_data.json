@@ -1,0 +1,118 @@
+{
+  "records": [
+    {
+      "timestamp": "2026-02-26T19:13:43.951549",
+      "data": {
+        "GitHub": {
+          "status": "success",
+          "min": 135.0,
+          "max": 137.0,
+          "avg": 136.0,
+          "loss": 0.0
+        },
+        "Google": {
+          "status": "failed",
+          "error": "Host unreachable"
+        },
+        "Baidu": {
+          "status": "success",
+          "min": 10.6,
+          "max": 10.9,
+          "avg": 10.7,
+          "loss": 0.0
+        }
+      }
+    },
+    {
+      "timestamp": "2026-02-26T19:40:12.901748",
+      "data": {
+        "GitHub": {
+          "status": "success",
+          "min": 124.0,
+          "max": 124.0,
+          "avg": 124.0,
+          "loss": 25.0
+        },
+        "Google": {
+          "status": "failed",
+          "error": "Host unreachable"
+        },
+        "Baidu": {
+          "status": "success",
+          "min": 13.3,
+          "max": 13.8,
+          "avg": 13.45,
+          "loss": 0.0
+        }
+      }
+    },
+    {
+      "timestamp": "2026-02-26T19:43:50.465610",
+      "data": {
+        "GitHub": {
+          "status": "success",
+          "min": 134.0,
+          "max": 139.0,
+          "avg": 135.75,
+          "loss": 0.0
+        },
+        "Baidu": {
+          "status": "success",
+          "min": 10.5,
+          "max": 17.8,
+          "avg": 12.38,
+          "loss": 0.0
+        },
+        "Cloudflare": {
+          "status": "success",
+          "min": 202.0,
+          "max": 209.0,
+          "avg": 203.75,
+          "loss": 0.0
+        }
+      }
+    },
+    {
+      "timestamp": "2026-02-26T19:44:13.537661",
+      "data": {
+        "GitHub": {
+          "status": "success",
+          "min": 135.0,
+          "max": 136.0,
+          "avg": 135.25,
+          "loss": 0.0
+        },
+        "Baidu": {
+          "status": "success",
+          "min": 9.87,
+          "max": 12.0,
+          "avg": 10.43,
+          "loss": 0.0
+        },
+        "Cloudflare": {
+          "status": "success",
+          "min": 194.0,
+          "max": 195.0,
+          "avg": 194.75,
+          "loss": 0.0
+        }
+      }
+    }
+  ],
+  "alerts": [
+    {
+      "timestamp": "2026-02-26T19:43:50.465610",
+      "target": "Cloudflare",
+      "type": "high_latency",
+      "message": "Cloudflare \u5ef6\u8fdf\u8fc7\u9ad8: 203.75ms (\u9608\u503c: 100ms)",
+      "severity": "medium"
+    },
+    {
+      "timestamp": "2026-02-26T19:44:13.537661",
+      "target": "Cloudflare",
+      "type": "high_latency",
+      "message": "Cloudflare \u5ef6\u8fdf\u8fc7\u9ad8: 194.75ms (\u9608\u503c: 100ms)",
+      "severity": "medium"
+    }
+  ]
+}

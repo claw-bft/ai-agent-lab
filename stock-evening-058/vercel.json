@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "name": "stock-evening-058",
+  "builds": [
+    {
+      "src": "index.html",
+      "use": "@vercel/static"
+    }
+  ]
+}

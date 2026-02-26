@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agent Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --bg-primary: #0d1117;
+            --bg-secondary: #161b22;
+            --bg-tertiary: #21262d;
+            --text-primary: #c9d1d9;
+            --text-secondary: #8b949e;
+            --accent-primary: #58a6ff;
+            --accent-success: #238636;
+            --accent-warning: #d29922;
+            --accent-danger: #da3633;
+            --border-color: #30363d;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+        
+        .header {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .header h1::before {
+            content: '🤖';
+        }
+        
+        .connection-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+        
+        .connection-status .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--accent-success);
+            animation: pulse 2s infinite;
+        }
+        
+        .connection-status.disconnected .dot {
+            background: var(--accent-danger);
+            animation: none;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+        }
+        
+        .stat-card h3 {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-card .value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        
+        .stat-card.active .value {
+            color: var(--accent-success);
+        }
+        
+        /* Sessions Section */
+        .section {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            margin-bottom: 2rem;
+        }
+        
+        .section-header {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .section-header h2 {
+            font-size: 1.125rem;
+            font-weight: 600;
+        }
+        
+        .section-content {
+            padding: 1rem;
+        }
+        
+        /* Session List */
+        .session-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .session-item {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        
+        .session-item:hover {
+            border-color: var(--accent-primary);
+            background: var(--bg-secondary);
+        }
+        
+        .session-item.new {
+            animation: highlight 2s ease-out;
+        }
+        
+        @keyframes highlight {
+            0% { background: rgba(88, 166, 255, 0.3); }
+            100% { background: var(--bg-tertiary); }
+        }
+        
+        .session-info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+        
+        .session-name {
+            font-weight: 600;
+            font-size: 0.9375rem;
+        }
+        
+        .session-meta {
+            font-size: 0.8125rem;
+            color: var(--text-secondary);
+        }
+        
+        .session-badges {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .badge {
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        
+        .badge.status-active {
+            background: rgba(35, 134, 54, 0.2);
+            color: #3fb950;
+        }
+        
+        .badge.status-idle {
+            background: rgba(210, 153, 34, 0.2);
+            color: #d29922;
+        }
+        
+        .badge.agent {
+            background: var(--bg-secondary);
+            color: var(--text-secondary);
+        }
+        
+        .badge.tasks {
+            background: rgba(88, 166, 255, 0.2);
+            color: var(--accent-primary);
+        }
+        
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-secondary);
+        }
+        
+        .empty-state-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+        
+        /* Log Panel */
+        .log-panel {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 1rem;
+            max-height: 300px;
+            overflow-y: auto;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.8125rem;
+        }
+        
+        .log-entry {
+            padding: 0.25rem 0;
+            color: var(--text-secondary);
+        }
+        
+        .log-entry.new-session {
+            color: var(--accent-success);
+        }
+        
+        .log-entry.update {
+            color: var(--accent-primary);
+        }
+        
+        .log-entry.closed {
+            color: var(--accent-danger);
+        }
+        
+        .log-time {
+            color: var(--text-secondary);
+            opacity: 0.7;
+        }
+        
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--text-secondary);
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <h1>Agent Dashboard</h1>
+        <div class="connection-status" id="connectionStatus">
+            <span class="dot"></span>
+            <span id="connectionText">Connecting...</span>
+        </div>
+    </header>
+    
+    <div class="container">
+        <!-- Stats -->
+        <div class="stats-grid">
+            <div class="stat-card active">
+                <h3>Active Sessions</h3>
+                <div class="value" id="statSessions">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>Total Tasks</h3>
+                <div class="value" id="statTasks">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>Registered Agents</h3>
+                <div class="value" id="statAgents">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>System Status</h3>
+                <div class="value" id="statStatus">OK</div>
+            </div>
+        </div>
+        
+        <!-- Sessions -->
+        <div class="section">
+            <div class="section-header">
+                <h2>Active Sessions</h2>
+                <span id="sessionCount">0 sessions</span>
+            </div>
+            <div class="section-content">
+                <div class="session-list" id="sessionList">
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📭</div>
+                        <p>No active sessions</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Activity Log -->
+        <div class="section">
+            <div class="section-header">
+                <h2>Activity Log</h2>
+            </div>
+            <div class="section-content">
+                <div class="log-panel" id="logPanel">
+                    <div class="log-entry">
+                        <span class="log-time">[--:--:--]</span> Dashboard initialized
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const API_BASE = window.location.hostname === 'localhost' ? 'http://localhost:8000' : '';
+        let ws = null;
+        let reconnectInterval = null;
+        let sessions = {};
+        
+        // DOM Elements
+        const connectionStatus = document.getElementById('connectionStatus');
+        const connectionText = document.getElementById('connectionText');
+        const sessionList = document.getElementById('sessionList');
+        const logPanel = document.getElementById('logPanel');
+        
+        // Connect WebSocket
+        function connectWS() {
+            const wsUrl = API_BASE.replace('http', 'ws') + '/ws';
+            ws = new WebSocket(wsUrl);
+            
+            ws.onopen = () => {
+                console.log('WebSocket connected');
+                connectionStatus.classList.remove('disconnected');
+                connectionText.textContent = 'Connected';
+                addLog('WebSocket connected', 'update');
+                
+                // 获取初始数据
+                fetchStats();
+            };
+            
+            ws.onmessage = (event) => {
+                const msg = JSON.parse(event.data);
+                handleMessage(msg);
+            };
+            
+            ws.onclose = () => {
+                console.log('WebSocket disconnected');
+                connectionStatus.classList.add('disconnected');
+                connectionText.textContent = 'Disconnected - Reconnecting...';
+                addLog('WebSocket disconnected', 'closed');
+                
+                // 重连
+                if (!reconnectInterval) {
+                    reconnectInterval = setInterval(() => {
+                        connectWS();
+                    }, 3000);
+                }
+            };
+            
+            ws.onerror = (err) => {
+                console.error('WebSocket error:', err);
+            };
+        }
+        
+        // Handle WebSocket messages
+        function handleMessage(msg) {
+            switch(msg.type) {
+                case 'init':
+                    if (msg.data.sessions) {
+                        msg.data.sessions.forEach(s => sessions[s.id] = s);
+                        renderSessions();
+                    }
+                    updateStats(msg.data.stats);
+                    break;
+                    
+                case 'session_new':
+                    sessions[msg.data.id] = msg.data;
+                    renderSessions();
+                    addLog(`New session: ${msg.data.name || msg.data.id}`, 'new-session');
+                    break;
+                    
+                case 'session_update':
+                    sessions[msg.data.id] = msg.data;
+                    renderSessions();
+                    addLog(`Updated: ${msg.data.name || msg.data.id}`, 'update');
+                    break;
+                    
+                case 'session_closed':
+                    delete sessions[msg.data.id];
+                    renderSessions();
+                    addLog(`Closed: ${msg.data.id}`, 'closed');
+                    break;
+                    
+                case 'heartbeat':
+                    // 心跳响应
+                    ws.send(JSON.stringify({type: 'ping'}));
+                    break;
+            }
+        }
+        
+        // Render sessions list
+        function renderSessions() {
+            const sessionArray = Object.values(sessions);
+            document.getElementById('sessionCount').textContent = 
+                `${sessionArray.length} session${sessionArray.length !== 1 ? 's' : ''}`;
+            
+            if (sessionArray.length === 0) {
+                sessionList.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📭</div>
+                        <p>No active sessions</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            sessionList.innerHTML = sessionArray.map(session => `
+                <div class="session-item" data-id="${session.id}">
+                    <div class="session-info">
+                        <div class="session-name">${escapeHtml(session.name || session.id)}</div>
+                        <div class="session-meta">
+                            ${session.agent_type !== 'unknown' ? `Agent: ${session.agent_type}` : ''}
+                            ${session.created_at ? `• Created: ${formatTime(session.created_at)}` : ''}
+                        </div>
+                    </div>
+                    <div class="session-badges">
+                        <span class="badge status-${session.status || 'active'}">${session.status || 'active'}</span>
+                        ${session.agent_type !== 'unknown' ? `<span class="badge agent">${session.agent_type}</span>` : ''}
+                        ${session.tasks_count ? `<span class="badge tasks">${session.tasks_count} tasks</span>` : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        // Update stats
+        function updateStats(stats) {
+            if (!stats) return;
+            document.getElementById('statSessions').textContent = stats.total_sessions || 0;
+            document.getElementById('statTasks').textContent = stats.total_tasks || 0;
+            document.getElementById('statAgents').textContent = stats.total_agents || 0;
+        }
+        
+        // Fetch stats via HTTP
+        async function fetchStats() {
+            try {
+                const res = await fetch(`${API_BASE}/api/stats`);
+                const stats = await res.json();
+                updateStats(stats);
+                
+                const sessionsRes = await fetch(`${API_BASE}/api/sessions`);
+                const sessionData = await sessionsRes.json();
+                sessions = {};
+                sessionData.forEach(s => sessions[s.id] = s);
+                renderSessions();
+            } catch (err) {
+                console.error('Fetch error:', err);
+            }
+        }
+        
+        // Add log entry
+        function addLog(message, type = '') {
+            const time = new Date().toLocaleTimeString();
+            const entry = document.createElement('div');
+            entry.className = `log-entry ${type}`;
+            entry.innerHTML = `<span class="log-time">[${time}]</span> ${escapeHtml(message)}`;
+            logPanel.appendChild(entry);
+            logPanel.scrollTop = logPanel.scrollHeight;
+            
+            // 限制日志数量
+            while (logPanel.children.length > 100) {
+                logPanel.removeChild(logPanel.firstChild);
+            }
+        }
+        
+        // Utility functions
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        function formatTime(isoString) {
+            try {
+                const date = new Date(isoString);
+                return date.toLocaleTimeString();
+            } catch {
+                return isoString;
+            }
+        }
+        
+        // Initialize
+        connectWS();
+        
+        // 定期刷新（作为WebSocket的备份）
+        setInterval(fetchStats, 10000);
+    </script>
+</body>
+</html>

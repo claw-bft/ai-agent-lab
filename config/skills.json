@@ -1,0 +1,51 @@
+{
+  "version": "1.0.0",
+  "description": "AI Agent Lab 统一配置管理",
+  "last_updated": "2026-02-26",
+  "skills": {
+    "finance-pro": {
+      "enabled": true,
+      "data_sources": {
+        "akshare": {
+          "enabled": true,
+          "description": "A股实时数据"
+        },
+        "yfinance": {
+          "enabled": true,
+          "description": "美股数据"
+        }
+      }
+    },
+    "research-pro": {
+      "enabled": true,
+      "features": {
+        "web_search": true,
+        "deep_research": true,
+        "data_analysis": true
+      }
+    },
+    "coding-pro": {
+      "enabled": true,
+      "features": {
+        "code_generation": true,
+        "code_review": true,
+        "repo_management": true,
+        "cicd": true
+      }
+    },
+    "product-pro": {
+      "enabled": true,
+      "features": {
+        "competitor_analysis": true,
+        "prd_generation": true,
+        "ppt_generation": true,
+        "user_research": true
+      }
+    }
+  },
+  "cli": {
+    "default_output_format": "json",
+    "log_level": "info",
+    "timeout_seconds": 60
+  }
+}

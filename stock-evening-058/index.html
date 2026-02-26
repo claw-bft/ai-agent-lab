@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A股晚间点评 - 2025年2月26日</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            min-height: 100vh;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .gradient-text {
+            background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .up-text { color: #ef4444; }
+        .down-text { color: #22c55e; }
+        .pulse-ring {
+            animation: pulse-ring 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+        }
+        @keyframes pulse-ring {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+        .stock-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+    </style>
+</head>
+<body class="text-white">
+    <div class="max-w-6xl mx-auto px-4 py-8">
+        <!-- Header -->
+        <header class="text-center mb-10">
+            <div class="inline-flex items-center gap-3 mb-4">
+                <div class="w-3 h-3 bg-red-500 rounded-full pulse-ring"></div>
+                <span class="text-gray-400 text-sm tracking-widest">MARKET REVIEW</span>
+            </div>
+            <h1 class="text-4xl md:text-5xl font-bold mb-2 gradient-text">A股晚间点评</h1>
+            <p class="text-xl text-gray-400">2025年2月26日 星期三</p>
+        </header>
+
+        <!-- Market Overview -->
+        <section class="mb-8">
+            <div class="glass-card rounded-2xl p-6">
+                <h2 class="text-xl font-semibold mb-6 flex items-center gap-2">
+                    <svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                    </svg>
+                    大盘概览
+                </h2>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div class="bg-gray-800/50 rounded-xl p-4 text-center stock-card transition-all duration-300">
+                        <p class="text-gray-400 text-sm mb-1">上证指数</p>
+                        <p class="text-2xl font-bold down-text">-0.01%</p>
+                        <p class="text-xs text-gray-500 mt-1">震荡微跌</p>
+                    </div>
+                    <div class="bg-gray-800/50 rounded-xl p-4 text-center stock-card transition-all duration-300">
+                        <p class="text-gray-400 text-sm mb-1">深证成指</p>
+                        <p class="text-2xl font-bold up-text">+0.19%</p>
+                        <p class="text-xs text-gray-500 mt-1">小幅上涨</p>
+                    </div>
+                    <div class="bg-gray-800/50 rounded-xl p-4 text-center stock-card transition-all duration-300">
+                        <p class="text-gray-400 text-sm mb-1">创业板指</p>
+                        <p class="text-2xl font-bold down-text">-0.29%</p>
+                        <p class="text-xs text-gray-500 mt-1">小幅回调</p>
+                    </div>
+                    <div class="bg-gray-800/50 rounded-xl p-4 text-center stock-card transition-all duration-300">
+                        <p class="text-gray-400 text-sm mb-1">成交额</p>
+                        <p class="text-2xl font-bold text-blue-400">2.54万亿</p>
+                        <p class="text-xs text-gray-500 mt-1">放量759亿</p>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-4 mt-4">
+                    <div class="bg-gray-800/30 rounded-xl p-4 flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-400 text-sm">涨停家数</p>
+                            <p class="text-xl font-bold text-red-400">61股</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-gray-400 text-sm">封板率</p>
+                            <p class="text-lg font-semibold text-green-400">73%</p>
+                        </div>
+                    </div>
+                    <div class="bg-gray-800/30 rounded-xl p-4 flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-400 text-sm">个股涨跌</p>
+                            <p class="text-xl font-bold text-green-400">超2800只下跌</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-gray-400 text-sm">市场情绪</p>
+                            <p class="text-lg font-semibold text-yellow-400">偏谨慎</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sector Performance -->
+        <section class="mb-8">
+            <div class="glass-card rounded-2xl p-6">
+                <h2 class="text-xl font-semibold mb-6 flex items-center gap-2">
+                    <svg class="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+                    </svg>
+                    板块涨跌
+                </h2>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <!-- Rising Sectors -->
+                    <div>
+                        <h3 class="text-red-400 font-medium mb-3 flex items-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"/>
+                            </svg>
+                            涨幅板块
+                        </h3>
+                        <div class="space-y-2">
+                            <div class="bg-red-500/10 border border-red-500/20 rounded-lg p-3 flex items-center justify-between">
+                                <span class="font-medium">算力硬件</span>
+                                <span class="text-red-400 text-sm">PCB/液冷</span>
+                            </div>
+                            <div class="bg-red-500/10 border border-red-500/20 rounded-lg p-3 flex items-center justify-between">
+                                <span class="font-medium">算力租赁</span>
+                                <span class="text-red-400 text-sm">云服务</span>
+                            </div>
+                            <div class="bg-red-500/10 border border-red-500/20 rounded-lg p-3 flex items-center justify-between">
+                                <span class="font-medium">风电</span>
+                                <span class="text-red-400 text-sm">新能源</span>
+                            </div>
+                            <div class="bg-red-500/10 border border-red-500/20 rounded-lg p-3 flex items-center justify-between">
+                                <span class="font-medium">环保</span>
+                                <span class="text-red-400 text-sm">法典草案</span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Falling Sectors -->
+                    <div>
+                        <h3 class="text-green-400 font-medium mb-3 flex items-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
+                            </svg>
+                            跌幅板块
+                        </h3>
+                        <div class="space-y-2">
+                            <div class="bg-green-500/10 border border-green-500/20 rounded-lg p-3 flex items-center justify-between">
+                                <span class="font-medium">影视</span>
+                                <span class="text-green-400 text-sm">消费疲软</span>
+                            </div>
+                            <div class="bg-green-500/10 border border-green-500/20 rounded-lg p-3 flex items-center justify-between">
+                                <span class="font-medium">房地产</span>
+                                <span class="text-green-400 text-sm">政策观望</span>
+                            </div>
+                            <div class="bg-green-500/10 border border-green-500/20 rounded-lg p-3 flex items-center justify-between">
+                                <span class="font-medium">锂电池</span>
+                                <span class="text-green-400 text-sm">产能过剩</span>
+                            </div>
+                            <div class="bg-green-500/10 border border-green-500/20 rounded-lg p-3 flex items-center justify-between">
+                                <span class="font-medium">保险</span>
+                                <span class="text-green-400 text-sm">利率下行</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Charts Section -->
+        <section class="mb-8">
+            <div class="glass-card rounded-2xl p-6">
+                <h2 class="text-xl font-semibold mb-6 flex items-center gap-2">
+                    <svg class="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"/>
+                    </svg>
+                    资金流向分析
+                </h2>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div>
+                        <canvas id="sectorChart"></canvas>
+                    </div>
+                    <div>
+                        <canvas id="volumeChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Limit-up Stocks -->
+        <section class="mb-8">
+            <div class="glass-card rounded-2xl p-6">
+                <h2 class="text-xl font-semibold mb-6 flex items-center gap-2">
+                    <svg class="w-6 h-6 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                    </svg>
+                    连板股追踪
+                </h2>
+                <div class="grid md:grid-cols-3 gap-4">
+                    <div class="bg-gradient-to-br from-red-600/20 to-red-800/20 rounded-xl p-5 border border-red-500/30 stock-card transition-all duration-300">
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="text-2xl font-bold">豫能控股</span>
+                            <span class="bg-red-500 text-white text-xs px-2 py-1 rounded-full">6连板</span>
+                        </div>
+                        <p class="text-gray-400 text-sm">电力+新能源</p>
+                        <div class="mt-3 flex items-center gap-2">
+                            <span class="text-red-400 font-semibold">龙头地位</span>
+                            <span class="text-gray-500">|</span>
+                            <span class="text-gray-400 text-sm">强势涨停</span>
+                        </div>
+                    </div>
+                    <div class="bg-gradient-to-br from-orange-600/20 to-orange-800/20 rounded-xl p-5 border border-orange-500/30 stock-card transition-all duration-300">
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="text-2xl font-bold">法尔胜</span>
+                            <span class="bg-orange-500 text-white text-xs px-2 py-1 rounded-full">4连板</span>
+                        </div>
+                        <p class="text-gray-400 text-sm">环保+新材料</p>
+                        <div class="mt-3 flex items-center gap-2">
+                            <span class="text-orange-400 font-semibold">次龙头</span>
+                            <span class="text-gray-500">|</span>
+                            <span class="text-gray-400 text-sm">持续走强</span>
+                        </div>
+                    </div>
+                    <div class="bg-gradient-to-br from-yellow-600/20 to-yellow-800/20 rounded-xl p-5 border border-yellow-500/30 stock-card transition-all duration-300">
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="text-xl font-bold">澄星股份</span>
+                            <span class="bg-yellow-500 text-white text-xs px-2 py-1 rounded-full">3连板</span>
+                        </div>
+                        <p class="text-gray-400 text-sm">磷化工</p>
+                        <div class="mt-3 flex items-center gap-2">
+                            <span class="text-yellow-400 font-semibold">潜力股</span>
+                            <span class="text-gray-500">|</span>
+                            <span class="text-gray-400 text-sm">关注延续性</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-4 bg-gray-800/30 rounded-xl p-4">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <span class="text-xl font-bold">金正大</span>
+                            <span class="text-gray-400 text-sm ml-2">化肥</span>
+                        </div>
+                        <span class="bg-yellow-500/20 text-yellow-400 text-xs px-3 py-1 rounded-full border border-yellow-500/30">3连板</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- News Section -->
+        <section class="mb-8">
+            <div class="glass-card rounded-2xl p-6">
+                <h2 class="text-xl font-semibold mb-6 flex items-center gap-2">
+                    <svg class="w-6 h-6 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/>
+                    </svg>
+                    市场要闻
+                </h2>
+                <div class="space-y-4">
+                    <div class="bg-blue-500/10 border-l-4 border-blue-500 rounded-r-lg p-4">
+                        <div class="flex items-start gap-3">
+                            <span class="bg-blue-500 text-white text-xs px-2 py-1 rounded">算力</span>
+                            <div>
+                                <h4 class="font-medium mb-1">英伟达财报超预期，Vera Rubin芯片提振算力硬件</h4>
+                                <p class="text-gray-400 text-sm">英伟达最新财报业绩亮眼，新一代Vera Rubin芯片发布刺激A股算力硬件板块大涨，PCB、液冷等细分领域表现活跃。</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-purple-500/10 border-l-4 border-purple-500 rounded-r-lg p-4">
+                        <div class="flex items-start gap-3">
+                            <span class="bg-purple-500 text-white text-xs px-2 py-1 rounded">国产</span>
+                            <div>
+                                <h4 class="font-medium mb-1">国产算力概念走强，字节/华为产业链受关注</h4>
+                                <p class="text-gray-400 text-sm">国产替代逻辑持续发酵，字节跳动、华为等科技巨头算力布局带动相关概念股集体上涨。</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-green-500/10 border-l-4 border-green-500 rounded-r-lg p-4">
+                        <div class="flex items-start gap-3">
+                            <span class="bg-green-500 text-white text-xs px-2 py-1 rounded">政策</span>
+                            <div>
+                                <h4 class="font-medium mb-1">两会临近，环保板块受法典草案刺激大涨</h4>
+                                <p class="text-gray-400 text-sm">生态环境法典草案即将审议，环保政策预期升温，污水处理、固废处理等细分板块迎来资金追捧。</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Summary -->
+        <section class="mb-8">
+            <div class="glass-card rounded-2xl p-6">
+                <h2 class="text-xl font-semibold mb-4 flex items-center gap-2">
+                    <svg class="w-6 h-6 text-pink-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                    </svg>
+                    市场总结
+                </h2>
+                <div class="bg-gray-800/50 rounded-xl p-5">
+                    <p class="text-gray-300 leading-relaxed">
+                        今日A股三大指数涨跌互现，沪指微跌0.01%，深成指涨0.19%，创业板指跌0.29%。市场成交额达<span class="text-blue-400 font-semibold">2.54万亿</span>，较昨日放量759亿，显示市场交投活跃。个股方面超2800只下跌，涨停61股，封板率73%，市场情绪偏谨慎。
+                    </p>
+                    <p class="text-gray-300 leading-relaxed mt-3">
+                        板块方面，<span class="text-red-400">算力硬件</span>、<span class="text-red-400">算力租赁</span>、<span class="text-red-400">风电</span>、<span class="text-red-400">环保</span>等板块涨幅居前，主要受英伟达财报超预期及两会政策预期刺激。影视、房地产、锂电池、保险等板块跌幅居前。
+                    </p>
+                    <p class="text-gray-300 leading-relaxed mt-3">
+                        连板股方面，<span class="text-yellow-400 font-semibold">豫能控股</span>强势6连板成为市场最高标，<span class="text-yellow-400">法尔胜</span>4连板紧随其后。短期来看，市场热点仍集中在算力产业链和政策受益板块，投资者可关注两会相关政策的进一步明朗。
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="text-center text-gray-500 text-sm py-6">
+            <p>数据仅供参考，不构成投资建议 | 股市有风险，投资需谨慎</p>
+            <p class="mt-2">© 2025 A股晚间点评 | Generated on 2025-02-26</p>
+        </footer>
+    </div>
+
+    <script>
+        // Sector Performance Chart
+        const sectorCtx = document.getElementById('sectorChart').getContext('2d');
+        new Chart(sectorCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['算力硬件', '算力租赁', '风电', '环保', '其他上涨', '下跌板块'],
+                datasets: [{
+                    data: [25, 20, 15, 15, 10, 15],
+                    backgroundColor: [
+                        'rgba(239, 68, 68, 0.8)',
+                        'rgba(249, 115, 22, 0.8)',
+                        'rgba(34, 197, 94, 0.8)',
+                        'rgba(59, 130, 246, 0.8)',
+                        'rgba(168, 85, 247, 0.8)',
+                        'rgba(107, 114, 128, 0.8)'
+                    ],
+                    borderColor: 'rgba(255, 255, 255, 0.1)',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: { color: '#9ca3af', font: { size: 11 } }
+                    },
+                    title: {
+                        display: true,
+                        text: '板块资金流向分布',
+                        color: '#e5e7eb',
+                        font: { size: 14 }
+                    }
+                }
+            }
+        });
+
+        // Volume Chart
+        const volumeCtx = document.getElementById('volumeChart').getContext('2d');
+        new Chart(volumeCtx, {
+            type: 'bar',
+            data: {
+                labels: ['2.17', '2.18', '2.19', '2.20', '2.21', '2.24', '2.25', '2.26'],
+                datasets: [{
+                    label: '成交额(万亿)',
+                    data: [1.94, 1.81, 1.75, 2.12, 2.23, 2.12, 2.47, 2.54],
+                    backgroundColor: 'rgba(59, 130, 246, 0.6)',
+                    borderColor: 'rgba(59, 130, 246, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        labels: { color: '#9ca3af' }
+                    },
+                    title: {
+                        display: true,
+                        text: '近8日成交额趋势',
+                        color: '#e5e7eb',
+                        font: { size: 14 }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: { color: '#9ca3af' },
+                        grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                    },
+                    x: {
+                        ticks: { color: '#9ca3af' },
+                        grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

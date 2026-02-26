@@ -1,0 +1,6 @@
+[Monitor] Database initialized: /root/.openclaw/agent_dashboard.db
+[Monitor] Started monitoring: /root/.openclaw/sessions
+[Monitor] Scan interval: 1.0s
+
+[Monitor] Received signal 15
+[Monitor] Stopping...

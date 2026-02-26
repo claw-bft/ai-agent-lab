@@ -1,0 +1,1321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenClaw Dashboard - Real-time</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-tertiary: #334155;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent-primary: #3b82f6;
+            --accent-success: #22c55e;
+            --accent-warning: #f59e0b;
+            --accent-danger: #ef4444;
+            --border-color: #475569;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        /* Header */
+        .header {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .header h1 {
+            font-size: 1.5rem;
+            background: linear-gradient(135deg, var(--accent-primary), #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .connection-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+        }
+        
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--accent-danger);
+            animation: pulse 2s infinite;
+        }
+        
+        .status-dot.connected {
+            background: var(--accent-success);
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        /* Layout */
+        .container {
+            display: grid;
+            grid-template-columns: 250px 1fr 350px;
+            gap: 1rem;
+            padding: 1rem;
+            max-width: 1800px;
+            margin: 0 auto;
+        }
+        
+        @media (max-width: 1400px) {
+            .container {
+                grid-template-columns: 200px 1fr;
+            }
+            .right-panel {
+                display: none;
+            }
+        }
+        
+        @media (max-width: 900px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+            .sidebar {
+                display: none;
+            }
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 1rem;
+            height: fit-content;
+        }
+        
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: var(--text-secondary);
+            margin-bottom: 0.25rem;
+        }
+        
+        .nav-item:hover, .nav-item.active {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+        
+        .nav-item.active {
+            background: var(--accent-primary);
+            color: white;
+        }
+        
+        /* Main Content */
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+        
+        .stat-card {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid var(--border-color);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+        
+        .stat-label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        
+        .stat-change {
+            font-size: 0.75rem;
+            margin-top: 0.5rem;
+        }
+        
+        .stat-change.positive { color: var(--accent-success); }
+        .stat-change.negative { color: var(--accent-danger); }
+        
+        /* Panels */
+        .panel {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+        }
+        
+        .panel-header {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .panel-title {
+            font-size: 1rem;
+            font-weight: 600;
+        }
+        
+        .panel-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .btn {
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .btn-primary {
+            background: var(--accent-primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #2563eb;
+        }
+        
+        .btn-secondary {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+        
+        .btn-secondary:hover {
+            background: #475569;
+        }
+        
+        .btn-danger {
+            background: var(--accent-danger);
+            color: white;
+        }
+        
+        .panel-content {
+            padding: 1rem;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        /* Tasks */
+        .task-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .task-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            background: var(--bg-primary);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .task-item:hover {
+            background: var(--bg-tertiary);
+        }
+        
+        .task-checkbox {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--border-color);
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        
+        .task-item.completed .task-checkbox {
+            background: var(--accent-success);
+            border-color: var(--accent-success);
+        }
+        
+        .task-item.completed .task-text {
+            text-decoration: line-through;
+            color: var(--text-secondary);
+        }
+        
+        .task-text {
+            flex: 1;
+        }
+        
+        .task-actions {
+            display: flex;
+            gap: 0.25rem;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        
+        .task-item:hover .task-actions {
+            opacity: 1;
+        }
+        
+        .task-action-btn {
+            padding: 0.25rem 0.5rem;
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        
+        .task-action-btn:hover {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+        
+        /* Task Input */
+        .task-input-container {
+            display: flex;
+            gap: 0.5rem;
+            padding: 1rem;
+            border-top: 1px solid var(--border-color);
+        }
+        
+        .task-input {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 0.875rem;
+        }
+        
+        .task-input:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+        }
+        
+        /* Skills */
+        .skill-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .skill-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.75rem;
+            background: var(--bg-primary);
+            border-radius: 8px;
+        }
+        
+        .skill-info h4 {
+            font-size: 0.875rem;
+            margin-bottom: 0.25rem;
+        }
+        
+        .skill-info p {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+        
+        .skill-status {
+            padding: 0.25rem 0.5rem;
+            background: var(--accent-success);
+            color: white;
+            border-radius: 4px;
+            font-size: 0.75rem;
+        }
+        
+        /* File Explorer */
+        .file-tree {
+            font-size: 0.875rem;
+        }
+        
+        .file-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        
+        .file-item:hover {
+            background: var(--bg-tertiary);
+        }
+        
+        .file-children {
+            margin-left: 1.5rem;
+            border-left: 1px solid var(--border-color);
+        }
+        
+        /* Chat */
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            height: 400px;
+        }
+        
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        
+        .chat-message {
+            max-width: 80%;
+            padding: 0.75rem 1rem;
+            border-radius: 12px;
+            font-size: 0.875rem;
+        }
+        
+        .chat-message.user {
+            align-self: flex-end;
+            background: var(--accent-primary);
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+        
+        .chat-message.assistant {
+            align-self: flex-start;
+            background: var(--bg-tertiary);
+            border-bottom-left-radius: 4px;
+        }
+        
+        .chat-input-container {
+            display: flex;
+            gap: 0.5rem;
+            padding: 1rem;
+            border-top: 1px solid var(--border-color);
+        }
+        
+        .chat-input {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 0.875rem;
+        }
+        
+        .chat-input:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+        }
+        
+        /* Terminal */
+        .terminal {
+            background: #000;
+            border-radius: 8px;
+            padding: 1rem;
+            font-family: 'Courier New', monospace;
+            font-size: 0.875rem;
+            height: 200px;
+            overflow-y: auto;
+        }
+        
+        .terminal-line {
+            margin-bottom: 0.25rem;
+        }
+        
+        .terminal-prompt {
+            color: var(--accent-success);
+        }
+        
+        .terminal-input {
+            background: transparent;
+            border: none;
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: inherit;
+            width: 100%;
+            outline: none;
+        }
+        
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+        
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .modal {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow: hidden;
+            transform: scale(0.9);
+            transition: transform 0.3s;
+        }
+        
+        .modal-overlay.active .modal {
+            transform: scale(1);
+        }
+        
+        .modal-header {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        
+        .modal-content {
+            padding: 1.5rem;
+            overflow-y: auto;
+            max-height: 60vh;
+        }
+        
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+        
+        .form-input, .form-textarea {
+            width: 100%;
+            padding: 0.75rem;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: var(--text-primary);
+            font-size: 0.875rem;
+        }
+        
+        .form-textarea {
+            min-height: 150px;
+            resize: vertical;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .form-input:focus, .form-textarea:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+        }
+        
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: var(--bg-primary);
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--bg-tertiary);
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--border-color);
+        }
+        
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .animate-in {
+            animation: fadeIn 0.3s ease-out;
+        }
+        
+        /* Toast notifications */
+        .toast-container {
+            position: fixed;
+            bottom: 1rem;
+            right: 1rem;
+            z-index: 1001;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .toast {
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            color: white;
+            font-size: 0.875rem;
+            animation: slideIn 0.3s ease-out;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .toast.success { background: var(--accent-success); }
+        .toast.error { background: var(--accent-danger); }
+        .toast.info { background: var(--accent-primary); }
+        
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <h1>🔧 OpenClaw Dashboard</h1>
+        <div class="connection-status">
+            <span class="status-dot" id="status-dot"></span>
+            <span id="status-text">Connecting...</span>
+            <span id="client-count" style="margin-left: 1rem; color: var(--text-secondary);"></span>
+        </div>
+    </header>
+    
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="nav-item active" data-section="overview">
+                <span>📊</span> Overview
+            </div>
+            <div class="nav-item" data-section="tasks">
+                <span>✅</span> Tasks
+            </div>
+            <div class="nav-item" data-section="skills">
+                <span>🔌</span> Skills
+            </div>
+            <div class="nav-item" data-section="files">
+                <span>📁</span> Files
+            </div>
+            <div class="nav-item" data-section="terminal">
+                <span>💻</span> Terminal
+            </div>
+            <div class="nav-item" data-section="chat">
+                <span>💬</span> Chat
+            </div>
+        </aside>
+        
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Stats Grid -->
+            <div class="stats-grid" id="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Uptime</div>
+                    <div class="stat-value" id="stat-uptime">--</div>
+                    <div class="stat-change">seconds</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">CPU Usage</div>
+                    <div class="stat-value" id="stat-cpu">--</div>
+                    <div class="stat-change">%</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Memory</div>
+                    <div class="stat-value" id="stat-memory">--</div>
+                    <div class="stat-change" id="stat-memory-detail">--</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Clients</div>
+                    <div class="stat-value" id="stat-clients">--</div>
+                    <div class="stat-change">connected</div>
+                </div>
+            </div>
+            
+            <!-- Tasks Panel -->
+            <div class="panel" id="tasks-panel">
+                <div class="panel-header">
+                    <h3 class="panel-title">✅ Tasks</h3>
+                    <div class="panel-actions">
+                        <button class="btn btn-primary" onclick="refreshTasks()">🔄 Refresh</button>
+                    </div>
+                </div>
+                <div class="panel-content">
+                    <div class="task-list" id="task-list">
+                        <!-- Tasks will be rendered here -->
+                    </div>
+                </div>
+                <div class="task-input-container">
+                    <input type="text" class="task-input" id="new-task-input" 
+                           placeholder="Add a new task..." onkeypress="handleTaskKeypress(event)">
+                    <button class="btn btn-primary" onclick="addTask()">➕ Add</button>
+                </div>
+            </div>
+            
+            <!-- Skills Panel -->
+            <div class="panel" id="skills-panel">
+                <div class="panel-header">
+                    <h3 class="panel-title">🔌 Skills</h3>
+                    <div class="panel-actions">
+                        <button class="btn btn-primary" onclick="refreshSkills()">🔄 Refresh</button>
+                    </div>
+                </div>
+                <div class="panel-content">
+                    <div class="skill-list" id="skill-list">
+                        <!-- Skills will be rendered here -->
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Files Panel -->
+            <div class="panel" id="files-panel">
+                <div class="panel-header">
+                    <h3 class="panel-title">📁 Files</h3>
+                    <div class="panel-actions">
+                        <button class="btn btn-primary" onclick="refreshFiles()">🔄 Refresh</button>
+                    </div>
+                </div>
+                <div class="panel-content">
+                    <div class="file-tree" id="file-tree">
+                        <!-- Files will be rendered here -->
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Terminal Panel -->
+            <div class="panel" id="terminal-panel">
+                <div class="panel-header">
+                    <h3 class="panel-title">💻 Terminal</h3>
+                    <div class="panel-actions">
+                        <button class="btn btn-secondary" onclick="clearTerminal()">🗑️ Clear</button>
+                    </div>
+                </div>
+                <div class="panel-content" style="padding: 0;">
+                    <div class="terminal" id="terminal">
+                        <div class="terminal-line">
+                            <span class="terminal-prompt">➜</span> Welcome to OpenClaw Dashboard Terminal
+                        </div>
+                        <div class="terminal-line">
+                            <span class="terminal-prompt">➜</span> Type 'help' for available commands
+                        </div>
+                        <div class="terminal-line" style="display: flex;">
+                            <span class="terminal-prompt" style="margin-right: 0.5rem;">➜</span>
+                            <input type="text" class="terminal-input" id="terminal-input" 
+                                   onkeypress="handleTerminalKeypress(event)" autofocus>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        
+        <!-- Right Panel (Chat) -->
+        <aside class="right-panel">
+            <div class="panel" style="height: 100%;">
+                <div class="panel-header">
+                    <h3 class="panel-title">💬 Chat</h3>
+                </div>
+                <div class="panel-content" style="padding: 0; height: calc(100% - 60px);">
+                    <div class="chat-container">
+                        <div class="chat-messages" id="chat-messages">
+                            <!-- Messages will be rendered here -->
+                        </div>
+                        <div class="chat-input-container">
+                            <input type="text" class="chat-input" id="chat-input" 
+                                   placeholder="Type a message..." onkeypress="handleChatKeypress(event)">
+                            <button class="btn btn-primary" onclick="sendChatMessage()">➤</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+    </div>
+    
+    <!-- File Editor Modal -->
+    <div class="modal-overlay" id="file-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="modal-title">Edit File</h3>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-content">
+                <div class="form-group">
+                    <label class="form-label">Path</label>
+                    <input type="text" class="form-input" id="file-path" readonly>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Content</label>
+                    <textarea class="form-textarea" id="file-content"></textarea>
+                </div>
+                <div style="display: flex; gap: 0.5rem; justify-content: flex-end;">
+                    <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                    <button class="btn btn-primary" onclick="saveFile()">💾 Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Toast Container -->
+    <div class="toast-container" id="toast-container"></div>
+    
+    <script>
+        // WebSocket Configuration
+        const WS_HOST = window.location.hostname === 'localhost' ? 'localhost' : window.location.hostname;
+        const WS_PORT = '8000';
+        const WS_URL = `ws://${WS_HOST}:${WS_PORT}`;
+        
+        // Global state
+        let ws = null;
+        let clientId = null;
+        let tasks = [];
+        let skills = [];
+        let files = [];
+        let currentFile = null;
+        
+        // Initialize WebSocket connection
+        function connect() {
+            showToast('Connecting to server...', 'info');
+            
+            ws = new WebSocket(WS_URL);
+            
+            ws.onopen = () => {
+                console.log('WebSocket connected');
+                updateConnectionStatus(true);
+                showToast('Connected to server', 'success');
+                
+                // Request initial data
+                sendMessage({ type: 'get_stats' });
+                sendMessage({ type: 'get_tasks' });
+                sendMessage({ type: 'get_skills' });
+                sendMessage({ type: 'get_files' });
+            };
+            
+            ws.onmessage = (event) => {
+                try {
+                    const message = JSON.parse(event.data);
+                    handleMessage(message);
+                } catch (e) {
+                    console.error('Error parsing message:', e);
+                }
+            };
+            
+            ws.onclose = () => {
+                console.log('WebSocket disconnected');
+                updateConnectionStatus(false);
+                showToast('Disconnected from server. Retrying...', 'error');
+                
+                // Auto reconnect
+                setTimeout(connect, 3000);
+            };
+            
+            ws.onerror = (error) => {
+                console.error('WebSocket error:', error);
+                updateConnectionStatus(false);
+            };
+        }
+        
+        // Send message to server
+        function sendMessage(data) {
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify(data));
+            }
+        }
+        
+        // Handle incoming messages
+        function handleMessage(message) {
+            console.log('Received:', message);
+            
+            switch (message.type) {
+                case 'connected':
+                    clientId = message.data.client_id;
+                    break;
+                    
+                case 'stats_update':
+                case 'stats':
+                    updateStats(message.data);
+                    break;
+                    
+                case 'clients_update':
+                    document.getElementById('stat-clients').textContent = message.data.count;
+                    break;
+                    
+                case 'tasks':
+                    tasks = message.data;
+                    renderTasks();
+                    break;
+                    
+                case 'task_created':
+                    tasks.push(message.data);
+                    renderTasks();
+                    showToast('Task created', 'success');
+                    break;
+                    
+                case 'task_updated':
+                    const idx = tasks.findIndex(t => t.id === message.data.id);
+                    if (idx !== -1) {
+                        tasks[idx] = message.data;
+                        renderTasks();
+                    }
+                    break;
+                    
+                case 'task_deleted':
+                    tasks = tasks.filter(t => t.id !== message.data.id);
+                    renderTasks();
+                    showToast('Task deleted', 'info');
+                    break;
+                    
+                case 'skills':
+                    skills = message.data;
+                    renderSkills();
+                    break;
+                    
+                case 'files':
+                case 'files_updated':
+                    files = message.data;
+                    renderFiles();
+                    break;
+                    
+                case 'file_content':
+                    openFileEditor(message.data.path, message.data.content);
+                    break;
+                    
+                case 'file_written':
+                    if (message.data.success) {
+                        showToast('File saved successfully', 'success');
+                        closeModal();
+                    } else {
+                        showToast('Failed to save file', 'error');
+                    }
+                    break;
+                    
+                case 'chat_message':
+                    addChatMessage(message.data);
+                    break;
+                    
+                case 'command_result':
+                    displayCommandResult(message.data);
+                    break;
+                    
+                case 'error':
+                    showToast(message.data.message, 'error');
+                    break;
+                    
+                case 'pong':
+                    // Heartbeat response
+                    break;
+            }
+        }
+        
+        // Update connection status UI
+        function updateConnectionStatus(connected) {
+            const dot = document.getElementById('status-dot');
+            const text = document.getElementById('status-text');
+            
+            if (connected) {
+                dot.classList.add('connected');
+                text.textContent = 'Connected';
+            } else {
+                dot.classList.remove('connected');
+                text.textContent = 'Disconnected';
+            }
+        }
+        
+        // Update stats display
+        function updateStats(data) {
+            document.getElementById('stat-uptime').textContent = formatDuration(data.uptime);
+            document.getElementById('stat-cpu').textContent = data.cpu_percent?.toFixed(1) || '--';
+            document.getElementById('stat-memory').textContent = 
+                data.memory ? Math.round(data.memory.percent) + '%' : '--';
+            document.getElementById('stat-memory-detail').textContent = 
+                data.memory ? formatBytes(data.memory.used) + ' / ' + formatBytes(data.memory.total) : '--';
+            document.getElementById('stat-clients').textContent = data.clients_connected || 0;
+        }
+        
+        // Render tasks
+        function renderTasks() {
+            const container = document.getElementById('task-list');
+            container.innerHTML = '';
+            
+            tasks.forEach(task => {
+                const item = document.createElement('div');
+                item.className = `task-item ${task.status === 'done' ? 'completed' : ''} animate-in`;
+                item.innerHTML = `
+                    <div class="task-checkbox" onclick="toggleTask('${task.id}')">
+                        ${task.status === 'done' ? '✓' : ''}
+                    </div>
+                    <span class="task-text">${escapeHtml(task.title)}</span>
+                    <div class="task-actions">
+                        <button class="task-action-btn" onclick="deleteTask('${task.id}')">🗑️</button>
+                    </div>
+                `;
+                container.appendChild(item);
+            });
+        }
+        
+        // Render skills
+        function renderSkills() {
+            const container = document.getElementById('skill-list');
+            container.innerHTML = '';
+            
+            skills.forEach(skill => {
+                const item = document.createElement('div');
+                item.className = 'skill-item animate-in';
+                item.innerHTML = `
+                    <div class="skill-info">
+                        <h4>${escapeHtml(skill.name)}</h4>
+                        <p>${escapeHtml(skill.description)}</p>
+                    </div>
+                    <span class="skill-status">Installed</span>
+                `;
+                container.appendChild(item);
+            });
+        }
+        
+        // Render files
+        function renderFiles() {
+            const container = document.getElementById('file-tree');
+            container.innerHTML = renderFileTree(files);
+        }
+        
+        function renderFileTree(items, level = 0) {
+            if (!items || items.length === 0) return '';
+            
+            return items.map(item => {
+                const icon = item.type === 'directory' ? '📁' : '📄';
+                const children = item.children ? renderFileTree(item.children, level + 1) : '';
+                
+                return `
+                    <div class="file-item" onclick="${item.type === 'file' ? `openFile('${item.path}')` : ''}" 
+                         style="padding-left: ${level * 1.5}rem">
+                        <span>${icon}</span>
+                        <span>${escapeHtml(item.name)}</span>
+                    </div>
+                    ${children ? `<div class="file-children">${children}</div>` : ''}
+                `;
+            }).join('');
+        }
+        
+        // Task operations
+        function handleTaskKeypress(e) {
+            if (e.key === 'Enter') addTask();
+        }
+        
+        function addTask() {
+            const input = document.getElementById('new-task-input');
+            const title = input.value.trim();
+            
+            if (title) {
+                sendMessage({
+                    type: 'create_task',
+                    data: { title, status: 'todo' }
+                });
+                input.value = '';
+            }
+        }
+        
+        function toggleTask(id) {
+            const task = tasks.find(t => t.id === id);
+            if (task) {
+                sendMessage({
+                    type: 'update_task',
+                    id: id,
+                    data: { status: task.status === 'done' ? 'todo' : 'done' }
+                });
+            }
+        }
+        
+        function deleteTask(id) {
+            if (confirm('Delete this task?')) {
+                sendMessage({ type: 'delete_task', id: id });
+            }
+        }
+        
+        function refreshTasks() {
+            sendMessage({ type: 'get_tasks' });
+            showToast('Refreshing tasks...', 'info');
+        }
+        
+        // Skill operations
+        function refreshSkills() {
+            sendMessage({ type: 'get_skills' });
+            showToast('Refreshing skills...', 'info');
+        }
+        
+        // File operations
+        function refreshFiles() {
+            sendMessage({ type: 'get_files' });
+            showToast('Refreshing files...', 'info');
+        }
+        
+        function openFile(path) {
+            currentFile = path;
+            sendMessage({ type: 'read_file', path: path });
+        }
+        
+        function openFileEditor(path, content) {
+            document.getElementById('file-path').value = path;
+            document.getElementById('file-content').value = content;
+            document.getElementById('modal-title').textContent = 'Edit: ' + path;
+            document.getElementById('file-modal').classList.add('active');
+        }
+        
+        function closeModal() {
+            document.getElementById('file-modal').classList.remove('active');
+            currentFile = null;
+        }
+        
+        function saveFile() {
+            const path = document.getElementById('file-path').value;
+            const content = document.getElementById('file-content').value;
+            
+            sendMessage({
+                type: 'write_file',
+                path: path,
+                content: content
+            });
+        }
+        
+        // Chat operations
+        function handleChatKeypress(e) {
+            if (e.key === 'Enter') sendChatMessage();
+        }
+        
+        function sendChatMessage() {
+            const input = document.getElementById('chat-input');
+            const content = input.value.trim();
+            
+            if (content) {
+                sendMessage({
+                    type: 'chat_message',
+                    role: 'user',
+                    content: content
+                });
+                input.value = '';
+            }
+        }
+        
+        function addChatMessage(message) {
+            const container = document.getElementById('chat-messages');
+            const div = document.createElement('div');
+            div.className = `chat-message ${message.role} animate-in`;
+            div.textContent = message.content;
+            container.appendChild(div);
+            container.scrollTop = container.scrollHeight;
+        }
+        
+        // Terminal operations
+        function handleTerminalKeypress(e) {
+            if (e.key === 'Enter') {
+                const input = document.getElementById('terminal-input');
+                const command = input.value.trim();
+                
+                if (command) {
+                    addTerminalLine(`<span class="terminal-prompt">➜</span> ${escapeHtml(command)}`);
+                    
+                    if (command === 'help') {
+                        addTerminalLine('Available commands: ls, cat, pwd, ps, help, clear');
+                    } else if (command === 'clear') {
+                        clearTerminal();
+                    } else {
+                        sendMessage({
+                            type: 'execute_command',
+                            command: command
+                        });
+                    }
+                    
+                    input.value = '';
+                }
+            }
+        }
+        
+        function displayCommandResult(result) {
+            if (result.success) {
+                if (result.stdout) {
+                    result.stdout.split('\n').forEach(line => {
+                        addTerminalLine(escapeHtml(line));
+                    });
+                }
+            } else {
+                addTerminalLine(`<span style="color: var(--accent-danger);">Error: ${escapeHtml(result.error || result.stderr || 'Unknown error')}</span>`);
+            }
+            addTerminalInput();
+        }
+        
+        function addTerminalLine(html) {
+            const terminal = document.getElementById('terminal');
+            const line = document.createElement('div');
+            line.className = 'terminal-line';
+            line.innerHTML = html;
+            terminal.insertBefore(line, terminal.lastElementChild);
+            terminal.scrollTop = terminal.scrollHeight;
+        }
+        
+        function addTerminalInput() {
+            const terminal = document.getElementById('terminal');
+            const existingInput = terminal.querySelector('.terminal-input');
+            if (existingInput) {
+                existingInput.parentElement.remove();
+            }
+            
+            const line = document.createElement('div');
+            line.className = 'terminal-line';
+            line.style.display = 'flex';
+            line.innerHTML = `
+                <span class="terminal-prompt" style="margin-right: 0.5rem;">➜</span>
+                <input type="text" class="terminal-input" onkeypress="handleTerminalKeypress(event)" autofocus>
+            `;
+            terminal.appendChild(line);
+            line.querySelector('input').focus();
+        }
+        
+        function clearTerminal() {
+            const terminal = document.getElementById('terminal');
+            terminal.innerHTML = `
+                <div class="terminal-line">
+                    <span class="terminal-prompt">➜</span> Terminal cleared
+                </div>
+            `;
+            addTerminalInput();
+        }
+        
+        // Utility functions
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            
+            const icons = { success: '✓', error: '✗', info: 'ℹ' };
+            toast.innerHTML = `<span>${icons[type]}</span> ${escapeHtml(message)}`;
+            
+            container.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }
+        
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        function formatDuration(seconds) {
+            if (seconds < 60) return seconds + 's';
+            if (seconds < 3600) return Math.floor(seconds / 60) + 'm';
+            return Math.floor(seconds / 3600) + 'h' + Math.floor((seconds % 3600) / 60) + 'm';
+        }
+        
+        function formatBytes(bytes) {
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+            if (bytes < 1024 * 1024 * 1024) return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+            return (bytes / (1024 * 1024 * 1024)).toFixed(1) + ' GB';
+        }
+        
+        // Navigation
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', () => {
+                document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+                item.classList.add('active');
+                
+                const section = item.dataset.section;
+                // Scroll to section or show/hide panels
+                const panel = document.getElementById(section + '-panel');
+                if (panel) {
+                    panel.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+        
+        // Heartbeat
+        setInterval(() => {
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                sendMessage({ type: 'ping' });
+            }
+        }, 30000);
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            connect();
+        });
+        
+        // Close modal on overlay click
+        document.getElementById('file-modal').addEventListener('click', (e) => {
+            if (e.target.id === 'file-modal') {
+                closeModal();
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,70 @@
+{
+  "session_id": "test_session",
+  "saved_at": 1772113896.413177,
+  "entries": [
+    {
+      "timestamp": 1772113889.8864527,
+      "role": "user",
+      "content": "查询一下茅台股票",
+      "intent": null,
+      "skill_used": null,
+      "metadata": {}
+    },
+    {
+      "timestamp": 1772113895.4328432,
+      "role": "assistant",
+      "content": "✗ 错误: 获取行情失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))\n",
+      "intent": "get_quote",
+      "skill_used": "finance-pro",
+      "metadata": {}
+    },
+    {
+      "timestamp": 1772113895.4328802,
+      "role": "user",
+      "content": "分析一下600519的走势",
+      "intent": null,
+      "skill_used": null,
+      "metadata": {}
+    },
+    {
+      "timestamp": 1772113896.129273,
+      "role": "assistant",
+      "content": "✗ 错误: 获取历史数据失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))\n",
+      "intent": "analyze_stock",
+      "skill_used": "finance-pro",
+      "metadata": {}
+    },
+    {
+      "timestamp": 1772113896.1293066,
+      "role": "user",
+      "content": "帮我写一个Python爬虫",
+      "intent": null,
+      "skill_used": null,
+      "metadata": {}
+    },
+    {
+      "timestamp": 1772113896.1293569,
+      "role": "user",
+      "content": "研究一下AI发展趋势",
+      "intent": null,
+      "skill_used": null,
+      "metadata": {}
+    },
+    {
+      "timestamp": 1772113896.4130008,
+      "role": "assistant",
+      "content": "✓ 执行成功\n  主题: 下AI发展趋势\n  执行查询: 8 个\n\n详细结果 (使用 --json 查看完整数据)\n",
+      "intent": "research",
+      "skill_used": "research-pro",
+      "metadata": {}
+    },
+    {
+      "timestamp": 1772113896.4130301,
+      "role": "user",
+      "content": "分析竞品情况",
+      "intent": null,
+      "skill_used": null,
+      "metadata": {}
+    }
+  ]
+}
