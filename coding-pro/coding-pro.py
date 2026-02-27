@@ -45,8 +45,8 @@ def generate_code(prompt: str, output_dir: str, language: str = "python") -> Dic
         f.write(f"# {structure.get('name', 'Generated Project')}\n\n")
         f.write(f"## 描述\n\n{prompt}\n\n")
         f.write(f"## 文件结构\n\n")
-        for f in created_files:
-            f.write(f"- {os.path.basename(f)}\n")
+        for filepath in created_files:
+            f.write(f"- {os.path.basename(filepath)}\n")
     
     return {
         "success": True,
