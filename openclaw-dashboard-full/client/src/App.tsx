@@ -10,13 +10,15 @@ import {
   X,
   Zap,
   Cloud,
-  Wifi
+  Wifi,
+  Users
 } from 'lucide-react';
 import Dashboard from './pages/Dashboard';
 import Tasks from './pages/Tasks';
 import Skills from './pages/Skills';
 import Chat from './pages/Chat';
 import SettingsPage from './pages/Settings';
+import Collaboration from './pages/Collaboration';
 import { isKVConfigured } from './hooks/useKVData';
 
 function Sidebar({ isOpen, setIsOpen }: { isOpen: boolean; setIsOpen: (v: boolean) => void }) {
@@ -26,6 +28,7 @@ function Sidebar({ isOpen, setIsOpen }: { isOpen: boolean; setIsOpen: (v: boolea
     { path: '/', icon: LayoutDashboard, label: 'Dashboard' },
     { path: '/tasks', icon: CheckSquare, label: 'Tasks' },
     { path: '/skills', icon: Wrench, label: 'Skills' },
+    { path: '/collaboration', icon: Users, label: 'Collaboration' },
     { path: '/chat', icon: MessageSquare, label: 'Chat' },
     { path: '/settings', icon: Settings, label: 'Settings' },
   ];
@@ -153,6 +156,7 @@ function App() {
               <Route path="/" element={<Dashboard />} />
               <Route path="/tasks" element={<Tasks />} />
               <Route path="/skills" element={<Skills />} />
+              <Route path="/collaboration" element={<Collaboration />} />
               <Route path="/chat" element={<Chat />} />
               <Route path="/settings" element={<SettingsPage />} />
             </Routes>
