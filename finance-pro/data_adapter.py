@@ -445,6 +445,31 @@ def get_adapter() -> FinanceDataAdapter:
     return _adapter
 
 
+def get_finance_adapter() -> FinanceDataAdapter:
+    """获取金融数据适配器实例 (别名，供skill-cli使用)"""
+    return get_adapter()
+
+
+def get_research_adapter():
+    """获取研究模块适配器 (兼容函数，供skill-cli使用)
+    
+    实际从research-pro导入SearchAdapter
+    """
+    import sys
+    import os
+    # 添加research-pro到路径
+    research_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'research-pro')
+    if research_path not in sys.path:
+        sys.path.insert(0, research_path)
+    
+    try:
+        from search_adapter import SearchAdapter
+        return SearchAdapter()
+    except ImportError:
+        # 如果research-pro不可用，返回None
+        return None
+
+
 def get_stock_quote(symbol: str) -> Dict[str, Any]:
     """便捷函数: 获取股票行情"""
     return get_adapter().get_stock_quote(symbol)
