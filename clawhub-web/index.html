@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ClawHub - AI技能包市场</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <a href="/" class="logo">
+                    <span class="logo-icon">🐾</span>
+                    <span class="logo-text">ClawHub</span>
+                </a>
+                <nav class="nav">
+                    <a href="#skills" class="nav-link">技能包</a>
+                    <a href="#categories" class="nav-link">分类</a>
+                    <a href="#docs" class="nav-link">文档</a>
+                    <a href="https://github.com/claw-bft/ai-agent-lab" class="nav-link" target="_blank">GitHub</a>
+                </nav>
+                <div class="header-actions">
+                    <button class="btn btn-secondary" id="theme-toggle">🌙</button>
+                    <a href="https://github.com/claw-bft/ai-agent-lab" class="btn btn-primary" target="_blank">
+                        开始使用
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="container">
+                <div class="hero-content">
+                    <h1 class="hero-title">
+                        发现、安装、分享
+                        <span class="gradient-text">AI技能包</span>
+                    </h1>
+                    <p class="hero-description">
+                        ClawHub 是 AI Agent Lab 的官方技能包市场。探索 24+ 个专业技能包，
+                        从金融分析到代码生成，一键安装，即刻使用。
+                    </p>
+                    <div class="hero-actions">
+                        <a href="#skills" class="btn btn-large btn-primary">浏览技能包</a>
+                        <a href="#publish" class="btn btn-large btn-secondary">发布技能包</a>
+                    </div>
+                    <div class="hero-stats">
+                        <div class="stat">
+                            <span class="stat-value" id="stat-skills">24</span>
+                            <span class="stat-label">技能包</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-value" id="stat-downloads">1.2K</span>
+                            <span class="stat-label">下载量</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-value" id="stat-categories">8</span>
+                            <span class="stat-label">分类</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Search Section -->
+        <section class="search-section" id="skills">
+            <div class="container">
+                <div class="search-box">
+                    <input type="text" class="search-input" id="search-input" placeholder="搜索技能包...">
+                    <button class="search-btn" id="search-btn">🔍</button>
+                </div>
+                <div class="filter-tags" id="filter-tags">
+                    <button class="tag active" data-category="all">全部</button>
+                    <button class="tag" data-category="finance">💰 金融</button>
+                    <button class="tag" data-category="coding">💻 开发</button>
+                    <button class="tag" data-category="research">🔬 研究</button>
+                    <button class="tag" data-category="product">📦 产品</button>
+                    <button class="tag" data-category="ai">🧠 AI增强</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Skills Grid -->
+        <section class="skills-section">
+            <div class="container">
+                <div class="section-header">
+                    <h2 class="section-title">热门技能包</h2>
+                    <div class="sort-dropdown">
+                        <select id="sort-select">
+                            <option value="downloads">按下载量</option>
+                            <option value="rating">按评分</option>
+                            <option value="updated">最近更新</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="skills-grid" id="skills-grid">
+                    <!-- Skills will be loaded dynamically -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Categories Section -->
+        <section class="categories-section" id="categories">
+            <div class="container">
+                <h2 class="section-title">浏览分类</h2>
+                <div class="categories-grid" id="categories-grid">
+                    <!-- Categories will be loaded dynamically -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Featured Section -->
+        <section class="featured-section">
+            <div class="container">
+                <div class="featured-card">
+                    <div class="featured-content">
+                        <span class="featured-badge">🌟 精选</span>
+                        <h3 class="featured-title">Claude Domain Skills</h3>
+                        <p class="featured-description">
+                            18个领域的专业知识库，涵盖商业策略、投资分析、游戏设计、创意写作等。
+                            由领域专家精心打造，助你快速成为任何领域的专家。
+                        </p>
+                        <div class="featured-stats">
+                            <span>📚 18 个领域</span>
+                            <span>⭐ 4.9 评分</span>
+                            <span>📥 500+ 下载</span>
+                        </div>
+                        <a href="#" class="btn btn-primary" onclick="showSkillDetail('claude-domain-skills')">查看详情</a>
+                    </div>
+                    <div class="featured-visual">
+                        <div class="domain-icons">
+                            <span class="domain-icon">💼</span>
+                            <span class="domain-icon">📈</span>
+                            <span class="domain-icon">🎮</span>
+                            <span class="domain-icon">✍️</span>
+                            <span class="domain-icon">🎨</span>
+                            <span class="domain-icon">🔧</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- How to Use -->
+        <section class="how-to-section" id="docs">
+            <div class="container">
+                <h2 class="section-title">快速开始</h2>
+                <div class="steps">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <h3 class="step-title">安装 CLI</h3>
+                        <p class="step-description">下载并安装 ClawHub CLI 工具</p>
+                        <code class="step-code">pip install clawhub</code>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <h3 class="step-title">浏览技能包</h3>
+                        <p class="step-description">查看可用的技能包列表</p>
+                        <code class="step-code">claw list</code>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <h3 class="step-title">安装使用</h3>
+                        <p class="step-description">一键安装所需技能包</p>
+                        <code class="step-code">claw install finance-pro</code>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Publish Section -->
+        <section class="publish-section" id="publish">
+            <div class="container">
+                <div class="publish-content">
+                    <h2 class="section-title">发布你的技能包</h2>
+                    <p class="publish-description">
+                        有独特的 AI 技能想法？分享给社区，让更多人受益。
+                        我们提供完整的发布指南和审核支持。
+                    </p>
+                    <div class="publish-actions">
+                        <a href="https://github.com/claw-bft/ai-agent-lab/blob/main/CONTRIBUTING.md" class="btn btn-primary" target="_blank">
+                            查看发布指南
+                        </a>
+                        <a href="https://github.com/claw-bft/ai-agent-lab/issues/new?template=skill_submission.md" class="btn btn-secondary" target="_blank">
+                            提交技能包
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <span class="logo-icon">🐾</span>
+                    <span class="logo-text">ClawHub</span>
+                    <p class="footer-tagline">AI 技能包生态系统</p>
+                </div>
+                <div class="footer-links">
+                    <div class="footer-column">
+                        <h4>产品</h4>
+                        <a href="#skills">技能包</a>
+                        <a href="#categories">分类</a>
+                        <a href="#docs">文档</a>
+                    </div>
+                    <div class="footer-column">
+                        <h4>社区</h4>
+                        <a href="https://github.com/claw-bft/ai-agent-lab" target="_blank">GitHub</a>
+                        <a href="#">Discord</a>
+                        <a href="#">论坛</a>
+                    </div>
+                    <div class="footer-column">
+                        <h4>资源</h4>
+                        <a href="#">API 文档</a>
+                        <a href="#">开发指南</a>
+                        <a href="#">最佳实践</a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 ClawHub. Built with ❤️ by AI Agent Lab.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Skill Detail Modal -->
+    <div class="modal" id="skill-modal">
+        <div class="modal-content">
+            <button class="modal-close" id="modal-close">&times;</button>
+            <div class="modal-body" id="modal-body">
+                <!-- Skill details will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

@@ -28,15 +28,17 @@ jobs:
       - name: Prepare deployment directory
         run: |
           mkdir -p _site
+          # Copy ClawHub Web (优先)
+          cp -r clawhub-web/* _site/ 2>/dev/null || true
           # Copy docs content
-          cp -r docs/* _site/ 2>/dev/null || true
+          cp -r docs/* _site/docs/ 2>/dev/null || true
           # Copy visual reports
-          cp -r visual-reports/* _site/ 2>/dev/null || true
+          cp -r visual-reports/* _site/visual-reports/ 2>/dev/null || true
           # Copy skill-cli HTML coverage if exists
           cp -r skills/skill-cli/htmlcov _site/coverage/skill-cli 2>/dev/null || true
           # Copy stock-portfolio-analyzer HTML coverage if exists  
           cp -r skills/stock-portfolio-analyzer/htmlcov _site/coverage/stock-portfolio-analyzer 2>/dev/null || true
-          # Create index.html if not exists
+          # Create fallback index.html if clawhub-web not exists
           if [ ! -f _site/index.html ]; then
             cat > _site/index.html << 'EOF'
 <!DOCTYPE html>
