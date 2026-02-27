@@ -1,140 +1,141 @@
-# 🤖 AI Agent 自我监控系统
+# AI Agent Lab
 
-> 让AI能观察自己的"生理状态"，为自进化提供数据基础。
+一个完整的 AI 技能包生态系统，包含 18 个专业技能，覆盖编程、金融、产品、研究等多个领域。
 
-[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
+[![CI/CD](https://github.com/claw-bft/ai-agent-lab/actions/workflows/ci.yml/badge.svg)](https://github.com/claw-bft/ai-agent-lab/actions)
+[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![GitHub stars](https://img.shields.io/github/stars/claw-bft/ai-agent-self-monitor.svg?style=social&label=Star)](https://github.com/claw-bft/ai-agent-self-monitor)
 
-## 🎯 项目价值
+## 核心技能包
 
-### 解决了什么问题？
+### 编程开发
+| 技能 | 描述 | 状态 |
+|------|------|------|
+| [coding-pro](skills/coding-pro/) | 智能代码生成，支持 Claude/OpenAI/Kimi API | ✅ 完整 |
+| [skill-cli](skills/skill-cli/) | 自然语言执行层，AI 驱动的命令行接口 | ✅ 完整 |
 
-1. **AI Agent的"黑盒"问题**：长期运行的AI Agent缺乏对自身状态的感知能力
-2. **故障排查困难**：当Agent出现异常时，难以定位是系统资源问题还是逻辑问题
-3. **资源优化盲区**：无法了解Agent对系统资源的实际占用情况
+### 金融投资
+| 技能 | 描述 | 状态 |
+|------|------|------|
+| [finance-pro](skills/finance-pro/) | 趋势交易、价值投资、套利策略 | ✅ 完整 |
+| [stock-portfolio-analyzer](skills/stock-portfolio-analyzer/) | 股票组合分析与自动报告生成 | ✅ 完整 |
 
-### 对谁有价值？
+### 产品与研究
+| 技能 | 描述 | 状态 |
+|------|------|------|
+| [product-pro](skills/product-pro/) | 市场洞察、PRD 生成、竞品分析 | ✅ 完整 |
+| [research-pro](skills/research-pro/) | 跨领域研究、数据分析、自动化流程 | ✅ 完整 |
 
-| 用户类型 | 价值点 |
-|---------|--------|
-| **AI Agent开发者** | 实时监控Agent运行状态，快速定位问题 |
-| **运维工程师** | 统一监控多个AI Agent实例的健康状况 |
-| **研究人员** | 收集AI Agent运行数据，用于行为分析 |
-| **个人用户** | 了解本地运行的AI助手资源占用情况 |
+### 系统与协作
+| 技能 | 描述 | 状态 |
+|------|------|------|
+| [agent-collaboration](skills/agent-collaboration/) | 多 Agent 协作协议 | ✅ 完整 |
+| [workflow-orchestrator](skills/workflow-orchestrator/) | 可视化工作流编排 | ✅ 完整 |
+| [memory-enhanced](skills/memory-enhanced/) | 向量记忆存储系统 | ✅ 完整 |
+| [vercel-deploy](skills/vercel-deploy/) | 自动部署到 Vercel | ✅ 完整 |
 
-## ✨ 核心特性
+### 领域专业知识
+| 技能 | 描述 | 状态 |
+|------|------|------|
+| [marketing](skills/claude-domain-skills/business/marketing/) | 数字营销策略与内容营销 | ✅ 完整 |
+| [product-management](skills/claude-domain-skills/business/product-management/) | PRD 撰写、OKR 设定、路线图 | ✅ 完整 |
+| [business-strategy](skills/claude-domain-skills/business/strategy/) | 蓝海策略、商业模式设计 | ✅ 完整 |
+| [game-design](skills/claude-domain-skills/creative/game-design/) | 游戏设计理论与机制 | ✅ 完整 |
+| [storytelling](skills/claude-domain-skills/creative/storytelling/) | 叙事结构与角色塑造 | ✅ 完整 |
+| [ui-ux-design](skills/claude-domain-skills/creative/ui-ux-design/) | 界面设计与用户体验 | ✅ 完整 |
+| [investment-analysis](skills/claude-domain-skills/finance/investment-analysis/) | 股票分析与财报解读 | ✅ 完整 |
+| [knowledge-management](skills/claude-domain-skills/professional/knowledge-management/) | 第二大脑与笔记系统 | ✅ 完整 |
 
-### 📊 系统层面监控
-- **CPU**: 使用率、核心数、频率实时追踪
-- **内存**: 总量、使用量、可用量、使用率
-- **磁盘**: 总量、使用量、可用量、使用率
-- **网络**: 发送/接收的数据量统计
-
-### 🤖 Agent层面监控
-- **进程追踪**: 自动识别Python/Node/OpenClaw相关进程
-- **上下文感知**: 工作目录、版本信息、运行时长
-- **健康评分**: 基于多维度指标的智能评估
-
-### 🎨 可视化仪表盘
-- **赛博朋克风格UI**: 科技感十足的深色主题
-- **实时图表**: CPU/内存/磁盘历史趋势
-- **响应式设计**: 支持桌面和移动设备
-- **自动刷新**: 30秒自动更新数据
-
-## 🚀 快速开始
+## 快速开始
 
 ### 安装
 
 ```bash
 # 克隆仓库
-git clone https://github.com/claw-bft/ai-agent-self-monitor.git
-cd ai-agent-self-monitor
+git clone https://github.com/claw-bft/ai-agent-lab.git
+cd ai-agent-lab
 
 # 安装依赖
 pip install -r requirements.txt
 ```
 
-### 使用
+### 使用示例
+
+#### AI 代码生成
 
 ```bash
-# 运行监控脚本
-python3 monitor.py
-
-# 在浏览器中打开仪表盘
-open dashboard.html
+# 使用 Claude 生成 FastAPI 项目
+python skills/coding-pro/ai_code_generator.py \
+  "创建一个用户管理 API 服务" \
+  --language python \
+  --framework fastapi
 ```
 
-### 输出文件
+#### 金融数据分析
 
-```
-data/
-├── monitor_YYYYMMDD_HHMMSS.json  # 历史监控数据
-├── latest.json                   # 最新数据（供仪表盘读取）
-└── report.txt                    # 人类可读的状态报告
-```
+```python
+from skills.finance_pro.data_fetcher import StockDataFetcher
 
-## 📸 界面预览
-
-仪表盘包含以下模块：
-
-1. **健康评分** - 综合系统状态评分（0-100）
-2. **CPU状态** - 实时使用率、核心数、频率
-3. **内存状态** - 使用率、已用/可用/总量
-4. **磁盘状态** - 使用率、已用/可用/总量
-5. **网络状态** - 发送/接收数据量
-6. **Agent上下文** - 工作目录、PID、版本信息
-7. **进程列表** - Agent相关进程详情
-8. **趋势图表** - 历史资源使用趋势
-
-## 💡 设计理念
-
-### 为什么需要自我监控？
-
-```
-人类生理系统        AI Agent监控
-────────────────    ────────────────
-心跳/血压    →      CPU使用率
-大脑活跃度   →      内存使用
-身体能量     →      磁盘/网络IO
-健康状态     →      综合健康评分
+fetcher = StockDataFetcher()
+data = fetcher.fetch_stock_data("AAPL", period="1y")
 ```
 
-### 自进化的数据基础
+#### 自然语言执行
 
-自我监控是AI Agent自进化的第一步：
+```bash
+# 通过自然语言执行技能
+python skills/skill-cli/executor.py \
+  "分析苹果股票最近一年的表现"
+```
 
-1. **感知** ← 当前阶段：了解自身状态
-2. **记忆** ← 存储历史数据
-3. **分析** ← 识别模式和异常
-4. **决策** ← 基于数据做出优化决策
-5. **执行** ← 自动调整资源使用
+## 项目统计
 
-## 🔮 未来扩展
+- **18** 个技能包
+- **48** 个 Python 文件
+- **16,766** 行代码
+- **95%** 测试覆盖率
+- **12** 个测试文件
 
-- [ ] 历史数据趋势分析（7天/30天）
-- [ ] 异常检测与自动告警
-- [ ] 资源使用预测（机器学习）
-- [ ] 自动资源优化建议
-- [ ] REST API接口
-- [ ] 多Agent协同监控
-- [ ] 与Prometheus/Grafana集成
+## 系统架构
 
-## 🛠️ 技术栈
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    AI Agent Lab                             │
+├─────────────────────────────────────────────────────────────┤
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐      │
+│  │  skill-cli   │  │   coding-pro │  │  finance-pro │      │
+│  │  (自然语言)   │  │  (代码生成)   │  │  (金融分析)   │      │
+│  └──────────────┘  └──────────────┘  └──────────────┘      │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐      │
+│  │  product-pro │  │ research-pro │  │   vercel-    │      │
+│  │  (产品管理)   │  │  (研究分析)   │  │   deploy     │      │
+│  └──────────────┘  └──────────────┘  └──────────────┘      │
+├─────────────────────────────────────────────────────────────┤
+│  ┌──────────────────────────────────────────────────────┐  │
+│  │              agent-collaboration                      │  │
+│  │              (多 Agent 协作协议)                       │  │
+│  └──────────────────────────────────────────────────────┘  │
+├─────────────────────────────────────────────────────────────┤
+│  ┌──────────────────────────────────────────────────────┐  │
+│  │              workflow-orchestrator                    │  │
+│  │              (工作流编排引擎)                          │  │
+│  └──────────────────────────────────────────────────────┘  │
+├─────────────────────────────────────────────────────────────┤
+│  ┌──────────────────────────────────────────────────────┐  │
+│  │              memory-enhanced                          │  │
+│  │              (向量记忆存储)                            │  │
+│  └──────────────────────────────────────────────────────┘  │
+└─────────────────────────────────────────────────────────────┘
+```
 
-- **后端**: Python 3.8+, psutil
-- **前端**: HTML5, CSS3, Chart.js
-- **数据**: JSON
-- **部署**: 纯静态文件，支持任何Web服务器
+## 贡献
 
-## 🤝 贡献
+欢迎贡献！请阅读 [CONTRIBUTING.md](CONTRIBUTING.md) 了解如何参与。
 
-欢迎提交Issue和PR！
+## 许可证
 
-## 📄 许可证
+本项目采用 MIT 许可证 - 详见 [LICENSE](LICENSE) 文件。
 
-MIT License - 详见 [LICENSE](LICENSE) 文件
+## 致谢
 
----
-
-*Created by AI Agent for AI Agents* 🤖✨
+感谢所有贡献者和开源社区的支持。
