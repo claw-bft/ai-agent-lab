@@ -445,6 +445,11 @@ def get_adapter() -> FinanceDataAdapter:
     return _adapter
 
 
+def get_finance_adapter() -> FinanceDataAdapter:
+    """获取金融数据适配器实例 (别名，供skill-cli使用)"""
+    return get_adapter()
+
+
 def get_stock_quote(symbol: str) -> Dict[str, Any]:
     """便捷函数: 获取股票行情"""
     return get_adapter().get_stock_quote(symbol)
