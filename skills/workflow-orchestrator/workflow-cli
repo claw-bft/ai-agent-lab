@@ -1,0 +1,347 @@
+#!/usr/bin/env python3
+"""
+Workflow Orchestrator - CLI工具
+智能工作流编排系统的命令行接口
+"""
+
+import sys
+import json
+import argparse
+from typing import Optional
+
+# 导入工作流引擎
+from workflow_engine import (
+    WorkflowEngine, WorkflowTemplateLibrary, WorkflowDefinition,
+    WorkflowNode, WorkflowEdge, NodeType, get_workflow_engine,
+    create_stock_research_workflow, create_product_dev_workflow
+)
+
+
+class WorkflowCLI:
+    """工作流CLI"""
+    
+    def __init__(self):
+        self.engine = get_workflow_engine()
+    
+    def status(self):
+        """显示系统状态"""
+        workflows = self.engine.list_workflows()
+        executions = self.engine.list_executions()
+        
+        print("=== Workflow Orchestrator Status ===")
+        print(f"\nRegistered Workflows: {len(workflows)}")
+        for wf in workflows:
+            print(f"  - {wf.workflow_id[:8]}: {wf.name} ({len(wf.nodes)} nodes)")
+        
+        print(f"\nTotal Executions: {len(executions)}")
+        
+        # 统计各状态
+        status_count = {}
+        for exec in executions:
+            status = exec.status.value
+            status_count[status] = status_count.get(status, 0) + 1
+        
+        for status, count in status_count.items():
+            print(f"  - {status}: {count}")
+        
+        print("\nAvailable Templates:")
+        for t in WorkflowTemplateLibrary.list_templates():
+            print(f"  - {t['id']}: {t['name']}")
+    
+    def list_workflows(self):
+        """列出所有工作流"""
+        workflows = self.engine.list_workflows()
+        
+        print("=== Workflows ===")
+        if not workflows:
+            print("No workflows registered.")
+            return
+        
+        for wf in workflows:
+            print(f"\n{wf.workflow_id}")
+            print(f"  Name: {wf.name}")
+            print(f"  Description: {wf.description}")
+            print(f"  Nodes: {len(wf.nodes)} | Edges: {len(wf.edges)}")
+            print(f"  Tags: {', '.join(wf.tags) if wf.tags else 'None'}")
+            print(f"  Created: {wf.created_at}")
+    
+    def list_templates(self):
+        """列出所有模板"""
+        templates = WorkflowTemplateLibrary.list_templates()
+        
+        print("=== Workflow Templates ===")
+        for t in templates:
+            print(f"\n{t['id']}")
+            print(f"  Name: {t['name']}")
+            print(f"  Description: {t['description']}")
+    
+    def create_from_template(self, template_id: str, name: Optional[str] = None):
+        """从模板创建工作流"""
+        try:
+            workflow = WorkflowTemplateLibrary.create_workflow_from_template(
+                template_id, name
+            )
+            workflow_id = self.engine.register_workflow(workflow)
+            
+            print(f"Created workflow from template '{template_id}'")
+            print(f"  Workflow ID: {workflow_id}")
+            print(f"  Name: {workflow.name}")
+            print(f"  Nodes: {len(workflow.nodes)}")
+        except ValueError as e:
+            print(f"Error: {e}")
+            print(f"Available templates: {[t['id'] for t in WorkflowTemplateLibrary.list_templates()]}")
+    
+    def create_stock_research(self, symbol: str):
+        """创建股票研究工作流"""
+        workflow = create_stock_research_workflow(symbol)
+        workflow_id = self.engine.register_workflow(workflow)
+        
+        print(f"Created stock research workflow for {symbol}")
+        print(f"  Workflow ID: {workflow_id}")
+        print(f"  Nodes: {len(workflow.nodes)}")
+    
+    def create_product_dev(self, product: str):
+        """创建产品开发工作流"""
+        workflow = create_product_dev_workflow(product)
+        workflow_id = self.engine.register_workflow(workflow)
+        
+        print(f"Created product development workflow for '{product}'")
+        print(f"  Workflow ID: {workflow_id}")
+        print(f"  Nodes: {len(workflow.nodes)}")
+    
+    def execute(self, workflow_id: str, input_json: Optional[str] = None):
+        """执行工作流"""
+        input_data = {}
+        if input_json:
+            try:
+                input_data = json.loads(input_json)
+            except json.JSONDecodeError:
+                print("Error: Invalid JSON input")
+                return
+        
+        try:
+            execution_id = self.engine.execute_workflow(workflow_id, input_data)
+            print(f"Started workflow execution")
+            print(f"  Execution ID: {execution_id}")
+            
+            # 显示执行状态
+            execution = self.engine.get_execution(execution_id)
+            print(f"  Status: {execution.status.value}")
+            
+        except ValueError as e:
+            print(f"Error: {e}")
+    
+    def execution_status(self, execution_id: str):
+        """查看执行状态"""
+        execution = self.engine.get_execution(execution_id)
+        if not execution:
+            print(f"Execution {execution_id} not found")
+            return
+        
+        print(f"=== Execution Status: {execution_id} ===")
+        print(f"Workflow ID: {execution.workflow_id}")
+        print(f"Status: {execution.status.value}")
+        print(f"Started: {execution.started_at}")
+        if execution.completed_at:
+            print(f"Completed: {execution.completed_at}")
+        
+        print(f"\nNode Executions ({len(execution.node_executions)}):")
+        for node_id, node_exec in execution.node_executions.items():
+            print(f"  - {node_id}: {node_exec.status.value}")
+            if node_exec.result:
+                print(f"    Result: {json.dumps(node_exec.result, indent=2)[:100]}...")
+            if node_exec.error:
+                print(f"    Error: {node_exec.error}")
+    
+    def list_executions(self, workflow_id: Optional[str] = None):
+        """列出执行记录"""
+        executions = self.engine.list_executions(workflow_id)
+        
+        print("=== Executions ===")
+        if not executions:
+            print("No executions found.")
+            return
+        
+        for exec in executions:
+            print(f"\n{exec.execution_id}")
+            print(f"  Workflow: {exec.workflow_id[:8]}...")
+            print(f"  Status: {exec.status.value}")
+            print(f"  Started: {exec.started_at}")
+            if exec.completed_at:
+                print(f"  Completed: {exec.completed_at}")
+    
+    def export_workflow(self, workflow_id: str, output_file: str):
+        """导出工作流为JSON"""
+        workflow = self.engine.get_workflow(workflow_id)
+        if not workflow:
+            print(f"Workflow {workflow_id} not found")
+            return
+        
+        with open(output_file, 'w', encoding='utf-8') as f:
+            json.dump(workflow.to_dict(), f, indent=2, ensure_ascii=False)
+        
+        print(f"Exported workflow to {output_file}")
+    
+    def import_workflow(self, input_file: str):
+        """从JSON导入工作流"""
+        try:
+            with open(input_file, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+            
+            workflow = WorkflowDefinition.from_dict(data)
+            workflow_id = self.engine.register_workflow(workflow)
+            
+            print(f"Imported workflow from {input_file}")
+            print(f"  Workflow ID: {workflow_id}")
+            print(f"  Name: {workflow.name}")
+            
+        except FileNotFoundError:
+            print(f"Error: File not found: {input_file}")
+        except json.JSONDecodeError:
+            print(f"Error: Invalid JSON file: {input_file}")
+    
+    def demo(self):
+        """运行演示"""
+        print("=== Workflow Orchestrator Demo ===\n")
+        
+        # 1. 创建股票研究工作流
+        print("1. Creating Stock Research Workflow...")
+        workflow = create_stock_research_workflow("AAPL")
+        workflow_id = self.engine.register_workflow(workflow)
+        print(f"   Created: {workflow.name}")
+        print(f"   ID: {workflow_id}")
+        
+        # 2. 显示工作流结构
+        print("\n2. Workflow Structure:")
+        for node in workflow.nodes:
+            print(f"   [{node.node_type.value}] {node.name}")
+            if node.agent_id:
+                print(f"      Agent: {node.agent_id}")
+            if node.task_type:
+                print(f"      Task: {node.task_type}")
+        
+        # 3. 执行工作流
+        print("\n3. Executing Workflow...")
+        exec_id = self.engine.execute_workflow(workflow_id, {"symbol": "AAPL"})
+        print(f"   Execution ID: {exec_id}")
+        
+        # 4. 显示执行结果
+        execution = self.engine.get_execution(exec_id)
+        print("\n4. Execution Results:")
+        print(f"   Status: {execution.status.value}")
+        print(f"   Nodes Executed: {len(execution.node_executions)}")
+        
+        for node_id, node_exec in execution.node_executions.items():
+            status_icon = "✓" if node_exec.status.value == "completed" else "✗"
+            print(f"   {status_icon} {node_id}: {node_exec.status.value}")
+        
+        # 5. 从模板创建工作流
+        print("\n5. Creating Workflow from Template...")
+        template_wf = WorkflowTemplateLibrary.create_workflow_from_template(
+            "product-dev", "AI助手开发"
+        )
+        template_id = self.engine.register_workflow(template_wf)
+        print(f"   Created: {template_wf.name}")
+        print(f"   ID: {template_id}")
+        
+        print("\n=== Demo Complete ===")
+
+
+def main():
+    parser = argparse.ArgumentParser(
+        description="Workflow Orchestrator - 智能工作流编排系统",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Examples:
+  %(prog)s status                    # 显示系统状态
+  %(prog)s templates                 # 列出可用模板
+  %(prog)s create --template stock-research
+  %(prog)s create --stock AAPL
+  %(prog)s execute <workflow_id>
+  %(prog)s executions
+  %(prog)s demo                      # 运行演示
+        """
+    )
+    
+    subparsers = parser.add_subparsers(dest="command", help="Available commands")
+    
+    # status
+    subparsers.add_parser("status", help="显示系统状态")
+    
+    # workflows
+    subparsers.add_parser("workflows", help="列出所有工作流")
+    
+    # templates
+    subparsers.add_parser("templates", help="列出可用模板")
+    
+    # create
+    create_parser = subparsers.add_parser("create", help="创建工作流")
+    create_parser.add_argument("--template", help="从模板创建")
+    create_parser.add_argument("--stock", help="创建股票研究工作流")
+    create_parser.add_argument("--product", help="创建产品开发工作流")
+    create_parser.add_argument("--name", help="工作流名称")
+    
+    # execute
+    execute_parser = subparsers.add_parser("execute", help="执行工作流")
+    execute_parser.add_argument("workflow_id", help="工作流ID")
+    execute_parser.add_argument("--input", help="输入JSON数据")
+    
+    # execution
+    execution_parser = subparsers.add_parser("execution", help="查看执行状态")
+    execution_parser.add_argument("execution_id", help="执行ID")
+    
+    # executions
+    executions_parser = subparsers.add_parser("executions", help="列出执行记录")
+    executions_parser.add_argument("--workflow", help="筛选特定工作流")
+    
+    # export
+    export_parser = subparsers.add_parser("export", help="导出工作流")
+    export_parser.add_argument("workflow_id", help="工作流ID")
+    export_parser.add_argument("output", help="输出文件")
+    
+    # import
+    import_parser = subparsers.add_parser("import", help="导入工作流")
+    import_parser.add_argument("input", help="输入JSON文件")
+    
+    # demo
+    subparsers.add_parser("demo", help="运行演示")
+    
+    args = parser.parse_args()
+    
+    if not args.command:
+        parser.print_help()
+        return
+    
+    cli = WorkflowCLI()
+    
+    if args.command == "status":
+        cli.status()
+    elif args.command == "workflows":
+        cli.list_workflows()
+    elif args.command == "templates":
+        cli.list_templates()
+    elif args.command == "create":
+        if args.template:
+            cli.create_from_template(args.template, args.name)
+        elif args.stock:
+            cli.create_stock_research(args.stock)
+        elif args.product:
+            cli.create_product_dev(args.product)
+        else:
+            print("Error: 请指定 --template, --stock 或 --product")
+    elif args.command == "execute":
+        cli.execute(args.workflow_id, args.input)
+    elif args.command == "execution":
+        cli.execution_status(args.execution_id)
+    elif args.command == "executions":
+        cli.list_executions(args.workflow)
+    elif args.command == "export":
+        cli.export_workflow(args.workflow_id, args.output)
+    elif args.command == "import":
+        cli.import_workflow(args.input)
+    elif args.command == "demo":
+        cli.demo()
+
+
+if __name__ == "__main__":
+    main()
