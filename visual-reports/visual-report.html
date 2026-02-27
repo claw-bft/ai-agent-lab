@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI量化选股报告 - 2026.02.26</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .header .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        .header .date {
+            margin-top: 10px;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+        }
+        
+        .card-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .card-title .icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+        
+        /* 选股卡片样式 */
+        .stock-grid {
+            display: grid;
+            gap: 12px;
+        }
+        
+        .stock-card {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8ec 100%);
+            border-radius: 12px;
+            padding: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 4px solid #667eea;
+            transition: all 0.3s ease;
+        }
+        
+        .stock-card:hover {
+            background: linear-gradient(135deg, #e8ecf1 0%, #d5dbe3 100%);
+            transform: translateX(5px);
+        }
+        
+        .stock-info h3 {
+            font-size: 1.1rem;
+            color: #333;
+            margin-bottom: 4px;
+        }
+        
+        .stock-info .code {
+            font-size: 0.85rem;
+            color: #666;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .stock-tags {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-top: 8px;
+        }
+        
+        .tag {
+            font-size: 0.7rem;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-weight: 500;
+        }
+        
+        .tag-buy {
+            background: #10b981;
+            color: white;
+        }
+        
+        .tag-hold {
+            background: #f59e0b;
+            color: white;
+        }
+        
+        .tag-theme {
+            background: #3b82f6;
+            color: white;
+        }
+        
+        .stock-score {
+            text-align: right;
+        }
+        
+        .score-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #667eea;
+        }
+        
+        .score-label {
+            font-size: 0.75rem;
+            color: #888;
+        }
+        
+        /* 情感分数样式 */
+        .sentiment-overview {
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .sentiment-score-big {
+            font-size: 4rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .sentiment-label {
+            font-size: 1.2rem;
+            color: #666;
+            margin-top: 10px;
+        }
+        
+        .sentiment-status {
+            display: inline-block;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: 600;
+            margin-top: 15px;
+        }
+        
+        .status-positive {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        
+        /* 图表容器 */
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin-top: 10px;
+        }
+        
+        .chart-container-large {
+            position: relative;
+            height: 400px;
+            margin-top: 10px;
+        }
+        
+        /* 词云样式 */
+        .word-cloud {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            padding: 20px;
+            min-height: 250px;
+        }
+        
+        .word {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            cursor: default;
+        }
+        
+        .word:hover {
+            transform: scale(1.1);
+        }
+        
+        .word-1 { font-size: 2rem; background: linear-gradient(135deg, #ff6b6b, #ee5a24); color: white; }
+        .word-2 { font-size: 1.8rem; background: linear-gradient(135deg, #4834d4, #686de0); color: white; }
+        .word-3 { font-size: 1.6rem; background: linear-gradient(135deg, #00d2d3, #01a3a4); color: white; }
+        .word-4 { font-size: 1.4rem; background: linear-gradient(135deg, #ff9f43, #feca57); color: white; }
+        .word-5 { font-size: 1.2rem; background: linear-gradient(135deg, #54a0ff, #2e86de); color: white; }
+        .word-6 { font-size: 1rem; background: linear-gradient(135deg, #5f27cd, #341f97); color: white; }
+        .word-7 { font-size: 0.9rem; background: linear-gradient(135deg, #10ac84, #1dd1a1); color: white; }
+        
+        /* 统计指标 */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .metric-item {
+            text-align: center;
+            padding: 15px;
+            background: #f8fafc;
+            border-radius: 10px;
+        }
+        
+        .metric-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #333;
+        }
+        
+        .metric-label {
+            font-size: 0.8rem;
+            color: #888;
+            margin-top: 5px;
+        }
+        
+        /* 响应式 */
+        @media (max-width: 768px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .metrics-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        /* 动画 */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .card {
+            animation: fadeIn 0.6s ease forwards;
+        }
+        
+        .card:nth-child(1) { animation-delay: 0.1s; }
+        .card:nth-child(2) { animation-delay: 0.2s; }
+        .card:nth-child(3) { animation-delay: 0.3s; }
+        .card:nth-child(4) { animation-delay: 0.4s; }
+        .card:nth-child(5) { animation-delay: 0.5s; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🤖 AI量化选股报告</h1>
+            <div class="subtitle">机器人 + AI算力板块 | 动量策略分析</div>
+            <div class="date">生成时间：2026年2月26日</div>
+        </div>
+        
+        <div class="dashboard">
+            <!-- 选股结果卡片 -->
+            <div class="card" style="grid-column: span 2;">
+                <div class="card-title">
+                    <div class="icon" style="background: linear-gradient(135deg, #667eea, #764ba2); color: white;">📊</div>
+                    精选股票池
+                </div>
+                <div class="stock-grid">
+                    <div class="stock-card">
+                        <div class="stock-info">
+                            <h3>长盛轴承</h3>
+                            <span class="code">300718.SZ</span>
+                            <div class="stock-tags">
+                                <span class="tag tag-buy">买入信号</span>
+                                <span class="tag tag-theme">机器人</span>
+                            </div>
+                        </div>
+                        <div class="stock-score">
+                            <div class="score-value">85</div>
+                            <div class="score-label">综合评分</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stock-card">
+                        <div class="stock-info">
+                            <h3>澜起科技</h3>
+                            <span class="code">688008.SH</span>
+                            <div class="stock-tags">
+                                <span class="tag tag-buy">买入信号</span>
+                                <span class="tag tag-theme">AI算力</span>
+                            </div>
+                        </div>
+                        <div class="stock-score">
+                            <div class="score-value">82</div>
+                            <div class="score-label">综合评分</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stock-card">
+                        <div class="stock-info">
+                            <h3>中大力德</h3>
+                            <span class="code">002896.SZ</span>
+                            <div class="stock-tags">
+                                <span class="tag tag-buy">买入信号</span>
+                                <span class="tag tag-theme">机器人</span>
+                            </div>
+                        </div>
+                        <div class="stock-score">
+                            <div class="score-value">78</div>
+                            <div class="score-label">综合评分</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stock-card">
+                        <div class="stock-info">
+                            <h3>绿的谐波</h3>
+                            <span class="code">688017.SH</span>
+                            <div class="stock-tags">
+                                <span class="tag tag-hold">持有观望</span>
+                                <span class="tag tag-theme">机器人</span>
+                            </div>
+                        </div>
+                        <div class="stock-score">
+                            <div class="score-value">76</div>
+                            <div class="score-label">综合评分</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stock-card">
+                        <div class="stock-info">
+                            <h3>中际旭创</h3>
+                            <span class="code">300308.SZ</span>
+                            <div class="stock-tags">
+                                <span class="tag tag-buy">买入信号</span>
+                                <span class="tag tag-theme">AI算力</span>
+                            </div>
+                        </div>
+                        <div class="stock-score">
+                            <div class="score-value">74</div>
+                            <div class="score-label">综合评分</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 情感分析 -->
+            <div class="card">
+                <div class="card-title">
+                    <div class="icon" style="background: linear-gradient(135deg, #f093fb, #f5576c); color: white;">💭</div>
+                    市场情绪分析
+                </div>
+                <div class="sentiment-overview">
+                    <div class="sentiment-score-big">68.2</div>
+                    <div class="sentiment-label">市场情感综合得分</div>
+                    <div class="sentiment-status status-positive">😊 正面偏多</div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="sentimentRadar"></canvas>
+                </div>
+            </div>
+            
+            <!-- 策略收益曲线 -->
+            <div class="card" style="grid-column: span 2;">
+                <div class="card-title">
+                    <div class="icon" style="background: linear-gradient(135deg, #4facfe, #00f2fe); color: white;">📈</div>
+                    策略回测收益曲线
+                </div>
+                <div class="chart-container-large">
+                    <canvas id="returnsChart"></canvas>
+                </div>
+                <div class="metrics-grid">
+                    <div class="metric-item">
+                        <div class="metric-value" style="color: #10b981;">+23.5%</div>
+                        <div class="metric-label">累计收益</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-value" style="color: #ef4444;">-8.2%</div>
+                        <div class="metric-label">最大回撤</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-value">1.45</div>
+                        <div class="metric-label">夏普比率</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-value">68%</div>
+                        <div class="metric-label">胜率</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-value">2.3</div>
+                        <div class="metric-label">盈亏比</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-value">42</div>
+                        <div class="metric-label">交易次数</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 热点主题词云 -->
+            <div class="card">
+                <div class="card-title">
+                    <div class="icon" style="background: linear-gradient(135deg, #fa709a, #fee140); color: white;">☁️</div>
+                    热点主题词云
+                </div>
+                <div class="word-cloud">
+                    <span class="word word-1">人形机器人</span>
+                    <span class="word word-2">AI算力</span>
+                    <span class="word word-3">减速器</span>
+                    <span class="word word-4">CPO</span>
+                    <span class="word word-5">谐波减速器</span>
+                    <span class="word word-6">伺服电机</span>
+                    <span class="word word-3">光模块</span>
+                    <span class="word word-4">智能制造</span>
+                    <span class="word word-5">数据中心</span>
+                    <span class="word word-6">工业4.0</span>
+                    <span class="word word-7">边缘计算</span>
+                    <span class="word word-7">神经网络</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // 情感分析雷达图
+        const sentimentCtx = document.getElementById('sentimentRadar').getContext('2d');
+        new Chart(sentimentCtx, {
+            type: 'radar',
+            data: {
+                labels: ['正面情绪', '交易活跃度', '机构关注', '新闻热度', '技术突破'],
+                datasets: [{
+                    label: '当前市场',
+                    data: [75, 82, 68, 71, 85],
+                    backgroundColor: 'rgba(102, 126, 234, 0.2)',
+                    borderColor: 'rgba(102, 126, 234, 1)',
+                    borderWidth: 2,
+                    pointBackgroundColor: 'rgba(102, 126, 234, 1)',
+                    pointBorderColor: '#fff',
+                    pointHoverBackgroundColor: '#fff',
+                    pointHoverBorderColor: 'rgba(102, 126, 234, 1)'
+                }, {
+                    label: '历史平均',
+                    data: [60, 65, 55, 60, 62],
+                    backgroundColor: 'rgba(200, 200, 200, 0.2)',
+                    borderColor: 'rgba(200, 200, 200, 1)',
+                    borderWidth: 2,
+                    pointBackgroundColor: 'rgba(200, 200, 200, 1)',
+                    borderDash: [5, 5]
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    r: {
+                        beginAtZero: true,
+                        max: 100,
+                        ticks: {
+                            stepSize: 20
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+        
+        // 策略收益曲线
+        const returnsCtx = document.getElementById('returnsChart').getContext('2d');
+        
+        // 生成模拟数据
+        const dates = [];
+        const strategyReturns = [];
+        const benchmarkReturns = [];
+        
+        let strategyValue = 100;
+        let benchmarkValue = 100;
+        
+        for (let i = 0; i < 252; i++) {
+            const date = new Date('2025-02-26');
+            date.setDate(date.getDate() + i);
+            dates.push(date.toISOString().split('T')[0]);
+            
+            // 模拟策略收益（带趋势和波动）
+            const strategyDaily = (Math.random() - 0.45) * 0.03 + 0.0008;
+            strategyValue *= (1 + strategyDaily);
+            strategyReturns.push(strategyValue);
+            
+            // 模拟基准收益
+            const benchmarkDaily = (Math.random() - 0.48) * 0.025 + 0.0003;
+            benchmarkValue *= (1 + benchmarkDaily);
+            benchmarkReturns.push(benchmarkValue);
+        }
+        
+        new Chart(returnsCtx, {
+            type: 'line',
+            data: {
+                labels: dates,
+                datasets: [{
+                    label: '动量策略',
+                    data: strategyReturns,
+                    borderColor: 'rgba(102, 126, 234, 1)',
+                    backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 0,
+                    pointHoverRadius: 6
+                }, {
+                    label: '沪深300基准',
+                    data: benchmarkReturns,
+                    borderColor: 'rgba(200, 200, 200, 1)',
+                    backgroundColor: 'transparent',
+                    borderWidth: 2,
+                    borderDash: [5, 5],
+                    tension: 0.4,
+                    pointRadius: 0,
+                    pointHoverRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: {
+                    intersect: false,
+                    mode: 'index'
+                },
+                scales: {
+                    x: {
+                        grid: {
+                            display: false
+                        },
+                        ticks: {
+                            maxTicksLimit: 12
+                        }
+                    },
+                    y: {
+                        beginAtZero: false,
+                        ticks: {
+                            callback: function(value) {
+                                return value.toFixed(0);
+                            }
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        align: 'end'
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.dataset.label + ': ' + context.parsed.y.toFixed(2);
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
