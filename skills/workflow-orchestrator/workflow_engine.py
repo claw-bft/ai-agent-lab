@@ -476,6 +476,77 @@ class WorkflowTemplateLibrary:
                 {"source": "node_2", "target": "node_3"},
                 {"source": "node_3", "target": "node_4"}
             ]
+        },
+        "data-analysis": {
+            "name": "数据分析",
+            "description": "数据采集 -> 清洗处理 -> 分析建模 -> 可视化报告",
+            "nodes": [
+                {"node_type": "start", "name": "开始", "position": {"x": 100, "y": 200}},
+                {"node_type": "task", "name": "数据采集", "agent_id": "research-pro", "task_type": "research.search", "position": {"x": 300, "y": 200}},
+                {"node_type": "task", "name": "数据清洗", "agent_id": "coding-pro", "task_type": "coding.generate", "position": {"x": 500, "y": 200}},
+                {"node_type": "task", "name": "分析建模", "agent_id": "research-pro", "task_type": "research.deep", "position": {"x": 700, "y": 200}},
+                {"node_type": "task", "name": "可视化报告", "agent_id": "coding-pro", "task_type": "coding.generate", "position": {"x": 900, "y": 200}},
+                {"node_type": "end", "name": "完成", "position": {"x": 1100, "y": 200}}
+            ],
+            "edges": [
+                {"source": "node_0", "target": "node_1"},
+                {"source": "node_1", "target": "node_2"},
+                {"source": "node_2", "target": "node_3"},
+                {"source": "node_3", "target": "node_4"},
+                {"source": "node_4", "target": "node_5"}
+            ]
+        },
+        "customer-service": {
+            "name": "客户服务",
+            "description": "工单分类 -> 智能回复 -> 满意度分析 -> 知识库更新",
+            "nodes": [
+                {"node_type": "start", "name": "开始", "position": {"x": 100, "y": 200}},
+                {"node_type": "task", "name": "工单分类", "agent_id": "research-pro", "task_type": "research.search", "position": {"x": 300, "y": 200}},
+                {"node_type": "condition", "name": "是否技术问题", "position": {"x": 500, "y": 200}},
+                {"node_type": "task", "name": "技术回复", "agent_id": "coding-pro", "task_type": "coding.generate", "position": {"x": 700, "y": 100}},
+                {"node_type": "task", "name": "一般回复", "agent_id": "research-pro", "task_type": "research.report", "position": {"x": 700, "y": 300}},
+                {"node_type": "aggregate", "name": "合并回复", "position": {"x": 900, "y": 200}},
+                {"node_type": "task", "name": "满意度分析", "agent_id": "research-pro", "task_type": "research.deep", "position": {"x": 1100, "y": 200}},
+                {"node_type": "task", "name": "更新知识库", "agent_id": "product-pro", "task_type": "product.prd", "position": {"x": 1300, "y": 200}},
+                {"node_type": "end", "name": "完成", "position": {"x": 1500, "y": 200}}
+            ],
+            "edges": [
+                {"source": "node_0", "target": "node_1"},
+                {"source": "node_1", "target": "node_2"},
+                {"source": "node_2", "target": "node_3", "label": "是"},
+                {"source": "node_2", "target": "node_4", "label": "否"},
+                {"source": "node_3", "target": "node_5"},
+                {"source": "node_4", "target": "node_5"},
+                {"source": "node_5", "target": "node_6"},
+                {"source": "node_6", "target": "node_7"},
+                {"source": "node_7", "target": "node_8"}
+            ]
+        },
+        "devops-monitoring": {
+            "name": "运维监控",
+            "description": "指标采集 -> 异常检测 -> 告警通知 -> 自动修复 -> 报告生成",
+            "nodes": [
+                {"node_type": "start", "name": "开始", "position": {"x": 100, "y": 200}},
+                {"node_type": "task", "name": "指标采集", "agent_id": "research-pro", "task_type": "research.search", "position": {"x": 300, "y": 200}},
+                {"node_type": "condition", "name": "异常检测", "position": {"x": 500, "y": 200}},
+                {"node_type": "task", "name": "告警通知", "agent_id": "research-pro", "task_type": "research.report", "position": {"x": 700, "y": 100}},
+                {"node_type": "task", "name": "自动修复", "agent_id": "coding-pro", "task_type": "coding.generate", "position": {"x": 700, "y": 300}},
+                {"node_type": "aggregate", "name": "合并结果", "position": {"x": 900, "y": 200}},
+                {"node_type": "delay", "name": "等待验证", "position": {"x": 1100, "y": 200}},
+                {"node_type": "task", "name": "生成报告", "agent_id": "research-pro", "task_type": "research.report", "position": {"x": 1300, "y": 200}},
+                {"node_type": "end", "name": "完成", "position": {"x": 1500, "y": 200}}
+            ],
+            "edges": [
+                {"source": "node_0", "target": "node_1"},
+                {"source": "node_1", "target": "node_2"},
+                {"source": "node_2", "target": "node_3", "label": "异常"},
+                {"source": "node_2", "target": "node_7", "label": "正常"},
+                {"source": "node_3", "target": "node_5"},
+                {"source": "node_4", "target": "node_5"},
+                {"source": "node_5", "target": "node_6"},
+                {"source": "node_6", "target": "node_7"},
+                {"source": "node_7", "target": "node_8"}
+            ]
         }
     }
     
