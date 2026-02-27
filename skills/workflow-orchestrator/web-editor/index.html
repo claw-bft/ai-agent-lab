@@ -1,0 +1,1469 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Workflow Orchestrator - 可视化工作流编辑器</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #0f172a;
+            color: #e2e8f0;
+            overflow: hidden;
+        }
+
+        .app {
+            display: flex;
+            height: 100vh;
+        }
+
+        /* 左侧工具栏 */
+        .sidebar {
+            width: 260px;
+            background: #1e293b;
+            border-right: 1px solid #334155;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid #334155;
+        }
+
+        .sidebar-header h1 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #60a5fa;
+        }
+
+        .sidebar-header p {
+            font-size: 12px;
+            color: #94a3b8;
+            margin-top: 4px;
+        }
+
+        .node-palette {
+            flex: 1;
+            padding: 16px;
+            overflow-y: auto;
+        }
+
+        .palette-section {
+            margin-bottom: 20px;
+        }
+
+        .palette-section h3 {
+            font-size: 12px;
+            text-transform: uppercase;
+            color: #64748b;
+            margin-bottom: 12px;
+            letter-spacing: 0.5px;
+        }
+
+        .node-item {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            background: #334155;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            cursor: grab;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+        }
+
+        .node-item:hover {
+            background: #475569;
+            border-color: #60a5fa;
+            transform: translateX(4px);
+        }
+
+        .node-item:active {
+            cursor: grabbing;
+        }
+
+        .node-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            font-size: 14px;
+        }
+
+        .node-icon.start { background: #10b981; }
+        .node-icon.end { background: #ef4444; }
+        .node-icon.task { background: #3b82f6; }
+        .node-icon.condition { background: #f59e0b; }
+        .node-icon.parallel { background: #8b5cf6; }
+        .node-icon.aggregate { background: #ec4899; }
+        .node-icon.delay { background: #6b7280; }
+
+        .node-info h4 {
+            font-size: 13px;
+            font-weight: 500;
+            color: #f1f5f9;
+        }
+
+        .node-info p {
+            font-size: 11px;
+            color: #94a3b8;
+            margin-top: 2px;
+        }
+
+        /* 中间画布 */
+        .canvas-container {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .toolbar {
+            position: absolute;
+            top: 16px;
+            left: 16px;
+            right: 16px;
+            height: 48px;
+            background: #1e293b;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            gap: 8px;
+            z-index: 100;
+            border: 1px solid #334155;
+        }
+
+        .toolbar-btn {
+            padding: 8px 16px;
+            background: #334155;
+            border: none;
+            border-radius: 6px;
+            color: #e2e8f0;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .toolbar-btn:hover {
+            background: #475569;
+        }
+
+        .toolbar-btn.primary {
+            background: #3b82f6;
+        }
+
+        .toolbar-btn.primary:hover {
+            background: #2563eb;
+        }
+
+        .toolbar-btn.success {
+            background: #10b981;
+        }
+
+        .toolbar-btn.success:hover {
+            background: #059669;
+        }
+
+        .toolbar-separator {
+            width: 1px;
+            height: 24px;
+            background: #475569;
+            margin: 0 8px;
+        }
+
+        .toolbar-spacer {
+            flex: 1;
+        }
+
+        .canvas {
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 1px 1px, #334155 1px, transparent 0);
+            background-size: 20px 20px;
+            cursor: grab;
+            position: relative;
+        }
+
+        .canvas:active {
+            cursor: grabbing;
+        }
+
+        .canvas.dragging {
+            cursor: crosshair;
+        }
+
+        /* 节点样式 */
+        .workflow-node {
+            position: absolute;
+            min-width: 160px;
+            background: #1e293b;
+            border: 2px solid #475569;
+            border-radius: 12px;
+            padding: 12px;
+            cursor: move;
+            transition: box-shadow 0.2s, border-color 0.2s;
+            user-select: none;
+        }
+
+        .workflow-node:hover {
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        .workflow-node.selected {
+            border-color: #60a5fa;
+            box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.2);
+        }
+
+        .workflow-node.executing {
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(96, 165, 250, 0.4); }
+            50% { box-shadow: 0 0 0 8px rgba(96, 165, 250, 0); }
+        }
+
+        .workflow-node.success {
+            border-color: #10b981;
+        }
+
+        .workflow-node.error {
+            border-color: #ef4444;
+        }
+
+        .node-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .node-type-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+
+        .node-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #f1f5f9;
+        }
+
+        .node-body {
+            font-size: 11px;
+            color: #94a3b8;
+            line-height: 1.4;
+        }
+
+        .node-ports {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .node-ports.input {
+            left: -8px;
+        }
+
+        .node-ports.output {
+            right: -8px;
+        }
+
+        .port {
+            width: 16px;
+            height: 16px;
+            background: #475569;
+            border: 2px solid #1e293b;
+            border-radius: 50%;
+            cursor: crosshair;
+            transition: all 0.2s;
+            margin: 4px 0;
+        }
+
+        .port:hover {
+            background: #60a5fa;
+            transform: scale(1.2);
+        }
+
+        .port.connected {
+            background: #10b981;
+        }
+
+        /* 连接线 */
+        .connections {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .connection-line {
+            fill: none;
+            stroke: #475569;
+            stroke-width: 2;
+            pointer-events: stroke;
+        }
+
+        .connection-line:hover {
+            stroke: #60a5fa;
+            stroke-width: 3;
+        }
+
+        .connection-line.selected {
+            stroke: #60a5fa;
+        }
+
+        .temp-line {
+            fill: none;
+            stroke: #60a5fa;
+            stroke-width: 2;
+            stroke-dasharray: 5, 5;
+            pointer-events: none;
+        }
+
+        /* 右侧属性面板 */
+        .properties-panel {
+            width: 320px;
+            background: #1e293b;
+            border-left: 1px solid #334155;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .properties-header {
+            padding: 20px;
+            border-bottom: 1px solid #334155;
+        }
+
+        .properties-header h2 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #f1f5f9;
+        }
+
+        .properties-content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .property-group {
+            margin-bottom: 20px;
+        }
+
+        .property-group label {
+            display: block;
+            font-size: 12px;
+            color: #94a3b8;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .property-group input,
+        .property-group select,
+        .property-group textarea {
+            width: 100%;
+            padding: 10px 12px;
+            background: #334155;
+            border: 1px solid #475569;
+            border-radius: 6px;
+            color: #e2e8f0;
+            font-size: 13px;
+            transition: border-color 0.2s;
+        }
+
+        .property-group input:focus,
+        .property-group select:focus,
+        .property-group textarea:focus {
+            outline: none;
+            border-color: #60a5fa;
+        }
+
+        .property-group textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #64748b;
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        .empty-state h3 {
+            font-size: 14px;
+            font-weight: 500;
+            color: #94a3b8;
+            margin-bottom: 8px;
+        }
+
+        .empty-state p {
+            font-size: 12px;
+        }
+
+        /* 模板选择弹窗 */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal {
+            background: #1e293b;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            transform: scale(0.95);
+            transition: transform 0.3s;
+        }
+
+        .modal-overlay.active .modal {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid #334155;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h2 {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: #94a3b8;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 4px;
+        }
+
+        .modal-close:hover {
+            color: #e2e8f0;
+        }
+
+        .modal-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .template-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 16px;
+        }
+
+        .template-card {
+            background: #334155;
+            border-radius: 8px;
+            padding: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+        }
+
+        .template-card:hover {
+            background: #475569;
+            border-color: #60a5fa;
+            transform: translateY(-2px);
+        }
+
+        .template-icon {
+            font-size: 32px;
+            margin-bottom: 12px;
+        }
+
+        .template-card h4 {
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .template-card p {
+            font-size: 12px;
+            color: #94a3b8;
+        }
+
+        /* 执行状态面板 */
+        .execution-panel {
+            position: absolute;
+            bottom: 16px;
+            left: 16px;
+            right: 16px;
+            max-height: 200px;
+            background: #1e293b;
+            border-radius: 8px;
+            border: 1px solid #334155;
+            display: flex;
+            flex-direction: column;
+            z-index: 100;
+            transition: transform 0.3s;
+        }
+
+        .execution-panel.collapsed {
+            transform: translateY(calc(100% - 48px));
+        }
+
+        .execution-header {
+            padding: 12px 16px;
+            border-bottom: 1px solid #334155;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .execution-header h3 {
+            font-size: 13px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .execution-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-badge {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        .status-badge.pending { background: #6b7280; }
+        .status-badge.running { background: #3b82f6; }
+        .status-badge.success { background: #10b981; }
+        .status-badge.error { background: #ef4444; }
+
+        .execution-logs {
+            flex: 1;
+            overflow-y: auto;
+            padding: 12px 16px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 12px;
+            line-height: 1.6;
+        }
+
+        .log-entry {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 4px;
+        }
+
+        .log-time {
+            color: #64748b;
+            flex-shrink: 0;
+        }
+
+        .log-level {
+            flex-shrink: 0;
+            font-weight: 500;
+        }
+
+        .log-level.info { color: #60a5fa; }
+        .log-level.success { color: #10b981; }
+        .log-level.error { color: #ef4444; }
+
+        .log-message {
+            color: #e2e8f0;
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <!-- 左侧工具栏 -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h1>🔀 Workflow Orchestrator</h1>
+                <p>可视化工作流编辑器</p>
+            </div>
+            <div class="node-palette">
+                <div class="palette-section">
+                    <h3>基础节点</h3>
+                    <div class="node-item" draggable="true" data-type="START">
+                        <div class="node-icon start">▶</div>
+                        <div class="node-info">
+                            <h4>开始</h4>
+                            <p>工作流入口</p>
+                        </div>
+                    </div>
+                    <div class="node-item" draggable="true" data-type="END">
+                        <div class="node-icon end">⏹</div>
+                        <div class="node-info">
+                            <h4>结束</h4>
+                            <p>工作流出口</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="palette-section">
+                    <h3>任务节点</h3>
+                    <div class="node-item" draggable="true" data-type="TASK">
+                        <div class="node-icon task">⚡</div>
+                        <div class="node-info">
+                            <h4>任务</h4>
+                            <p>调用Agent执行</p>
+                        </div>
+                    </div>
+                    <div class="node-item" draggable="true" data-type="CONDITION">
+                        <div class="node-icon condition">◈</div>
+                        <div class="node-info">
+                            <h4>条件</h4>
+                            <p>分支判断</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="palette-section">
+                    <h3>流程控制</h3>
+                    <div class="node-item" draggable="true" data-type="PARALLEL">
+                        <div class="node-icon parallel">⇉</div>
+                        <div class="node-info">
+                            <h4>并行</h4>
+                            <p>同时执行多分支</p>
+                        </div>
+                    </div>
+                    <div class="node-item" draggable="true" data-type="AGGREGATE">
+                        <div class="node-icon aggregate">⇶</div>
+                        <div class="node-info">
+                            <h4>聚合</h4>
+                            <p>合并并行结果</p>
+                        </div>
+                    </div>
+                    <div class="node-item" draggable="true" data-type="DELAY">
+                        <div class="node-icon delay">⏱</div>
+                        <div class="node-info">
+                            <h4>延迟</h4>
+                            <p>延时执行</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- 中间画布 -->
+        <div class="canvas-container">
+            <div class="toolbar">
+                <button class="toolbar-btn" onclick="app.newWorkflow()">
+                    <span>📝</span> 新建
+                </button>
+                <button class="toolbar-btn" onclick="app.showTemplates()">
+                    <span>📋</span> 模板
+                </button>
+                <div class="toolbar-separator"></div>
+                <button class="toolbar-btn" onclick="app.importWorkflow()">
+                    <span>📥</span> 导入
+                </button>
+                <button class="toolbar-btn" onclick="app.exportWorkflow()">
+                    <span>📤</span> 导出
+                </button>
+                <div class="toolbar-spacer"></div>
+                <button class="toolbar-btn primary" onclick="app.executeWorkflow()">
+                    <span>▶</span> 执行
+                </button>
+                <button class="toolbar-btn success" onclick="app.saveWorkflow()">
+                    <span>💾</span> 保存
+                </button>
+            </div>
+
+            <div class="canvas" id="canvas">
+                <svg class="connections" id="connections"></svg>
+            </div>
+
+            <!-- 执行状态面板 -->
+            <div class="execution-panel collapsed" id="executionPanel">
+                <div class="execution-header" onclick="app.toggleExecutionPanel()">
+                    <h3>
+                        <span>📊</span>
+                        执行状态
+                    </h3>
+                    <div class="execution-status">
+                        <span class="status-badge pending" id="executionStatus">就绪</span>
+                        <span>▼</span>
+                    </div>
+                </div>
+                <div class="execution-logs" id="executionLogs">
+                    <div class="log-entry">
+                        <span class="log-time">16:10:00</span>
+                        <span class="log-level info">INFO</span>
+                        <span class="log-message">工作流编辑器已就绪</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 右侧属性面板 -->
+        <aside class="properties-panel">
+            <div class="properties-header">
+                <h2>属性</h2>
+            </div>
+            <div class="properties-content" id="propertiesContent">
+                <div class="empty-state">
+                    <div class="empty-state-icon">🖱️</div>
+                    <h3>选择节点</h3>
+                    <p>点击画布上的节点查看和编辑属性</p>
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <!-- 模板选择弹窗 -->
+    <div class="modal-overlay" id="templateModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2>选择工作流模板</h2>
+                <button class="modal-close" onclick="app.closeTemplates()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="template-grid">
+                    <div class="template-card" onclick="app.loadTemplate('stock-research')">
+                        <div class="template-icon">📈</div>
+                        <h4>股票研究</h4>
+                        <p>获取行情、公司研究、深度分析</p>
+                    </div>
+                    <div class="template-card" onclick="app.loadTemplate('product-dev')">
+                        <div class="template-icon">🚀</div>
+                        <h4>产品开发</h4>
+                        <p>调研、竞品分析、PRD、原型</p>
+                    </div>
+                    <div class="template-card" onclick="app.loadTemplate('content-marketing')">
+                        <div class="template-icon">✍️</div>
+                        <h4>内容营销</h4>
+                        <p>话题研究、深度分析、报告生成</p>
+                    </div>
+                    <div class="template-card" onclick="app.loadTemplate('data-analysis')">
+                        <div class="template-icon">📊</div>
+                        <h4>数据分析</h4>
+                        <p>数据采集、清洗、可视化</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 工作流编辑器应用
+        class WorkflowEditor {
+            constructor() {
+                this.canvas = document.getElementById('canvas');
+                this.connections = document.getElementById('connections');
+                this.propertiesContent = document.getElementById('propertiesContent');
+                this.executionPanel = document.getElementById('executionPanel');
+                this.executionLogs = document.getElementById('executionLogs');
+                
+                this.nodes = [];
+                this.edges = [];
+                this.selectedNode = null;
+                this.draggedNode = null;
+                this.connecting = null;
+                this.tempLine = null;
+                
+                this.workflowId = this.generateId();
+                this.workflowName = '未命名工作流';
+                
+                this.init();
+            }
+
+            init() {
+                this.setupDragAndDrop();
+                this.setupCanvasEvents();
+                this.log('工作流编辑器初始化完成', 'info');
+            }
+
+            generateId() {
+                return 'node_' + Math.random().toString(36).substr(2, 9);
+            }
+
+            // 设置拖拽
+            setupDragAndDrop() {
+                const nodeItems = document.querySelectorAll('.node-item');
+                
+                nodeItems.forEach(item => {
+                    item.addEventListener('dragstart', (e) => {
+                        e.dataTransfer.setData('nodeType', item.dataset.type);
+                    });
+                });
+
+                this.canvas.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                });
+
+                this.canvas.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    const nodeType = e.dataTransfer.getData('nodeType');
+                    if (nodeType) {
+                        const rect = this.canvas.getBoundingClientRect();
+                        const x = e.clientX - rect.left;
+                        const y = e.clientY - rect.top;
+                        this.addNode(nodeType, x, y);
+                    }
+                });
+            }
+
+            // 设置画布事件
+            setupCanvasEvents() {
+                this.canvas.addEventListener('mousedown', (e) => {
+                    if (e.target === this.canvas || e.target === this.connections) {
+                        this.deselectNode();
+                    }
+                });
+
+                document.addEventListener('mousemove', (e) => {
+                    if (this.draggedNode) {
+                        this.moveNode(e);
+                    }
+                    if (this.connecting) {
+                        this.updateTempLine(e);
+                    }
+                });
+
+                document.addEventListener('mouseup', () => {
+                    this.draggedNode = null;
+                    if (this.connecting) {
+                        this.cancelConnection();
+                    }
+                });
+
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'Delete' && this.selectedNode) {
+                        this.deleteNode(this.selectedNode);
+                    }
+                });
+            }
+
+            // 添加节点
+            addNode(type, x, y) {
+                const nodeId = this.generateId();
+                const node = {
+                    id: nodeId,
+                    type: type,
+                    name: this.getDefaultNodeName(type),
+                    x: x - 80,
+                    y: y - 40,
+                    data: {}
+                };
+
+                this.nodes.push(node);
+                this.renderNode(node);
+                this.selectNode(node);
+                this.log(`添加节点: ${node.name}`, 'success');
+            }
+
+            getDefaultNodeName(type) {
+                const names = {
+                    'START': '开始',
+                    'END': '结束',
+                    'TASK': '任务',
+                    'CONDITION': '条件判断',
+                    'PARALLEL': '并行执行',
+                    'AGGREGATE': '结果聚合',
+                    'DELAY': '延迟等待'
+                };
+                return names[type] || type;
+            }
+
+            // 渲染节点
+            renderNode(node) {
+                const el = document.createElement('div');
+                el.className = 'workflow-node';
+                el.id = node.id;
+                el.style.left = node.x + 'px';
+                el.style.top = node.y + 'px';
+                
+                const icons = {
+                    'START': '▶', 'END': '⏹', 'TASK': '⚡',
+                    'CONDITION': '◈', 'PARALLEL': '⇉', 'AGGREGATE': '⇶', 'DELAY': '⏱'
+                };
+                
+                const colors = {
+                    'START': '#10b981', 'END': '#ef4444', 'TASK': '#3b82f6',
+                    'CONDITION': '#f59e0b', 'PARALLEL': '#8b5cf6', 'AGGREGATE': '#ec4899', 'DELAY': '#6b7280'
+                };
+
+                el.innerHTML = `
+                    <div class="node-ports input">
+                        ${node.type !== 'START' ? '<div class="port" data-port="in"></div>' : ''}
+                    </div>
+                    <div class="node-header">
+                        <div class="node-type-icon" style="background: ${colors[node.type]}">${icons[node.type]}</div>
+                        <div class="node-title">${node.name}</div>
+                    </div>
+                    <div class="node-body">${node.type}</div>
+                    <div class="node-ports output">
+                        ${node.type !== 'END' ? '<div class="port" data-port="out"></div>' : ''}
+                    </div>
+                `;
+
+                // 节点拖拽
+                el.addEventListener('mousedown', (e) => {
+                    if (e.target.classList.contains('port')) {
+                        this.startConnection(node, e.target);
+                    } else {
+                        this.startDragNode(node, e);
+                    }
+                });
+
+                // 端口连接
+                const ports = el.querySelectorAll('.port');
+                ports.forEach(port => {
+                    port.addEventListener('mouseup', (e) => {
+                        if (this.connecting) {
+                            this.completeConnection(node, port);
+                        }
+                    });
+                });
+
+                this.canvas.appendChild(el);
+            }
+
+            // 开始拖拽节点
+            startDragNode(node, e) {
+                this.draggedNode = node;
+                this.dragOffset = {
+                    x: e.clientX - node.x,
+                    y: e.clientY - node.y
+                };
+                this.selectNode(node);
+            }
+
+            // 移动节点
+            moveNode(e) {
+                if (!this.draggedNode) return;
+                
+                this.draggedNode.x = e.clientX - this.dragOffset.x;
+                this.draggedNode.y = e.clientY - this.dragOffset.y;
+                
+                const el = document.getElementById(this.draggedNode.id);
+                el.style.left = this.draggedNode.x + 'px';
+                el.style.top = this.draggedNode.y + 'px';
+                
+                this.updateConnections();
+            }
+
+            // 选择节点
+            selectNode(node) {
+                this.deselectNode();
+                this.selectedNode = node;
+                const el = document.getElementById(node.id);
+                el.classList.add('selected');
+                this.showProperties(node);
+            }
+
+            // 取消选择
+            deselectNode() {
+                if (this.selectedNode) {
+                    const el = document.getElementById(this.selectedNode.id);
+                    if (el) el.classList.remove('selected');
+                    this.selectedNode = null;
+                }
+                this.showEmptyProperties();
+            }
+
+            // 删除节点
+            deleteNode(node) {
+                const el = document.getElementById(node.id);
+                el.remove();
+                
+                this.edges = this.edges.filter(e => e.source !== node.id && e.target !== node.id);
+                this.nodes = this.nodes.filter(n => n.id !== node.id);
+                
+                this.updateConnections();
+                this.showEmptyProperties();
+                this.log(`删除节点: ${node.name}`, 'info');
+            }
+
+            // 显示属性面板
+            showProperties(node) {
+                const agentOptions = ['finance-pro', 'research-pro', 'product-pro', 'coding-pro'];
+                const taskOptions = ['finance.quote', 'research.search', 'research.deep', 'product.competitor', 'product.prd', 'coding.generate'];
+                
+                let html = `
+                    <div class="property-group">
+                        <label>节点名称</label>
+                        <input type="text" value="${node.name}" onchange="app.updateNodeName('${node.id}', this.value)">
+                    </div>
+                    <div class="property-group">
+                        <label>节点类型</label>
+                        <input type="text" value="${node.type}" disabled>
+                    </div>
+                `;
+
+                if (node.type === 'TASK') {
+                    html += `
+                        <div class="property-group">
+                            <label>Agent</label>
+                            <select onchange="app.updateNodeData('${node.id}', 'agent_id', this.value)">
+                                ${agentOptions.map(a => `<option value="${a}" ${node.data.agent_id === a ? 'selected' : ''}>${a}</option>`).join('')}
+                            </select>
+                        </div>
+                        <div class="property-group">
+                            <label>任务类型</label>
+                            <select onchange="app.updateNodeData('${node.id}', 'task_type', this.value)">
+                                ${taskOptions.map(t => `<option value="${t}" ${node.data.task_type === t ? 'selected' : ''}>${t}</option>`).join('')}
+                            </select>
+                        </div>
+                        <div class="property-group">
+                            <label>参数 (JSON)</label>
+                            <textarea onchange="app.updateNodeData('${node.id}', 'parameters', this.value)">${JSON.stringify(node.data.parameters || {}, null, 2)}</textarea>
+                        </div>
+                    `;
+                }
+
+                if (node.type === 'DELAY') {
+                    html += `
+                        <div class="property-group">
+                            <label>延迟时间 (秒)</label>
+                            <input type="number" value="${node.data.delay_seconds || 5}" onchange="app.updateNodeData('${node.id}', 'delay_seconds', this.value)">
+                        </div>
+                    `;
+                }
+
+                this.propertiesContent.innerHTML = html;
+            }
+
+            // 显示空属性面板
+            showEmptyProperties() {
+                this.propertiesContent.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🖱️</div>
+                        <h3>选择节点</h3>
+                        <p>点击画布上的节点查看和编辑属性</p>
+                    </div>
+                `;
+            }
+
+            // 更新节点名称
+            updateNodeName(nodeId, name) {
+                const node = this.nodes.find(n => n.id === nodeId);
+                if (node) {
+                    node.name = name;
+                    const el = document.getElementById(nodeId);
+                    el.querySelector('.node-title').textContent = name;
+                }
+            }
+
+            // 更新节点数据
+            updateNodeData(nodeId, key, value) {
+                const node = this.nodes.find(n => n.id === nodeId);
+                if (node) {
+                    if (key === 'parameters') {
+                        try {
+                            value = JSON.parse(value);
+                        } catch (e) {
+                            this.log('JSON格式错误', 'error');
+                            return;
+                        }
+                    }
+                    node.data[key] = value;
+                }
+            }
+
+            // 开始连接
+            startConnection(node, port) {
+                this.connecting = { node, port };
+                this.canvas.classList.add('dragging');
+                
+                this.tempLine = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                this.tempLine.classList.add('temp-line');
+                this.connections.appendChild(this.tempLine);
+            }
+
+            // 更新临时连线
+            updateTempLine(e) {
+                if (!this.tempLine || !this.connecting) return;
+                
+                const sourceEl = document.getElementById(this.connecting.node.id);
+                const sourceRect = sourceEl.querySelector('.port').getBoundingClientRect();
+                const canvasRect = this.canvas.getBoundingClientRect();
+                
+                const x1 = sourceRect.left + sourceRect.width / 2 - canvasRect.left;
+                const y1 = sourceRect.top + sourceRect.height / 2 - canvasRect.top;
+                const x2 = e.clientX - canvasRect.left;
+                const y2 = e.clientY - canvasRect.top;
+                
+                const path = this.createBezierPath(x1, y1, x2, y2);
+                this.tempLine.setAttribute('d', path);
+            }
+
+            // 完成连接
+            completeConnection(targetNode, targetPort) {
+                if (this.connecting.node.id === targetNode.id) {
+                    this.cancelConnection();
+                    return;
+                }
+
+                const edge = {
+                    id: this.generateId(),
+                    source: this.connecting.node.id,
+                    target: targetNode.id
+                };
+
+                this.edges.push(edge);
+                this.renderConnection(edge);
+                this.log(`创建连接: ${this.connecting.node.name} → ${targetNode.name}`, 'success');
+                
+                this.cancelConnection();
+            }
+
+            // 取消连接
+            cancelConnection() {
+                this.connecting = null;
+                this.canvas.classList.remove('dragging');
+                if (this.tempLine) {
+                    this.tempLine.remove();
+                    this.tempLine = null;
+                }
+            }
+
+            // 渲染连接
+            renderConnection(edge) {
+                const sourceEl = document.getElementById(edge.source);
+                const targetEl = document.getElementById(edge.target);
+                
+                if (!sourceEl || !targetEl) return;
+                
+                const sourcePort = sourceEl.querySelector('.port[data-port="out"]') || sourceEl.querySelector('.port');
+                const targetPort = targetEl.querySelector('.port[data-port="in"]') || targetEl.querySelector('.port');
+                
+                const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                path.classList.add('connection-line');
+                path.id = edge.id;
+                
+                this.updateConnectionPath(path, sourcePort, targetPort);
+                this.connections.appendChild(path);
+            }
+
+            // 更新连接线路径
+            updateConnectionPath(path, sourcePort, targetPort) {
+                const canvasRect = this.canvas.getBoundingClientRect();
+                const sourceRect = sourcePort.getBoundingClientRect();
+                const targetRect = targetPort.getBoundingClientRect();
+                
+                const x1 = sourceRect.left + sourceRect.width / 2 - canvasRect.left;
+                const y1 = sourceRect.top + sourceRect.height / 2 - canvasRect.top;
+                const x2 = targetRect.left + targetRect.width / 2 - canvasRect.left;
+                const y2 = targetRect.top + targetRect.height / 2 - canvasRect.top;
+                
+                const d = this.createBezierPath(x1, y1, x2, y2);
+                path.setAttribute('d', d);
+            }
+
+            // 创建贝塞尔曲线路径
+            createBezierPath(x1, y1, x2, y2) {
+                const dx = Math.abs(x2 - x1) * 0.5;
+                return `M ${x1} ${y1} C ${x1 + dx} ${y1}, ${x2 - dx} ${y2}, ${x2} ${y2}`;
+            }
+
+            // 更新所有连接
+            updateConnections() {
+                this.edges.forEach(edge => {
+                    const path = document.getElementById(edge.id);
+                    if (path) {
+                        const sourceEl = document.getElementById(edge.source);
+                        const targetEl = document.getElementById(edge.target);
+                        if (sourceEl && targetEl) {
+                            const sourcePort = sourceEl.querySelector('.port[data-port="out"]') || sourceEl.querySelector('.port');
+                            const targetPort = targetEl.querySelector('.port[data-port="in"]') || targetEl.querySelector('.port');
+                            this.updateConnectionPath(path, sourcePort, targetPort);
+                        }
+                    }
+                });
+            }
+
+            // 工具栏功能
+            newWorkflow() {
+                if (confirm('确定要创建新工作流吗？未保存的更改将丢失。')) {
+                    this.nodes.forEach(n => document.getElementById(n.id)?.remove());
+                    this.connections.innerHTML = '';
+                    this.nodes = [];
+                    this.edges = [];
+                    this.workflowId = this.generateId();
+                    this.workflowName = '未命名工作流';
+                    this.log('创建新工作流', 'info');
+                }
+            }
+
+            showTemplates() {
+                document.getElementById('templateModal').classList.add('active');
+            }
+
+            closeTemplates() {
+                document.getElementById('templateModal').classList.remove('active');
+            }
+
+            loadTemplate(templateName) {
+                this.closeTemplates();
+                this.newWorkflow();
+                
+                const templates = {
+                    'stock-research': [
+                        { type: 'START', x: 100, y: 200, name: '开始' },
+                        { type: 'TASK', x: 300, y: 200, name: '获取行情', data: { agent_id: 'finance-pro', task_type: 'finance.quote' } },
+                        { type: 'TASK', x: 500, y: 200, name: '公司研究', data: { agent_id: 'research-pro', task_type: 'research.search' } },
+                        { type: 'END', x: 700, y: 200, name: '完成' }
+                    ],
+                    'product-dev': [
+                        { type: 'START', x: 100, y: 200, name: '开始' },
+                        { type: 'TASK', x: 300, y: 200, name: '市场调研', data: { agent_id: 'research-pro', task_type: 'research.search' } },
+                        { type: 'TASK', x: 500, y: 200, name: '竞品分析', data: { agent_id: 'product-pro', task_type: 'product.competitor' } },
+                        { type: 'TASK', x: 700, y: 200, name: '生成PRD', data: { agent_id: 'product-pro', task_type: 'product.prd' } },
+                        { type: 'END', x: 900, y: 200, name: '完成' }
+                    ],
+                    'content-marketing': [
+                        { type: 'START', x: 100, y: 200, name: '开始' },
+                        { type: 'TASK', x: 300, y: 200, name: '话题研究', data: { agent_id: 'research-pro', task_type: 'research.search' } },
+                        { type: 'TASK', x: 500, y: 200, name: '深度分析', data: { agent_id: 'research-pro', task_type: 'research.deep' } },
+                        { type: 'END', x: 700, y: 200, name: '完成' }
+                    ],
+                    'data-analysis': [
+                        { type: 'START', x: 100, y: 200, name: '开始' },
+                        { type: 'TASK', x: 300, y: 200, name: '数据采集' },
+                        { type: 'TASK', x: 500, y: 200, name: '数据清洗' },
+                        { type: 'TASK', x: 700, y: 200, name: '可视化' },
+                        { type: 'END', x: 900, y: 200, name: '完成' }
+                    ]
+                };
+
+                const template = templates[templateName];
+                if (template) {
+                    template.forEach((t, i) => {
+                        const node = {
+                            id: this.generateId(),
+                            type: t.type,
+                            name: t.name,
+                            x: t.x,
+                            y: t.y,
+                            data: t.data || {}
+                        };
+                        this.nodes.push(node);
+                        this.renderNode(node);
+                        
+                        if (i > 0) {
+                            this.edges.push({
+                                id: this.generateId(),
+                                source: this.nodes[i-1].id,
+                                target: node.id
+                            });
+                        }
+                    });
+                    
+                    this.edges.forEach(e => this.renderConnection(e));
+                    this.log(`加载模板: ${templateName}`, 'success');
+                }
+            }
+
+            exportWorkflow() {
+                const workflow = {
+                    workflow_id: this.workflowId,
+                    name: this.workflowName,
+                    created_at: new Date().toISOString(),
+                    nodes: this.nodes.map(n => ({
+                        node_id: n.id,
+                        node_type: n.type,
+                        name: n.name,
+                        position: { x: n.x, y: n.y },
+                        ...n.data
+                    })),
+                    edges: this.edges.map(e => ({
+                        edge_id: e.id,
+                        source: e.source,
+                        target: e.target
+                    }))
+                };
+
+                const blob = new Blob([JSON.stringify(workflow, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `workflow-${this.workflowId}.json`;
+                a.click();
+                URL.revokeObjectURL(url);
+                
+                this.log('工作流已导出', 'success');
+            }
+
+            importWorkflow() {
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = '.json';
+                input.onchange = (e) => {
+                    const file = e.target.files[0];
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        try {
+                            const workflow = JSON.parse(event.target.result);
+                            this.loadWorkflowData(workflow);
+                            this.log('工作流已导入', 'success');
+                        } catch (err) {
+                            this.log('导入失败: ' + err.message, 'error');
+                        }
+                    };
+                    reader.readAsText(file);
+                };
+                input.click();
+            }
+
+            loadWorkflowData(workflow) {
+                this.nodes.forEach(n => document.getElementById(n.id)?.remove());
+                this.connections.innerHTML = '';
+                
+                this.workflowId = workflow.workflow_id;
+                this.workflowName = workflow.name;
+                this.nodes = [];
+                this.edges = [];
+
+                workflow.nodes.forEach(n => {
+                    const node = {
+                        id: n.node_id,
+                        type: n.node_type,
+                        name: n.name,
+                        x: n.position.x,
+                        y: n.position.y,
+                        data: { ...n }
+                    };
+                    delete node.data.node_id;
+                    delete node.data.node_type;
+                    delete node.data.name;
+                    delete node.data.position;
+                    
+                    this.nodes.push(node);
+                    this.renderNode(node);
+                });
+
+                workflow.edges.forEach(e => {
+                    this.edges.push({
+                        id: e.edge_id,
+                        source: e.source,
+                        target: e.target
+                    });
+                });
+
+                this.edges.forEach(e => this.renderConnection(e));
+            }
+
+            executeWorkflow() {
+                this.log('开始执行工作流...', 'info');
+                this.executionPanel.classList.remove('collapsed');
+                document.getElementById('executionStatus').textContent = '运行中';
+                document.getElementById('executionStatus').className = 'status-badge running';
+                
+                // 模拟执行
+                let step = 0;
+                const steps = this.nodes.filter(n => n.type === 'TASK');
+                
+                const runStep = () => {
+                    if (step >= steps.length) {
+                        document.getElementById('executionStatus').textContent = '完成';
+                        document.getElementById('executionStatus').className = 'status-badge success';
+                        this.log('工作流执行完成', 'success');
+                        return;
+                    }
+                    
+                    const node = steps[step];
+                    const el = document.getElementById(node.id);
+                    el.classList.add('executing');
+                    
+                    this.log(`执行节点: ${node.name}`, 'info');
+                    
+                    setTimeout(() => {
+                        el.classList.remove('executing');
+                        el.classList.add('success');
+                        step++;
+                        runStep();
+                    }, 1500);
+                };
+                
+                runStep();
+            }
+
+            saveWorkflow() {
+                const workflow = {
+                    workflow_id: this.workflowId,
+                    name: this.workflowName,
+                    created_at: new Date().toISOString(),
+                    nodes: this.nodes,
+                    edges: this.edges
+                };
+                
+                localStorage.setItem(`workflow_${this.workflowId}`, JSON.stringify(workflow));
+                this.log('工作流已保存到本地', 'success');
+            }
+
+            toggleExecutionPanel() {
+                this.executionPanel.classList.toggle('collapsed');
+            }
+
+            log(message, level = 'info') {
+                const time = new Date().toLocaleTimeString('zh-CN', { hour12: false });
+                const entry = document.createElement('div');
+                entry.className = 'log-entry';
+                entry.innerHTML = `
+                    <span class="log-time">${time}</span>
+                    <span class="log-level ${level}">${level.toUpperCase()}</span>
+                    <span class="log-message">${message}</span>
+                `;
+                this.executionLogs.appendChild(entry);
+                this.executionLogs.scrollTop = this.executionLogs.scrollHeight;
+            }
+        }
+
+        // 初始化应用
+        const app = new WorkflowEditor();
+    </script>
+</body>
+</html>

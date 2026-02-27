@@ -21,6 +21,9 @@ description: 智能工作流编排系统 - 可视化工作流编辑器，支持�
 workflow-orchestrator/
 ├── workflow_engine.py     # 工作流引擎核心
 ├── workflow-cli           # CLI工具
+├── web-editor/            # 可视化编辑器
+│   ├── index.html         # 编辑器主页面
+│   └── README.md          # 编辑器文档
 └── SKILL.md              # 本文档
 ```
 
@@ -44,6 +47,30 @@ workflow-orchestrator/
 | PARALLEL | 并行节点 | 同时执行多个分支 |
 | AGGREGATE | 聚合节点 | 合并并行结果 |
 | DELAY | 延迟节点 | 延时执行 |
+
+### 方式3: Web可视化编辑器
+
+```bash
+# 启动本地服务器
+cd web-editor
+python -m http.server 8080
+
+# 访问 http://localhost:8080
+```
+
+功能特性:
+- 🎨 拖拽式节点编辑
+- 🔗 可视化连线
+- 📋 4个预定义模板
+- ⚡ 实时执行监控
+- 💾 JSON导入导出
+- 🖥️ 执行日志面板
+
+使用方法:
+1. 从左侧拖拽节点到画布
+2. 点击节点编辑属性
+3. 拖拽节点端口创建连接
+4. 点击执行按钮运行工作流
 
 ## 使用方式
 
@@ -289,3 +316,7 @@ WorkflowTemplateLibrary.TEMPLATES["my-template"] = {
 - ✅ 实现3个预定义模板 (stock-research, product-dev, content-marketing)
 - ✅ 支持变量替换和上下文传递
 - ✅ 支持工作流导入导出
+- ✅ **实现可视化Web编辑器 (web-editor/)**
+- ✅ 支持拖拽式节点编辑和连线
+- ✅ 添加执行监控面板和日志
+- ✅ 支持JSON工作流导入导出

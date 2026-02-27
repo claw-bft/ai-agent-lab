@@ -64,7 +64,32 @@ stock-analyzer list
 
 - VERCEL_TOKEN - Vercel部署令牌
 - 新闻搜索工具 (tavily/kimi_search)
-- 股票数据接口
+- 股票数据接口 - 通过 finance-pro/data_fetcher 获取
+
+## 数据源
+
+本系统使用 **finance-pro/data_fetcher** 模块获取股票数据，具备以下特性：
+
+- **连接重试机制**：指数退避策略，最多5次重试
+- **本地JSON缓存层**：缓存时间15分钟
+- **请求超时设置**：10秒超时
+- **优雅降级**：网络失败时返回缓存数据或模拟数据
+
+### 数据源配置
+
+系统会自动检测并使用 finance-pro/data_fetcher，无需额外配置。
+
+```python
+# 在代码中使用
+def analyze_stock(symbol: str, name: str) -> Dict:
+    fetcher = self._get_fetcher()
+    
+    # 获取实时行情（自动重试+缓存）
+    result = fetcher.get_stock_quote(symbol)
+    if result.success:
+        data = result.data
+        print(f"价格: {data['price']}, 来自缓存: {result.from_cache}")
+```
 
 ## 配置
 

@@ -1,343 +1,304 @@
 #!/usr/bin/env python3
 """
-Agent协作系统 CLI
-
-统一入口，管理多Agent协作任务
+Agent Collaboration CLI - 多Agent协作命令行工具
 """
 
 import sys
 import os
 import json
-import argparse
 import time
+import argparse
+from typing import Optional
 
+# 添加当前目录到路径
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from agent_protocol import (
-    create_collaboration_system, AgentRegistry, MessageBus, 
-    TaskOrchestrator, AgentMessage, MessageType, TaskStatus
+    create_collaboration_system, Message, MessageType,
+    TaskStatus, WorkflowType
 )
-from skill_adapters import (
-    FinanceProAgent, CodingProAgent, ProductProAgent, 
-    ResearchProAgent, MasterOrchestratorAgent
-)
+from skill_adapters import create_skill_agents
 
 
-class AgentCollaborationCLI:
-    """Agent协作系统命令行界面"""
+class AgentCollabCLI:
+    """Agent协作CLI"""
     
     def __init__(self):
-        self.agents = {}
+        self.agents = None
         self.registry = None
-        self.bus = None
+        self.message_bus = None
         self.orchestrator = None
-        self.master = None
         self._initialized = False
     
-    def init_system(self):
-        """初始化协作系统"""
-        if self._initialized:
-            return
-        
-        self.registry, self.bus, self.orchestrator = create_collaboration_system()
-        
-        # 创建技能包Agent
-        self.agents["finance"] = FinanceProAgent(self.registry, self.bus)
-        self.agents["coding"] = CodingProAgent(self.registry, self.bus)
-        self.agents["product"] = ProductProAgent(self.registry, self.bus)
-        self.agents["research"] = ResearchProAgent(self.registry, self.bus)
-        
-        # 创建主编排Agent
-        self.master = MasterOrchestratorAgent(
-            self.registry, self.bus, self.orchestrator
-        )
-        self.agents["master"] = self.master
-        
-        self._initialized = True
-        print("✅ Agent协作系统已初始化")
+    def init(self):
+        """初始化系统"""
+        if not self._initialized:
+            self.agents, self.registry, self.message_bus, self.orchestrator = create_skill_agents()
+            self._initialized = True
     
-    def cmd_status(self, args):
-        """查看系统状态"""
-        self.init_system()
+    def status(self):
+        """显示系统状态"""
+        self.init()
         
-        print("\n=== Agent协作系统状态 ===\n")
+        print("=" * 60)
+        print("           Agent Collaboration Protocol Status")
+        print("=" * 60)
         
         # Agent状态
-        print("已注册Agent:")
-        for agent_info in self.registry.list_agents():
-            status = "🟢" if agent_info.get("status") == "online" else "🔴"
-            caps = ", ".join(agent_info["capabilities"])
-            print(f"  {status} {agent_info['agent_id']}")
-            print(f"     能力: {caps}")
+        print("\n📊 Registered Agents:")
+        print("-" * 40)
+        for agent in self.registry.list_agents():
+            health = self.registry.check_health()
+            status_icon = "🟢" if agent.agent_id in health["healthy"] else "🔴"
+            print(f"  {status_icon} {agent.agent_id}")
+            print(f"     Role: {agent.role.value}")
+            print(f"     Capabilities: {', '.join(agent.capabilities)}")
+            print(f"     Status: {agent.status}")
+            print()
         
-        # 任务状态
-        print("\n任务状态:")
-        tasks = self.orchestrator.get_all_tasks()
-        if tasks:
-            status_count = {}
-            for task in tasks:
-                status = task.status.name
-                status_count[status] = status_count.get(status, 0) + 1
-            
-            for status, count in status_count.items():
-                icon = {
-                    "COMPLETED": "✅",
-                    "FAILED": "❌",
-                    "RUNNING": "🔄",
-                    "PENDING": "⏳",
-                    "ASSIGNED": "📋"
-                }.get(status, "⏳")
-                print(f"  {icon} {status}: {count}")
-        else:
-            print("  暂无任务")
+        # 任务统计
+        print("\n📋 Task Statistics:")
+        print("-" * 40)
+        all_tasks = self.orchestrator.list_tasks()
+        status_counts = {}
+        for task in all_tasks:
+            status = task.status.value
+            status_counts[status] = status_counts.get(status, 0) + 1
         
-        # 消息统计
-        history = self.bus.get_history(1000)
-        print(f"\n消息统计: {len(history)} 条消息")
+        for status, count in status_counts.items():
+            print(f"  {status}: {count}")
+        
+        if not status_counts:
+            print("  No tasks yet")
+        
+        print("\n" + "=" * 60)
     
-    def cmd_agents(self, args):
+    def list_agents(self):
         """列出所有Agent"""
-        self.init_system()
+        self.init()
         
-        print("\n=== Agent列表 ===\n")
-        for agent_info in self.registry.list_agents():
-            print(f"ID: {agent_info['agent_id']}")
-            print(f"  角色: {agent_info['role']}")
-            print(f"  能力: {', '.join(agent_info['capabilities'])}")
-            print(f"  状态: {agent_info.get('status', 'unknown')}")
-            print(f"  注册时间: {agent_info.get('registered_at', 'N/A')}")
+        print("\nRegistered Agents:")
+        print("-" * 40)
+        for agent in self.registry.list_agents():
+            print(f"  {agent.agent_id} ({agent.role.value})")
+            print(f"    Capabilities: {', '.join(agent.capabilities)}")
             print()
     
-    def cmd_send(self, args):
-        """发送消息到Agent"""
-        self.init_system()
+    def create_task(self, task_type: str, description: str, agent: Optional[str] = None, 
+                    params: Optional[str] = None, wait: int = 0):
+        """创建任务"""
+        self.init()
         
-        message = AgentMessage(
-            msg_type=MessageType[args.type.upper()],
-            sender="cli",
-            receiver=args.to,
-            payload=json.loads(args.payload) if args.payload else {}
-        )
-        self.bus.publish(message)
-        print(f"✅ 消息已发送给 {args.to}")
-    
-    def cmd_task(self, args):
-        """创建并执行任务"""
-        self.init_system()
+        parameters = {}
+        if params:
+            try:
+                parameters = json.loads(params)
+            except json.JSONDecodeError:
+                print(f"Error: Invalid JSON parameters: {params}")
+                return
         
-        # 创建任务
         task = self.orchestrator.create_task(
-            task_type=args.type,
-            description=args.description,
-            parameters=json.loads(args.params) if args.params else {},
-            created_by="cli"
+            task_type=task_type,
+            description=description,
+            parameters=parameters
         )
         
-        print(f"✅ 任务已创建: {task.task_id}")
+        print(f"\n✅ Task created: {task.task_id}")
+        print(f"   Type: {task_type}")
+        print(f"   Description: {description}")
         
         # 分配任务
-        if args.agent:
-            success = self.orchestrator.assign_task(task.task_id, args.agent)
+        if agent:
+            success = self.orchestrator.assign_task(task.task_id, agent)
             if success:
-                print(f"✅ 任务已分配给 {args.agent}")
+                print(f"   Assigned to: {agent}")
             else:
-                print(f"❌ 分配失败，Agent {args.agent} 可能不存在")
+                print(f"   ⚠️ Failed to assign to {agent}")
+        else:
+            assigned = self.orchestrator.auto_assign(task.task_id)
+            if assigned:
+                print(f"   Auto-assigned to: {assigned}")
         
         # 等待结果
-        if args.wait:
-            print("等待任务完成...")
-            for _ in range(args.wait * 10):
-                status = self.orchestrator.get_task_status(task.task_id)
-                if status in [TaskStatus.COMPLETED, TaskStatus.FAILED]:
+        if wait > 0:
+            print(f"\n⏳ Waiting for completion (max {wait}s)...")
+            for i in range(wait):
+                time.sleep(1)
+                task_status = self.orchestrator.get_task(task.task_id)
+                if task_status.status in [TaskStatus.COMPLETED, TaskStatus.FAILED]:
                     break
-                time.sleep(0.1)
+                print(f"   Status: {task_status.status.value} ({i+1}s)")
             
-            task_obj = self.orchestrator._tasks.get(task.task_id)
-            if task_obj:
-                print(f"\n任务状态: {task_obj.status.name}")
-                if task_obj.result:
-                    print(f"结果: {json.dumps(task_obj.result, indent=2, ensure_ascii=False)}")
-                if task_obj.error:
-                    print(f"错误: {task_obj.error}")
+            task_status = self.orchestrator.get_task(task.task_id)
+            print(f"\n📊 Final Status: {task_status.status.value}")
+            if task_status.result:
+                print(f"   Result: {json.dumps(task_status.result, indent=2, default=str)}")
+            if task_status.error:
+                print(f"   Error: {task_status.error}")
     
-    def cmd_workflow(self, args):
-        """执行工作流"""
-        self.init_system()
+    def run_workflow(self, workflow_type: str, symbol: Optional[str] = None, 
+                     product: Optional[str] = None, monitor: int = 0):
+        """运行工作流"""
+        self.init()
         
-        if args.type == "stock-research":
-            if not args.symbol:
-                print("❌ 请提供股票代码: --symbol 600519.SH")
+        master = self.agents.get("master")
+        if not master:
+            print("Error: Master orchestrator not found")
+            return
+        
+        if workflow_type == WorkflowType.STOCK_RESEARCH.value:
+            if not symbol:
+                print("Error: --symbol required for stock-research workflow")
                 return
             
-            workflow_id = self.master.create_stock_research_workflow(args.symbol)
-            print(f"✅ 股票研究工作流已创建: {workflow_id}")
-            
-        elif args.type == "product-dev":
-            if not args.product:
-                print("❌ 请提供产品想法: --product 'AI助手'")
+            workflow_id = master.create_stock_research_workflow(symbol)
+            print(f"\n📈 Stock Research Workflow Created")
+            print(f"   Workflow ID: {workflow_id}")
+            print(f"   Symbol: {symbol}")
+        
+        elif workflow_type == WorkflowType.PRODUCT_DEV.value:
+            if not product:
+                print("Error: --product required for product-dev workflow")
                 return
             
-            workflow_id = self.master.create_product_development_workflow(args.product)
-            print(f"✅ 产品开发工作流已创建: {workflow_id}")
+            workflow_id = master.create_product_dev_workflow(product)
+            print(f"\n🚀 Product Development Workflow Created")
+            print(f"   Workflow ID: {workflow_id}")
+            print(f"   Product: {product}")
         
         else:
-            print(f"❌ 未知工作流类型: {args.type}")
-            print("可用类型: stock-research, product-dev")
+            print(f"Error: Unknown workflow type: {workflow_type}")
             return
         
         # 监控工作流
-        if args.monitor:
-            print("\n监控工作流执行...")
-            prev_status = None
-            
-            for _ in range(args.monitor * 10):
-                status = self.master.get_workflow_status(workflow_id)
-                current = json.dumps(status, sort_keys=True)
+        if monitor > 0:
+            print(f"\n⏳ Monitoring workflow (max {monitor}s)...")
+            for i in range(monitor):
+                time.sleep(1)
+                status = master.get_workflow_status(workflow_id)
                 
-                if current != prev_status:
-                    print(f"\n状态更新:")
-                    print(json.dumps(status, indent=2, ensure_ascii=False))
-                    prev_status = current
+                # 清屏并重新显示
+                os.system('clear' if os.name == 'posix' else 'cls')
+                print(f"\n📊 Workflow Status ({i+1}s)")
+                print("-" * 40)
+                print(f"Workflow ID: {workflow_id}")
+                print(f"Type: {status.get('type', 'unknown')}")
+                print(f"Status: {status.get('status', 'unknown')}")
+                print("\nTasks:")
+                for task in status.get('tasks', []):
+                    icon = "✅" if task['status'] == 'COMPLETED' else "⏳" if task['status'] == 'RUNNING' else "⏸️"
+                    print(f"  {icon} {task['task_id'][:8]}... - {task['status']} ({task['assigned_to']})")
                 
-                if status.get("overall_status") in ["completed", "failed"]:
+                if status.get('status') == 'completed':
+                    print("\n🎉 Workflow completed!")
                     break
-                
-                time.sleep(0.1)
+            
+            if status.get('status') != 'completed':
+                print(f"\n⏱️ Monitoring timeout. Workflow still running.")
     
-    def cmd_tasks(self, args):
-        """列出所有任务"""
-        self.init_system()
-        
-        tasks = self.orchestrator.get_all_tasks()
-        
-        if not tasks:
-            print("暂无任务")
-            return
-        
-        print(f"\n=== 任务列表 ({len(tasks)} 个) ===\n")
-        
-        for task in tasks:
-            icon = {
-                TaskStatus.COMPLETED: "✅",
-                TaskStatus.FAILED: "❌",
-                TaskStatus.RUNNING: "🔄",
-                TaskStatus.PENDING: "⏳",
-                TaskStatus.ASSIGNED: "📋"
-            }.get(task.status, "⏳")
-            
-            print(f"{icon} {task.task_id}")
-            print(f"   类型: {task.task_type}")
-            print(f"   描述: {task.description}")
-            print(f"   状态: {task.status.name}")
-            print(f"   分配给: {task.assigned_to or '未分配'}")
-            
-            if task.result:
-                result_str = json.dumps(task.result, ensure_ascii=False)
-                if len(result_str) > 100:
-                    result_str = result_str[:100] + "..."
-                print(f"   结果: {result_str}")
-            
-            if task.error:
-                print(f"   错误: {task.error}")
-            print()
-    
-    def cmd_demo(self, args):
+    def demo(self):
         """运行演示"""
-        self.init_system()
+        self.init()
         
-        print("\n=== Agent协作系统演示 ===\n")
+        print("=" * 60)
+        print("           Agent Collaboration Protocol Demo")
+        print("=" * 60)
         
-        # 演示1: 创建简单任务
-        print("1. 创建股票查询任务...")
-        task = self.orchestrator.create_task(
-            task_type="finance.quote",
-            description="查询茅台股票",
-            parameters={"symbol": "600519.SH"},
-            created_by="demo"
-        )
-        print(f"   任务ID: {task.task_id}")
+        # 显示Agent
+        print("\n1️⃣  Registered Agents:")
+        print("-" * 40)
+        for agent in self.registry.list_agents():
+            print(f"   • {agent.agent_id} ({agent.role.value})")
+            print(f"     Capabilities: {', '.join(agent.capabilities[:3])}...")
         
-        # 分配给finance agent
-        self.orchestrator.assign_task(task.task_id, "finance-pro")
-        print(f"   分配给: finance-pro")
+        # 创建股票研究工作流
+        print("\n2️⃣  Creating Stock Research Workflow...")
+        print("-" * 40)
+        master = self.agents.get("master")
+        workflow_id = master.create_stock_research_workflow("600519.SH")
+        print(f"   Workflow ID: {workflow_id}")
+        print(f"   Symbol: 600519.SH (茅台)")
         
-        # 等待并显示结果
-        time.sleep(1)
-        task_obj = self.orchestrator._tasks.get(task.task_id)
-        if task_obj and task_obj.result:
-            print(f"   结果: {json.dumps(task_obj.result, indent=2, ensure_ascii=False)}")
+        # 显示任务
+        print("\n3️⃣  Workflow Tasks:")
+        print("-" * 40)
+        status = master.get_workflow_status(workflow_id)
+        for task in status.get('tasks', []):
+            print(f"   • {task['task_id'][:8]}... -> {task['assigned_to']}")
         
-        # 演示2: 创建工作流
-        print("\n2. 创建股票研究工作流...")
-        workflow_id = self.master.create_stock_research_workflow("000001.SZ")
-        print(f"   工作流ID: {workflow_id}")
+        # 模拟执行
+        print("\n4️⃣  Simulating Task Execution...")
+        print("-" * 40)
+        for i, task_info in enumerate(status.get('tasks', [])):
+            task_id = task_info['task_id']
+            task = self.orchestrator.get_task(task_id)
+            
+            # 标记开始
+            self.orchestrator.start_task(task_id)
+            print(f"   ⏳ Task {i+1} started: {task.task_type}")
+            time.sleep(0.5)
+            
+            # 模拟完成
+            self.orchestrator.complete_task(task_id, {
+                "mock_result": True,
+                "task_type": task.task_type,
+                "completed_at": time.strftime("%Y-%m-%dT%H:%M:%S")
+            })
+            print(f"   ✅ Task {i+1} completed")
         
-        # 监控
-        print("   监控工作流...")
-        for _ in range(30):
-            status = self.master.get_workflow_status(workflow_id)
-            if status.get("overall_status") != "running":
-                break
-            time.sleep(0.1)
+        # 最终状态
+        print("\n5️⃣  Final Workflow Status:")
+        print("-" * 40)
+        final_status = master.get_workflow_status(workflow_id)
+        print(f"   Status: {final_status.get('status', 'unknown')}")
+        print(f"   All tasks completed: {final_status.get('status') == 'completed'}")
         
-        print(f"   最终状态: {status.get('overall_status')}")
-        
-        print("\n✅ 演示完成")
+        print("\n" + "=" * 60)
+        print("           Demo Complete!")
+        print("=" * 60)
 
 
 def main():
-    cli = AgentCollaborationCLI()
-    
     parser = argparse.ArgumentParser(
-        description="Agent协作系统 CLI",
+        description="Agent Collaboration Protocol CLI",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
-示例:
-  %(prog)s status                    # 查看系统状态
-  %(prog)s agents                    # 列出所有Agent
-  %(prog)s task --type finance.quote --description "查询茅台" --agent finance-pro
+Examples:
+  %(prog)s status
+  %(prog)s agents
+  %(prog)s task --type finance.quote --description "查询茅台股票" --agent finance-pro --wait 5
   %(prog)s workflow --type stock-research --symbol 600519.SH --monitor 10
-  %(prog)s demo                      # 运行演示
+  %(prog)s workflow --type product-dev --product "AI代码助手" --monitor 20
+  %(prog)s demo
         """
     )
     
-    subparsers = parser.add_subparsers(dest="command", help="可用命令")
+    subparsers = parser.add_subparsers(dest='command', help='Available commands')
     
-    # status
-    subparsers.add_parser("status", help="查看系统状态")
+    # status command
+    subparsers.add_parser('status', help='Show system status')
     
-    # agents
-    subparsers.add_parser("agents", help="列出所有Agent")
+    # agents command
+    subparsers.add_parser('agents', help='List all registered agents')
     
-    # send
-    send_parser = subparsers.add_parser("send", help="发送消息")
-    send_parser.add_argument("--to", required=True, help="目标Agent")
-    send_parser.add_argument("--type", default="TASK", help="消息类型")
-    send_parser.add_argument("--payload", help="消息内容(JSON)")
+    # task command
+    task_parser = subparsers.add_parser('task', help='Create a new task')
+    task_parser.add_argument('--type', required=True, help='Task type (e.g., finance.quote)')
+    task_parser.add_argument('--description', required=True, help='Task description')
+    task_parser.add_argument('--agent', help='Target agent ID')
+    task_parser.add_argument('--params', help='Task parameters as JSON string')
+    task_parser.add_argument('--wait', type=int, default=0, help='Wait for completion (seconds)')
     
-    # task
-    task_parser = subparsers.add_parser("task", help="创建任务")
-    task_parser.add_argument("--type", required=True, help="任务类型")
-    task_parser.add_argument("--description", required=True, help="任务描述")
-    task_parser.add_argument("--params", help="任务参数(JSON)")
-    task_parser.add_argument("--agent", help="分配给哪个Agent")
-    task_parser.add_argument("--wait", type=int, help="等待结果(秒)")
+    # workflow command
+    workflow_parser = subparsers.add_parser('workflow', help='Execute a predefined workflow')
+    workflow_parser.add_argument('--type', required=True, choices=['stock-research', 'product-dev'],
+                                help='Workflow type')
+    workflow_parser.add_argument('--symbol', help='Stock symbol (for stock-research)')
+    workflow_parser.add_argument('--product', help='Product name (for product-dev)')
+    workflow_parser.add_argument('--monitor', type=int, default=0, help='Monitor progress (seconds)')
     
-    # workflow
-    workflow_parser = subparsers.add_parser("workflow", help="执行工作流")
-    workflow_parser.add_argument("--type", required=True, 
-                                choices=["stock-research", "product-dev"],
-                                help="工作流类型")
-    workflow_parser.add_argument("--symbol", help="股票代码(股票研究)")
-    workflow_parser.add_argument("--product", help="产品想法(产品开发)")
-    workflow_parser.add_argument("--monitor", type=int, default=10,
-                                help="监控时间(秒)")
-    
-    # tasks
-    subparsers.add_parser("tasks", help="列出所有任务")
-    
-    # demo
-    subparsers.add_parser("demo", help="运行演示")
+    # demo command
+    subparsers.add_parser('demo', help='Run a demonstration')
     
     args = parser.parse_args()
     
@@ -345,20 +306,33 @@ def main():
         parser.print_help()
         return
     
-    command_map = {
-        "status": cli.cmd_status,
-        "agents": cli.cmd_agents,
-        "send": cli.cmd_send,
-        "task": cli.cmd_task,
-        "workflow": cli.cmd_workflow,
-        "tasks": cli.cmd_tasks,
-        "demo": cli.cmd_demo
-    }
+    cli = AgentCollabCLI()
     
-    if args.command in command_map:
-        command_map[args.command](args)
-    else:
-        print(f"未知命令: {args.command}")
+    if args.command == 'status':
+        cli.status()
+    
+    elif args.command == 'agents':
+        cli.list_agents()
+    
+    elif args.command == 'task':
+        cli.create_task(
+            task_type=args.type,
+            description=args.description,
+            agent=args.agent,
+            params=args.params,
+            wait=args.wait
+        )
+    
+    elif args.command == 'workflow':
+        cli.run_workflow(
+            workflow_type=args.type,
+            symbol=args.symbol,
+            product=args.product,
+            monitor=args.monitor
+        )
+    
+    elif args.command == 'demo':
+        cli.demo()
 
 
 if __name__ == "__main__":

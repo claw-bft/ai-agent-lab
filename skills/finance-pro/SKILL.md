@@ -30,6 +30,98 @@ description: 金融投资专业技能包 - 趋势交易、价值投资、套利�
 - akshare (综合金融数据)
 - pandas, numpy (数据分析)
 
+## 数据获取模块 (data_fetcher)
+
+为解决网络不稳定导致的akshare数据获取失败问题，本技能包提供了健壮的数据获取模块 `data_fetcher.py`。
+
+### 特性
+- **连接重试机制**：指数退避策略，最多5次重试
+- **本地JSON缓存层**：缓存时间15分钟，减少网络请求
+- **请求超时设置**：默认10秒超时
+- **优雅降级**：数据获取失败时返回缓存数据或空数据
+
+### 使用方法
+
+```python
+from data_fetcher import get_fetcher, fetch_stock_quote, fetch_stock_history
+
+# 方法1: 使用便捷函数
+result = fetch_stock_quote("000001.SZ")
+if result['success']:
+    print(f"当前价格: {result['data']['price']}")
+
+# 方法2: 使用Fetcher实例（推荐）
+fetcher = get_fetcher()
+
+# 获取实时行情
+result = fetcher.get_stock_quote("000001.SZ")
+if result.success:
+    data = result.data
+    print(f"价格: {data['price']}, 涨跌幅: {data['change_percent']}%")
+
+# 获取历史数据
+result = fetcher.get_stock_history("000001.SZ", days=30)
+if result.success:
+    for record in result.data['data']:
+        print(f"{record['date']}: {record['close']}")
+
+# 获取A股列表
+result = fetcher.get_stock_list()
+
+# 获取指数行情
+result = fetcher.get_index_quote("000001")  # 上证指数
+
+# 获取财务指标
+result = fetcher.get_stock_financial("000001.SZ")
+```
+
+### 返回结果结构
+
+```python
+{
+    "success": True,           # 是否成功
+    "data": {...},             # 数据内容
+    "error": None,             # 错误信息
+    "from_cache": False,       # 是否来自缓存
+    "cache_time": "2024-01-15T10:30:00",  # 缓存时间
+    "fetch_time": "2024-01-15T10:45:00",  # 获取时间
+    "retries": 0               # 重试次数
+}
+```
+
+### 缓存管理
+
+```python
+fetcher = get_fetcher()
+
+# 清除所有缓存
+fetcher.clear_cache()
+
+# 清除特定功能缓存
+fetcher.clear_cache('get_stock_quote')
+
+# 查看缓存统计
+stats = fetcher.get_cache_stats()
+print(f"缓存文件数: {stats['cache_count']}")
+```
+
+### 自定义配置
+
+```python
+from data_fetcher import DataFetcher
+
+config = {
+    'max_retries': 3,              # 最大重试次数
+    'timeout': 15,                 # 超时时间（秒）
+    'cache_duration_minutes': 30,  # 缓存时间（分钟）
+    'base_delay': 2.0,             # 初始重试延迟
+    'max_delay': 30.0,             # 最大重试延迟
+    'backoff_factor': 2.0,         # 指数退避因子
+}
+
+fetcher = DataFetcher(config)
+```
+
 ## 使用示例
 
 ```bash

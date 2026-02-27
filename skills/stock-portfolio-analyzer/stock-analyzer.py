@@ -90,43 +90,40 @@ class NewsAgent:
         return news_items
 
 class StockAgent:
-    """技术分析Agent - 接入finance-pro真实数据源"""
+    """技术分析Agent - 使用增强版数据源"""
     
     def __init__(self):
         self.name = "StockAgent"
-        self._finance_pro_available = self._check_finance_pro()
+        self._fetcher = None
     
-    def _check_finance_pro(self) -> bool:
-        """检查finance-pro是否可用"""
-        try:
-            finance_pro_path = SKILLS_DIR / "finance-pro"
-            if not finance_pro_path.exists():
-                return False
-            # 检查data_adapter.py是否存在
-            adapter_path = finance_pro_path / "data_adapter.py"
-            return adapter_path.exists()
-        except Exception:
-            return False
-    
-    def _get_finance_adapter(self):
-        """获取finance-pro数据适配器"""
-        try:
-            import sys
-            finance_pro_path = str(SKILLS_DIR / "finance-pro")
-            if finance_pro_path not in sys.path:
-                sys.path.insert(0, finance_pro_path)
-            from data_adapter import get_adapter
-            return get_adapter()
-        except Exception as e:
-            print(f"[警告] 无法加载finance-pro适配器: {e}")
-            return None
+    def _get_fetcher(self):
+        """获取增强版数据获取器"""
+        if self._fetcher is None:
+            try:
+                from enhanced_data_fetcher import get_enhanced_fetcher
+                self._fetcher = get_enhanced_fetcher()
+            except Exception as e:
+                print(f"[警告] 无法加载enhanced_data_fetcher: {e}")
+                return None
+        return self._fetcher
+                from data_fetcher import get_fetcher
+                self._fetcher = get_fetcher()
+            except Exception as e:
+                print(f"[警告] 无法加载data_fetcher: {e}")
+                return None
+        return self._fetcher
     
     def _calculate_technical_score(self, quote: Dict, history: Dict) -> int:
         """基于真实数据计算技术评分"""
         score = 50  # 基础分
         
+        if not quote or not quote.get('success'):
+            return score
+        
+        data = quote.get('data', {})
+        
         # 价格动量 (涨跌幅)
-        change = quote.get('change_percent', 0)
+        change = data.get('change_percent', 0)
         if change > 5:
             score += 10
         elif change > 2:
@@ -137,11 +134,12 @@ class StockAgent:
             score -= 5
         
         # 历史数据趋势分析
-        if history.get('success') and history.get('data'):
-            data = history['data']
-            if len(data) >= 5:
+        if history and history.get('success'):
+            hist_data = history.get('data', {})
+            records = hist_data.get('data', [])
+            if len(records) >= 5:
                 # 计算5日趋势
-                recent = data[-5:]
+                recent = records[-5:]
                 closes = [d.get('close', 0) for d in recent]
                 if len(closes) >= 2 and closes[0] > 0:
                     trend = (closes[-1] - closes[0]) / closes[0] * 100
@@ -164,7 +162,7 @@ class StockAgent:
                         score -= 5  # 缩量
         
         # 估值指标
-        pe = quote.get('pe_ttm')
+        pe = data.get('pe_ttm')
         if pe is not None and pe > 0:
             if pe < 15:
                 score += 5  # 低估值
@@ -190,23 +188,27 @@ class StockAgent:
             return "回避 - 技术面不佳，建议离场"
     
     def analyze(self, symbol: str, name: str) -> Dict:
-        """技术分析 - 使用finance-pro真实数据"""
-        adapter = self._get_finance_adapter()
+        """技术分析 - 使用data_fetcher获取真实数据"""
+        fetcher = self._get_fetcher()
         
-        if adapter:
+        if fetcher:
             try:
-                # 获取实时行情
-                quote = adapter.get_stock_quote(symbol)
+                # 获取实时行情（带重试和缓存）
+                quote_result = fetcher.get_stock_quote(symbol)
                 # 获取历史数据
-                history = adapter.get_stock_history(symbol, days=30)
+                history_result = fetcher.get_stock_history(symbol, days=30)
                 
-                if quote.get('success'):
+                if quote_result.success:
+                    data = quote_result.data
                     # 计算技术评分
-                    score = self._calculate_technical_score(quote, history)
-                    change = quote.get('change_percent', 0)
+                    score = self._calculate_technical_score(
+                        {'success': True, 'data': data}, 
+                        {'success': history_result.success, 'data': history_result.data} if history_result.success else None
+                    )
+                    change = data.get('change_percent', 0)
                     
                     # 计算支撑/阻力位 (简化版)
-                    price = quote.get('price', 0)
+                    price = data.get('price', 0)
                     support = round(price * 0.95, 2) if price > 0 else "N/A"
                     resistance = round(price * 1.05, 2) if price > 0 else "N/A"
                     
@@ -218,13 +220,13 @@ class StockAgent:
                         },
                         "Volume": {
                             "signal": "neutral",
-                            "value": f"{quote.get('volume', 0) / 10000:.1f}万"
+                            "value": f"{data.get('volume', 0) / 10000:.1f}万"
                         }
                     }
                     
                     # 添加PE/PB指标
-                    pe = quote.get('pe_ttm')
-                    pb = quote.get('pb')
+                    pe = data.get('pe_ttm')
+                    pb = data.get('pb')
                     if pe is not None:
                         indicators["PE-TTM"] = {
                             "signal": "bullish" if pe < 20 else "neutral" if pe < 40 else "bearish",
@@ -236,23 +238,34 @@ class StockAgent:
                             "value": f"{pb:.2f}"
                         }
                     
-                    return {
+                    # 构建返回结果
+                    result = {
                         "symbol": symbol,
                         "name": name,
                         "real_data": True,
+                        "from_cache": quote_result.from_cache,
+                        "retries": quote_result.retries,
                         "indicators": indicators,
                         "support": str(support),
                         "resistance": str(resistance),
                         "score": score,
                         "recommendation": self._generate_recommendation(score, change),
                         "raw_quote": {
-                            "price": quote.get('price'),
-                            "change": quote.get('change_percent'),
-                            "volume": quote.get('volume'),
-                            "high": quote.get('high'),
-                            "low": quote.get('low')
+                            "price": data.get('price'),
+                            "change": data.get('change_percent'),
+                            "volume": data.get('volume'),
+                            "high": data.get('high'),
+                            "low": data.get('low'),
+                            "open": data.get('open'),
+                            "pre_close": data.get('pre_close')
                         }
                     }
+                    
+                    if quote_result.from_cache:
+                        result["cache_time"] = quote_result.cache_time
+                    
+                    return result
+                    
             except Exception as e:
                 print(f"[警告] 获取真实数据失败: {e}，使用模拟数据")
         
