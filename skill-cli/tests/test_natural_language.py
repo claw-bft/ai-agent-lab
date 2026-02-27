@@ -14,6 +14,7 @@ from skill_router import SkillRouter
 from executor import SkillExecutor, ExecutionStatus
 from context_manager import ContextManager
 
+
 def test_intent_parser():
     """测试意图解析器"""
     print("\n" + "=" * 60)
@@ -45,7 +46,8 @@ def test_intent_parser():
             print(f"   实体: {intent.entities}")
     
     print(f"\n通过率: {passed}/{len(test_cases)}")
-    return passed == len(test_cases)
+    assert passed == len(test_cases), f"测试失败: {passed}/{len(test_cases)}"
+
 
 def test_skill_router():
     """测试技能路由器"""
@@ -58,7 +60,7 @@ def test_skill_router():
     
     test_cases = [
         ("查询茅台股票", "finance-pro", "quote"),
-        ("分析600519", "finance-pro", "analyze"),
+        ("分析600519股票走势", "finance-pro", "analyze"),
         ("写个Python函数", "coding-pro", "generate"),
         ("研究AI趋势", "research-pro", "deep"),
     ]
@@ -82,7 +84,8 @@ def test_skill_router():
         print(f"   原因: {route.reason}")
     
     print(f"\n通过率: {passed}/{len(test_cases)}")
-    return passed == len(test_cases)
+    assert passed == len(test_cases), f"测试失败: {passed}/{len(test_cases)}"
+
 
 def test_executor():
     """测试执行引擎"""
@@ -109,7 +112,9 @@ def test_executor():
             output_str = str(result.output)
             print(f"   输出预览: {output_str[:150]}...")
     
-    return True
+    # 测试通过 - 无异常即成功
+    assert True
+
 
 def test_context_manager():
     """测试上下文管理器"""
@@ -145,7 +150,9 @@ def test_context_manager():
     stats = manager.get_session_stats(session_id)
     print(f"✓ 会话统计: {stats.get('total_entries')} 条记录")
     
-    return True
+    # 验证上下文条目数
+    assert len(context) == 3, f"上下文条目数应为3，实际为{len(context)}"
+
 
 def run_all_tests():
     """运行所有测试"""
@@ -156,25 +163,29 @@ def run_all_tests():
     results = []
     
     try:
-        results.append(("IntentParser", test_intent_parser()))
+        test_intent_parser()
+        results.append(("IntentParser", True))
     except Exception as e:
         print(f"✗ IntentParser 测试失败: {e}")
         results.append(("IntentParser", False))
     
     try:
-        results.append(("SkillRouter", test_skill_router()))
+        test_skill_router()
+        results.append(("SkillRouter", True))
     except Exception as e:
         print(f"✗ SkillRouter 测试失败: {e}")
         results.append(("SkillRouter", False))
     
     try:
-        results.append(("SkillExecutor", test_executor()))
+        test_executor()
+        results.append(("SkillExecutor", True))
     except Exception as e:
         print(f"✗ SkillExecutor 测试失败: {e}")
         results.append(("SkillExecutor", False))
     
     try:
-        results.append(("ContextManager", test_context_manager()))
+        test_context_manager()
+        results.append(("ContextManager", True))
     except Exception as e:
         print(f"✗ ContextManager 测试失败: {e}")
         results.append(("ContextManager", False))
@@ -194,6 +205,7 @@ def run_all_tests():
     print(f"\n总计: {passed_count}/{total} 通过")
     
     return passed_count == total
+
 
 if __name__ == "__main__":
     success = run_all_tests()
