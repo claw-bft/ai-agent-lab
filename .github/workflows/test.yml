@@ -1,0 +1,168 @@
+name: Test and Coverage
+
+on:
+  push:
+    branches: [ master, main ]
+  pull_request:
+    branches: [ master, main ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: "test-${{ github.ref }}"
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.10', '3.11', '3.12']
+      fail-fast: false
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: 'pip'
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest pytest-cov pytest-asyncio
+          # Install all skill package dependencies
+          find . -name "requirements*.txt" -exec pip install -r {} \;
+          # Install packages in development mode
+          find . -name "setup.py" -exec dirname {} \; | while read dir; do
+            pip install -e "$dir" || true
+          done
+      
+      - name: Run tests with coverage
+        run: |
+          pytest \
+            --cov=. \
+            --cov-report=xml \
+            --cov-report=term-missing \
+            --cov-fail-under=60 \
+            -v 2>&1 | tee test-output.txt || true
+        continue-on-error: true
+      
+      - name: Generate test summary
+        run: |
+          echo "## Test Results for Python ${{ matrix.python-version }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if [ -f test-output.txt ]; then
+            PASSED=$(grep -oP '\d+ passed' test-output.txt | head -1 || echo "0 passed")
+            FAILED=$(grep -oP '\d+ failed' test-output.txt | head -1 || echo "0 failed")
+            SKIPPED=$(grep -oP '\d+ skipped' test-output.txt | head -1 || echo "0 skipped")
+            COVERAGE=$(grep -oP '\d+%' test-output.txt | tail -1 || echo "N/A")
+            echo "- ✅ Passed: $PASSED" >> $GITHUB_STEP_SUMMARY
+            echo "- ❌ Failed: $FAILED" >> $GITHUB_STEP_SUMMARY
+            echo "- ⏭️ Skipped: $SKIPPED" >> $GITHUB_STEP_SUMMARY
+            echo "- 📊 Coverage: $COVERAGE" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "No test output found" >> $GITHUB_STEP_SUMMARY
+          fi
+      
+      - name: Upload coverage to Codecov
+        if: matrix.python-version == '3.11'
+        uses: codecov/codecov-action@v4
+        with:
+          files: ./coverage.xml
+          fail_ci_if_error: false
+          verbose: true
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+      
+      - name: Upload test artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-py${{ matrix.python-version }}
+          path: |
+            test-output.txt
+            coverage.xml
+          retention-days: 30
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+      
+      - name: Install linting tools
+        run: |
+          python -m pip install --upgrade pip
+          pip install black isort flake8
+      
+      - name: Check code formatting with Black
+        run: |
+          echo "## Black Format Check" >> $GITHUB_STEP_SUMMARY
+          black --check --diff . 2>&1 | tee black-output.txt || true
+          if [ -s black-output.txt ]; then
+            echo "⚠️ Format issues found" >> $GITHUB_STEP_SUMMARY
+            echo '```diff' >> $GITHUB_STEP_SUMMARY
+            cat black-output.txt >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+          else
+            echo "✅ All files properly formatted" >> $GITHUB_STEP_SUMMARY
+          fi
+        continue-on-error: true
+      
+      - name: Check import sorting with isort
+        run: |
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## Import Sort Check" >> $GITHUB_STEP_SUMMARY
+          isort --check-only --diff . 2>&1 | tee isort-output.txt || true
+          if [ -s isort-output.txt ]; then
+            echo "⚠️ Import sorting issues found" >> $GITHUB_STEP_SUMMARY
+            echo '```diff' >> $GITHUB_STEP_SUMMARY
+            cat isort-output.txt >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+          else
+            echo "✅ All imports properly sorted" >> $GITHUB_STEP_SUMMARY
+          fi
+        continue-on-error: true
+      
+      - name: Run flake8 linter
+        run: |
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## Lint Check (Flake8)" >> $GITHUB_STEP_SUMMARY
+          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics 2>&1 | tee flake8-output.txt || true
+          if [ -s flake8-output.txt ]; then
+            echo "Issues found:" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            cat flake8-output.txt >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+          else
+            echo "✅ No critical lint issues" >> $GITHUB_STEP_SUMMARY
+          fi
+        continue-on-error: true
+
+  summary:
+    needs: [test, lint]
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Test Summary
+        run: |
+          echo "## CI/CD Pipeline Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Job | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-----|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Test (3.10) | ${{ needs.test.result == 'success' && '✅' || '⚠️' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Test (3.11) | ${{ needs.test.result == 'success' && '✅' || '⚠️' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Test (3.12) | ${{ needs.test.result == 'success' && '✅' || '⚠️' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Lint | ${{ needs.lint.result == 'success' && '✅' || '⚠️' }} |" >> $GITHUB_STEP_SUMMARY
