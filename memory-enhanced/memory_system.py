@@ -347,7 +347,10 @@ class MemoryStore:
         """从文件加载"""
         try:
             with open(self.storage_path, 'r', encoding='utf-8') as f:
-                data = json.load(f)
+                content = f.read().strip()
+                if not content:
+                    return
+                data = json.loads(content)
             
             self.memories = {
                 mid: MemoryEntry.from_dict(mdata) 
@@ -356,6 +359,8 @@ class MemoryStore:
             self.embedding.vocab = data.get("vocab", {})
             self.embedding.vocab_size = data.get("vocab_size", 0)
         except FileNotFoundError:
+            pass
+        except json.JSONDecodeError:
             pass
 
 

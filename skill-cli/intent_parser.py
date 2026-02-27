@@ -33,7 +33,7 @@ class Intent:
 
 class IntentParser:
     """自然语言意图解析器"""
-    
+
     # 意图关键词映射
     INTENT_PATTERNS = {
         IntentType.GET_QUOTE: [
@@ -41,6 +41,8 @@ class IntentParser:
             r"(.+?)(?:股票|股价|行情|价格)[多少|怎么样]",
             r"看看(.+?)(?:的走势|的行情|的价格)",
             r"查[一下]?(.+?)(?:股价|行情)",
+            r"check\s+(?:stock\s+)?(?:price|quote)\s+(?:for\s+)?(.+)",
+            r"get\s+(?:stock\s+)?(?:price|quote)\s+(?:for\s+)?(.+)",
         ],
         IntentType.ANALYZE_STOCK: [
             r"分析[一下]?(.+?)(?:股票|走势|技术面)",
@@ -55,10 +57,11 @@ class IntentParser:
             r"(?:预警|提醒|通知)(?:设置|添加)?",
         ],
         IntentType.GENERATE_CODE: [
-            r"(?:生成|写|创建|帮我写)[一个]?(?:代码|程序|脚本|函数|Python|JavaScript|JS|Java|Go|Rust|C\+\+|爬虫)",
-            r"帮我写[一个]?(.+?)(?:代码|程序|脚本|函数)",
+            r"(?:生成|创建|帮我写)[一个]?(?:代码|程序|脚本|函数|Python|JavaScript|JS|Java|Go|Rust|C\+\+|爬虫)?",
+            r"写[一个]?(.+?)(?:代码|程序|脚本|函数)",
             r"用(.+?)(?:语言|框架)?(?:实现|写|创建)(.+)",
             r"写个(.+?)(?:代码|程序|脚本|函数)?",
+            r"生成一个(\w+)(?:程序|代码|脚本|函数)",
         ],
         IntentType.REVIEW_CODE: [
             r"(?:审查|检查|review)[一下]?(.+?)(?:代码|文件)",
@@ -88,13 +91,26 @@ class IntentParser:
             r"竞品分析",
         ],
     }
-    
+
+    # 股票名称到代码映射 (常见股票)
+    STOCK_NAME_MAP = {
+        "茅台": "600519.SH",
+        "贵州茅台": "600519.SH",
+        "平安": "601318.SH",
+        "中国平安": "601318.SH",
+        "招商银行": "600036.SH",
+        "比亚迪": "002594.SZ",
+        "宁德时代": "300750.SZ",
+        "腾讯": "00700.HK",
+        "阿里巴巴": "09988.HK",
+    }
+
     # 股票代码模式
     STOCK_PATTERNS = [
         r"(\d{6})\.?(SH|SZ|BJ)?",  # 600519.SH, 000001.SZ
         r"([\u4e00-\u9fa5]{2,8})(?:股份|集团|科技|银行|证券|保险)?",  # 茅台, 中国平安
     ]
-    
+
     # 技能提示词映射
     SKILL_HINTS = {
         "股票": "finance-pro",
@@ -109,35 +125,35 @@ class IntentParser:
         "调研": "research-pro",
         "分析": "research-pro",
     }
-    
+
     def __init__(self):
         self.compiled_patterns = {}
         self._compile_patterns()
-    
+
     def _compile_patterns(self):
         """预编译正则表达式"""
         for intent_type, patterns in self.INTENT_PATTERNS.items():
             self.compiled_patterns[intent_type] = [
                 re.compile(p, re.IGNORECASE | re.UNICODE) for p in patterns
             ]
-    
+
     def parse(self, text: str) -> Intent:
         """
         解析自然语言文本，提取意图
-        
+
         Args:
             text: 用户输入的自然语言
-            
+
         Returns:
             Intent对象
         """
         text = text.strip()
-        
+
         # 尝试匹配所有意图模式
         best_match = None
         best_confidence = 0.0
         best_entities = {}
-        
+
         for intent_type, patterns in self.compiled_patterns.items():
             for pattern in patterns:
                 match = pattern.search(text)
@@ -148,14 +164,14 @@ class IntentParser:
                         best_confidence = confidence
                         best_match = intent_type
                         best_entities = self._extract_entities(match, intent_type, text)
-        
+
         # 如果没有匹配到明确意图，尝试提取技能提示
         skill_hint = self._extract_skill_hint(text)
-        
+
         if best_match is None:
             best_match = IntentType.UNKNOWN
             best_confidence = 0.3  # 基础置信度
-        
+
         return Intent(
             type=best_match,
             confidence=best_confidence,
@@ -163,7 +179,7 @@ class IntentParser:
             raw_text=text,
             skill_hint=skill_hint
         )
-    
+
     def _calculate_confidence(self, match: re.Match, text: str) -> float:
         """计算匹配置信度"""
         # 基于匹配长度比例
@@ -172,57 +188,64 @@ class IntentParser:
         position_weight = 1.0 - (match.start() / len(text)) * 0.3
         # 基础分
         base_score = 0.6
-        
+
         return min(0.95, base_score + match_ratio * 0.3 + position_weight * 0.1)
-    
+
     def _extract_entities(self, match: re.Match, intent_type: IntentType, text: str) -> Dict[str, Any]:
         """提取实体"""
         entities = {}
         groups = match.groups()
-        
+
         if intent_type in [IntentType.GET_QUOTE, IntentType.ANALYZE_STOCK]:
             # 提取股票代码或名称
             entities["symbol"] = self._extract_stock_symbol(text) or (groups[0] if groups else None)
-            
+
         elif intent_type == IntentType.SET_ALERT:
             if len(groups) >= 2:
-                entities["symbol"] = self._extract_stock_symbol(groups[0]) or groups[0]
+                # 尝试从第一个组提取股票代码
+                symbol = self._extract_stock_symbol(groups[0])
+                entities["symbol"] = symbol if symbol else groups[0]
                 entities["condition"] = groups[1]
-                
+
         elif intent_type == IntentType.GENERATE_CODE:
             if len(groups) >= 2:
                 entities["language"] = groups[0]
                 entities["prompt"] = groups[1]
             elif groups:
                 entities["prompt"] = groups[0]
-                
+
         elif intent_type == IntentType.REVIEW_CODE:
             if groups:
                 entities["path"] = groups[0]
-                
+
         elif intent_type == IntentType.RESEARCH:
             if groups:
                 entities["topic"] = groups[0]
-                
+
         elif intent_type == IntentType.ANALYZE_DATA:
             if len(groups) >= 2:
                 entities["file"] = groups[0]
                 entities["query"] = groups[1]
             elif groups:
                 entities["file"] = groups[0]
-                
+
         elif intent_type == IntentType.CREATE_PRD:
             if groups:
                 entities["feature"] = groups[0]
-                
+
         elif intent_type == IntentType.COMPETITOR_ANALYSIS:
             if groups:
                 entities["product"] = groups[0]
-        
+
         return entities
-    
+
     def _extract_stock_symbol(self, text: str) -> Optional[str]:
         """提取股票代码"""
+        # 先尝试名称映射
+        for name, code in self.STOCK_NAME_MAP.items():
+            if name in text:
+                return code
+
         # 尝试匹配6位数字代码
         match = re.search(r'(\d{6})', text)
         if match:
@@ -236,14 +259,14 @@ class IntentParser:
                 return f"{code}.BJ"
             return code
         return None
-    
+
     def _extract_skill_hint(self, text: str) -> Optional[str]:
         """从文本中提取技能提示"""
         for keyword, skill in self.SKILL_HINTS.items():
             if keyword in text:
                 return skill
         return None
-    
+
     def batch_parse(self, texts: List[str]) -> List[Intent]:
         """批量解析"""
         return [self.parse(t) for t in texts]
@@ -252,7 +275,7 @@ class IntentParser:
 # 测试代码
 if __name__ == "__main__":
     parser = IntentParser()
-    
+
     test_cases = [
         "查询一下茅台股票",
         "分析一下600519的走势",
@@ -260,7 +283,7 @@ if __name__ == "__main__":
         "研究一下AI发展趋势",
         "分析竞品情况",
     ]
-    
+
     for text in test_cases:
         intent = parser.parse(text)
         print(f"\n输入: {text}")

@@ -40,26 +40,25 @@ class TestFinanceProCore(unittest.TestCase):
         self.test_symbol = "000001.SZ"
         self.test_code = "000001"
     
-    @patch('finance_pro.ak')
-    def test_get_stock_quote_a_share_success(self, mock_ak):
+    @patch('finance_pro.ak.stock_zh_a_spot_em')
+    def test_get_stock_quote_a_share_success(self, mock_spot):
         """测试获取A股行情 - 成功场景"""
         # 模拟返回数据
-        mock_df = MagicMock()
-        mock_df.empty = False
-        mock_df.iloc = [MagicMock()]
-        mock_df.iloc[0].get.side_effect = lambda key, default: {
-            '名称': '平安银行',
-            '最新价': 10.5,
-            '涨跌幅': 2.5,
-            '涨跌额': 0.25,
-            '成交量': 1000000,
-            '成交额': 10500000,
-            '最高': 10.8,
-            '最低': 10.2,
-            '今开': 10.3,
-            '昨收': 10.25
-        }.get(key, default)
-        mock_ak.stock_zh_a_spot_em.return_value = mock_df
+        import pandas as pd
+        mock_df = pd.DataFrame({
+            '代码': ['000001'],
+            '名称': ['平安银行'],
+            '最新价': [10.5],
+            '涨跌幅': [2.5],
+            '涨跌额': [0.25],
+            '成交量': [1000000],
+            '成交额': [10500000],
+            '最高': [10.8],
+            '最低': [10.2],
+            '今开': [10.3],
+            '昨收': [10.25]
+        })
+        mock_spot.return_value = mock_df
         
         result = get_stock_quote_a_share(self.test_symbol)
         
