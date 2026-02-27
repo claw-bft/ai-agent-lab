@@ -1,0 +1,6 @@
+#!/bin/bash
+# Skill CLI 入口脚本
+# 使用: skill-cli <技能名> [命令] [参数]
+
+SKILL_CLI_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+python3 "$SKILL_CLI_DIR/skill-cli.py" "$@"

@@ -1,0 +1,19 @@
+{
+  "name": "financial-daily",
+  "description": "财经资讯日报 - 深度采集财经热点，生成日报推送到GitHub",
+  "schedule": {
+    "kind": "cron",
+    "expr": "0 18 * * *",
+    "tz": "Asia/Shanghai"
+  },
+  "payload": {
+    "kind": "agentTurn",
+    "message": "执行财经资讯日报任务：运行 /root/.openclaw/workspace/skills/financial-daily/generator.py 生成财经日报并推送到GitHub",
+    "model": "kimi-coding/k2p5"
+  },
+  "sessionTarget": "isolated",
+  "delivery": {
+    "mode": "announce"
+  },
+  "enabled": true
+}
