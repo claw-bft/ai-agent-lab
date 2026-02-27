@@ -1,0 +1,66 @@
+{
+  "categories": [
+    {
+      "id": "finance",
+      "name": "金融分析",
+      "name_en": "Finance",
+      "description": "股票分析、投资组合管理、财经数据获取",
+      "icon": "💰",
+      "skill_count": 3,
+      "skills": ["finance-pro", "stock-portfolio-analyzer", "financial-daily"]
+    },
+    {
+      "id": "development",
+      "name": "开发工具",
+      "name_en": "Development",
+      "description": "代码生成、CLI工具、部署自动化",
+      "icon": "💻",
+      "skill_count": 3,
+      "skills": ["coding-pro", "skill-cli", "vercel-deploy"]
+    },
+    {
+      "id": "research",
+      "name": "研究与分析",
+      "name_en": "Research",
+      "description": "智能研究助手、文献综述、上下文优化",
+      "icon": "🔬",
+      "skill_count": 3,
+      "skills": ["research-pro", "product-pro", "context-compressor"]
+    },
+    {
+      "id": "ai_enhancement",
+      "name": "智能增强",
+      "name_en": "AI Enhancement",
+      "description": "记忆系统、多智能体协作、工作流引擎",
+      "icon": "🧠",
+      "skill_count": 3,
+      "skills": ["memory-enhanced", "agent-collaboration", "workflow-orchestrator"]
+    },
+    {
+      "id": "productivity",
+      "name": "生产力",
+      "name_en": "Productivity",
+      "description": "模板生成、通知服务、配置管理",
+      "icon": "📋",
+      "skill_count": 3,
+      "skills": ["quick-templates", "notification-service", "token-manager"]
+    },
+    {
+      "id": "claude_domain",
+      "name": "Claude领域技能",
+      "name_en": "Claude Domain Skills",
+      "description": "18个专业领域技能，涵盖商业、金融、创意、专业服务等",
+      "icon": "🎨",
+      "skill_count": 18,
+      "skills": [
+        "business-strategy", "product-management", "project-management", "sales", "marketing",
+        "investment-analysis", "quant-trading", "strategy-optimization",
+        "game-design", "game-planner", "storytelling", "ui-ux-design", "visual-media", "brainstorming", "deckbuilder-roguelike", "galgame-master",
+        "personal-growth", "side-income",
+        "knowledge-management", "research-analysis",
+        "consistency-checker", "knowledge-acquisition-4c", "skill-optimizer", "tech-spec-gen"
+      ]
+    }
+  ],
+  "total": 6
+}

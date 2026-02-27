@@ -1,0 +1,23 @@
+{
+  "name": "AI Agent Lab Registry",
+  "version": "1.0.0",
+  "description": "AI Agent技能包注册表 - GitHub Pages托管",
+  "base_url": "https://claw-bft.github.io/ai-agent-lab/registry/api",
+  "last_updated": "2026-02-28T07:50:00+08:00",
+  "total_skills": 24,
+  "categories": {
+    "finance": 3,
+    "development": 3,
+    "research": 3,
+    "ai_enhancement": 3,
+    "productivity": 3,
+    "claude_domain": 18
+  },
+  "endpoints": {
+    "index": "/registry/api/index.json",
+    "skills": "/registry/api/skills.json",
+    "categories": "/registry/api/categories.json",
+    "search": "/registry/api/search?q={query}",
+    "skill_detail": "/registry/api/skills/{skill_id}.json"
+  }
+}

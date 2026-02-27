@@ -38,6 +38,9 @@ jobs:
           cp -r skills/skill-cli/htmlcov _site/coverage/skill-cli 2>/dev/null || true
           # Copy stock-portfolio-analyzer HTML coverage if exists  
           cp -r skills/stock-portfolio-analyzer/htmlcov _site/coverage/stock-portfolio-analyzer 2>/dev/null || true
+          # Copy Registry API files
+          mkdir -p _site/registry/api
+          cp -r registry/api/* _site/registry/api/ 2>/dev/null || true
           # Create fallback index.html if clawhub-web not exists
           if [ ! -f _site/index.html ]; then
             cat > _site/index.html << 'EOF'
