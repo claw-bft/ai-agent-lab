@@ -1,0 +1,48 @@
+# AI Agent Lab - 统一依赖管理
+# 安装命令: pip install -r requirements.txt
+# Python版本要求: >=3.10
+
+# ============ 核心依赖 ============
+# CLI与执行
+argparse>=1.4.0
+pydantic>=2.0.0
+python-dotenv>=1.0.0
+
+# Web框架与API
+fastapi>=0.100.0
+uvicorn>=0.23.0
+requests>=2.31.0
+
+# 数据处理
+pandas>=2.0.0
+numpy>=1.24.0
+
+# ============ 技能包依赖 ============
+# Finance Pro - 金融数据
+akshare>=1.14.0
+yfinance>=0.2.28
+
+# Research Pro - 研究助手
+tavily-python>=0.3.0
+
+# Stock Portfolio - 投资组合分析
+beautifulsoup4>=4.11.0
+lxml>=4.9.0
+
+# Product Pro - PRD生成
+python-pptx>=0.6.21
+
+# ============ 开发测试依赖 ============
+pytest>=7.4.0
+pytest-cov>=4.1.0
+pytest-asyncio>=0.21.0
+
+# ============ 可选依赖 ============
+# 向量数据库 (memory-enhanced)
+# sqlite-vec  # 通过pip install sqlite-vec安装
+
+# 代码分析 (coding-pro)
+# tree-sitter  # 可选，用于代码解析
+
+# 部署工具 (vercel-deploy)
+# vercel  # 通过npm install -g vercel安装
