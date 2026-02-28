@@ -5,8 +5,12 @@ Tests for Memory Enhanced System
 import pytest
 import time
 import os
+import sys
 import tempfile
 from datetime import datetime
+
+# 添加父目录到路径
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from memory_system import (
     MemoryType, MemoryPriority, MemoryEntry, SimpleEmbedding,
