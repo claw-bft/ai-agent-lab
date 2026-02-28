@@ -19,7 +19,7 @@ def demo_basic_usage():
 
     # 创建临时存储
     memory = MemoryStore(storage_path="/tmp/demo_memory.json")
-    
+
     # 存储用户偏好
     memory.store(
         content="用户偏好使用Python进行数据分析",
@@ -61,7 +61,7 @@ def demo_conversation_context():
     print("=" * 60)
 
     memory = MemoryStore(storage_path="/tmp/demo_memory.json")
-    
+
     # 模拟对话历史
     conversations = [
         ("用户", "我想部署一个网站到Vercel"),
@@ -69,7 +69,7 @@ def demo_conversation_context():
         ("用户", "项目在 /root/my-project"),
         ("助手", "好的，正在为您部署..."),
     ]
-    
+
     # 存储对话片段
     for speaker, content in conversations:
         memory.store(
@@ -94,14 +94,14 @@ def demo_skill_memory():
     print("=" * 60)
 
     memory = MemoryStore(storage_path="/tmp/demo_memory.json")
-    
+
     # 记录技能使用
     skills_used = [
         ("finance-pro", "查询了茅台股票 600519.SH", "stock-analysis"),
         ("research-pro", "搜索了AI Agent最新进展", "ai-research"),
         ("coding-pro", "生成了Python数据处理代码", "code-generation"),
     ]
-    
+
     for skill, action, project in skills_used:
         memory.store(
             content=f"使用 {skill} {action}",
@@ -127,16 +127,16 @@ def demo_decision_tracking():
     print("\n" + "=" * 60)
     print("示例4: 历史决策记录")
     print("=" * 60)
-    
+
     memory = MemoryStore(storage_path="/tmp/demo_memory.json")
-    
+
     # 记录重要决策
     decisions = [
         ("技术栈选择", "决定使用PostgreSQL而不是MySQL", "CRITICAL"),
         ("部署平台", "选择Vercel作为默认部署平台", "HIGH"),
         ("API设计", "采用RESTful API风格", "MEDIUM"),
     ]
-    
+
     for topic, decision, priority in decisions:
         priority_enum = MemoryPriority[priority]
         memory.store(
@@ -145,7 +145,7 @@ def demo_decision_tracking():
             priority=priority_enum,
             metadata={"topic": topic}
         )
-    
+
     # 检索决策历史
     print("\n检索: '为什么选择PostgreSQL'")
     results = memory.search("为什么选择PostgreSQL", top_k=3)
@@ -158,9 +158,9 @@ def demo_memory_stats():
     print("\n" + "=" * 60)
     print("示例5: 记忆统计")
     print("=" * 60)
-    
+
     memory = MemoryStore(storage_path="/tmp/demo_memory.json")
-    
+
     stats = memory.get_stats()
     print(f"\n记忆统计:")
     print(f"  总记忆数: {stats['total_memories']}")
@@ -177,17 +177,17 @@ def main():
     print("\n" + "=" * 60)
     print("Memory Enhanced System - 使用示例")
     print("=" * 60)
-    
+
     demo_basic_usage()
     demo_conversation_context()
     demo_skill_memory()
     demo_decision_tracking()
     demo_memory_stats()
-    
+
     print("\n" + "=" * 60)
     print("示例完成!")
     print("=" * 60)
-    
+
     # 清理临时文件
     if os.path.exists("/tmp/demo_memory.json"):
         os.remove("/tmp/demo_memory.json")
