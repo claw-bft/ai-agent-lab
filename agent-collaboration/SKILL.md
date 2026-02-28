@@ -19,10 +19,13 @@ Agent间协作协议，定义标准化的Agent通信机制，支持多Agent协�
 
 ```
 agent-collaboration/
-├── agent_protocol.py      # 核心协议实现
-├── skill_adapters.py      # 技能包适配器
-├── agent-collab           # CLI工具
-└── SKILL.md              # 本文档
+├── agent_protocol.py          # 核心协议实现
+├── acp_extensions.py          # ACP扩展 - 高级协作模式
+├── skill_adapters.py          # 技能包适配器
+├── agent-collab               # CLI工具
+├── tests/
+│   └── test_acp_extensions.py # 扩展功能测试
+└── SKILL.md                   # 本文档
 ```
 
 ### 核心组件
@@ -34,6 +37,10 @@ agent-collaboration/
 | 任务编排器 | `TaskOrchestrator` | 任务创建、分配、依赖管理 |
 | 结果聚合器 | `ResultAggregator` | 结果合并、冲突解决 |
 | 协作Agent基类 | `CollaborationAgent` | Agent实现基类 |
+| **协商管理器** | `NegotiationManager` | 多Agent协商与提案管理 |
+| **投票管理器** | `VotingManager` | 多种投票模式支持 |
+| **委托管理器** | `DelegationManager` | 权限委托与代理执行 |
+| **高级编排器** | `AdvancedOrchestrator` | 复杂工作流编排 |
 
 ## 使用方式
 
