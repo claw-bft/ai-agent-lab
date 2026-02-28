@@ -344,12 +344,18 @@ class SkillEvaluator:
         try:
             # 检测可用的 Python 命令
             python_cmd = "python3" if subprocess.run(["which", "python3"], capture_output=True).returncode == 0 else "python"
+            
+            # 在技能包目录下运行测试，并添加PYTHONPATH
+            env = os.environ.copy()
+            env["PYTHONPATH"] = str(skill_path) + ":" + env.get("PYTHONPATH", "")
+            
             result = subprocess.run(
-                [python_cmd, "-m", "pytest", str(skill_path), "-v", "--tb=no", "-q"],
+                [python_cmd, "-m", "pytest", "tests/", "-v", "--tb=no", "-q"],
                 capture_output=True,
                 text=True,
                 timeout=60,
-                cwd=str(skill_path.parent)
+                cwd=str(skill_path),
+                env=env
             )
             
             output = result.stdout + result.stderr
