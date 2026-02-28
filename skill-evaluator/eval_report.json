@@ -1,11 +1,11 @@
 {
-  "generated_at": "2026-03-01T06:32:50",
+  "generated_at": "2026-03-01T06:40:24",
   "total_skills": 20,
   "summary": {
-    "average_score": 89.0,
+    "average_score": 89.1,
     "grade_distribution": {
-      "S": 13,
-      "A": 7,
+      "S": 14,
+      "A": 6,
       "B": 0,
       "C": 0,
       "D": 0
@@ -83,8 +83,8 @@
         "添加 SKILL.md 文档，描述技能包功能和使用方法",
         "考虑添加性能基准测试"
       ],
-      "evaluated_at": "2026-03-01T06:32:36",
-      "duration_ms": 550
+      "evaluated_at": "2026-03-01T06:40:10",
+      "duration_ms": 555
     },
     "context-compressor": {
       "skill_name": "context-compressor",
@@ -145,8 +145,8 @@
         "修复 9 个代码风格问题",
         "考虑添加性能基准测试"
       ],
-      "evaluated_at": "2026-03-01T06:32:37",
-      "duration_ms": 269
+      "evaluated_at": "2026-03-01T06:40:10",
+      "duration_ms": 274
     },
     "finance-pro": {
       "skill_name": "finance-pro",
@@ -207,7 +207,7 @@
         ]
       },
       "performance_details": {
-        "import_time_ms": 477,
+        "import_time_ms": 483,
         "module_size_kb": 93.9296875,
         "has_performance_tests": false
       },
@@ -222,8 +222,8 @@
         "修复代码中的安全问题",
         "考虑添加性能基准测试"
       ],
-      "evaluated_at": "2026-03-01T06:32:37",
-      "duration_ms": 1503
+      "evaluated_at": "2026-03-01T06:40:11",
+      "duration_ms": 1515
     },
     "skill-cli": {
       "skill_name": "skill-cli",
@@ -294,7 +294,7 @@
         "修复代码中的安全问题",
         "考虑添加性能基准测试"
       ],
-      "evaluated_at": "2026-03-01T06:32:38",
+      "evaluated_at": "2026-03-01T06:40:12",
       "duration_ms": 459
     },
     "memory-enhanced": {
@@ -356,8 +356,8 @@
         "重构复杂函数，降低圈复杂度",
         "修复 5 个代码风格问题"
       ],
-      "evaluated_at": "2026-03-01T06:32:39",
-      "duration_ms": 391
+      "evaluated_at": "2026-03-01T06:40:13",
+      "duration_ms": 386
     },
     "coding-pro": {
       "skill_name": "coding-pro",
@@ -424,8 +424,8 @@
         "添加 README.md 文档",
         "考虑添加性能基准测试"
       ],
-      "evaluated_at": "2026-03-01T06:32:39",
-      "duration_ms": 4405
+      "evaluated_at": "2026-03-01T06:40:13",
+      "duration_ms": 4409
     },
     "financial-daily": {
       "skill_name": "financial-daily",
@@ -480,8 +480,8 @@
         "部分函数复杂度偏高，建议优化",
         "修复 3 个代码风格问题"
       ],
-      "evaluated_at": "2026-03-01T06:32:44",
-      "duration_ms": 277
+      "evaluated_at": "2026-03-01T06:40:17",
+      "duration_ms": 280
     },
     "clawhub-web": {
       "skill_name": "clawhub-web",
@@ -537,17 +537,17 @@
         "重构复杂函数，降低圈复杂度",
         "修复 2 个代码风格问题"
       ],
-      "evaluated_at": "2026-03-01T06:32:44",
+      "evaluated_at": "2026-03-01T06:40:18",
       "duration_ms": 284
     },
     "product-pro": {
       "skill_name": "product-pro",
       "skill_path": "/root/.openclaw/workspace/ai-agent-lab/product-pro",
-      "overall_score": 89.2,
-      "grade": "A",
+      "overall_score": 91.2,
+      "grade": "S",
       "code_quality_score": 77.0,
       "test_coverage_score": 100,
-      "documentation_score": 90.0,
+      "documentation_score": 100,
       "security_score": 90.0,
       "performance_score": 90.0,
       "code_quality_details": {
@@ -574,7 +574,7 @@
         "has_readme": true,
         "has_skill_md": true,
         "has_api_docs": false,
-        "readme_length": 1031,
+        "readme_length": 4588,
         "skill_md_length": 753,
         "doc_completeness": 100.0
       },
@@ -590,7 +590,7 @@
         ]
       },
       "performance_details": {
-        "import_time_ms": 1,
+        "import_time_ms": 4,
         "module_size_kb": 39.908203125,
         "has_performance_tests": true
       },
@@ -601,11 +601,10 @@
       "suggestions": [
         "重构复杂函数，降低圈复杂度",
         "修复 4 个代码风格问题",
-        "README.md 内容可以更完整，建议添加功能介绍和使用示例",
         "修复代码中的安全问题"
       ],
-      "evaluated_at": "2026-03-01T06:32:44",
-      "duration_ms": 342
+      "evaluated_at": "2026-03-01T06:40:18",
+      "duration_ms": 475
     },
     "skill-evaluator": {
       "skill_name": "skill-evaluator",
@@ -671,8 +670,8 @@
         "修复 4 个代码风格问题",
         "修复代码中的安全问题"
       ],
-      "evaluated_at": "2026-03-01T06:32:44",
-      "duration_ms": 544
+      "evaluated_at": "2026-03-01T06:40:18",
+      "duration_ms": 793
     },
     "quick-templates": {
       "skill_name": "quick-templates",
@@ -730,8 +729,8 @@
         "README.md 内容可以更完整，建议添加功能介绍和使用示例",
         "考虑添加性能基准测试"
       ],
-      "evaluated_at": "2026-03-01T06:32:45",
-      "duration_ms": 272
+      "evaluated_at": "2026-03-01T06:40:19",
+      "duration_ms": 275
     },
     "token-manager": {
       "skill_name": "token-manager",
@@ -790,8 +789,8 @@
         "重构复杂函数，降低圈复杂度",
         "修复 5 个代码风格问题"
       ],
-      "evaluated_at": "2026-03-01T06:32:45",
-      "duration_ms": 283
+      "evaluated_at": "2026-03-01T06:40:20",
+      "duration_ms": 282
     },
     "research-pro": {
       "skill_name": "research-pro",
@@ -865,8 +864,8 @@
         "修复代码中的安全问题",
         "考虑添加性能基准测试"
       ],
-      "evaluated_at": "2026-03-01T06:32:46",
-      "duration_ms": 2590
+      "evaluated_at": "2026-03-01T06:40:20",
+      "duration_ms": 2584
     },
     "vercel-deploy": {
       "skill_name": "vercel-deploy",
@@ -922,7 +921,7 @@
         "修复 3 个代码风格问题",
         "README.md 内容可以更完整，建议添加功能介绍和使用示例"
       ],
-      "evaluated_at": "2026-03-01T06:32:48",
+      "evaluated_at": "2026-03-01T06:40:22",
       "duration_ms": 279
     },
     "api": {
@@ -979,7 +978,7 @@
         "重构复杂函数，降低圈复杂度",
         "修复 2 个代码风格问题"
       ],
-      "evaluated_at": "2026-03-01T06:32:48",
+      "evaluated_at": "2026-03-01T06:40:23",
       "duration_ms": 283
     },
     "agent-collaboration": {
@@ -1040,8 +1039,8 @@
         "重构复杂函数，降低圈复杂度",
         "修复 6 个代码风格问题"
       ],
-      "evaluated_at": "2026-03-01T06:32:49",
-      "duration_ms": 310
+      "evaluated_at": "2026-03-01T06:40:23",
+      "duration_ms": 300
     },
     "skill-recommender": {
       "skill_name": "skill-recommender",
@@ -1100,8 +1099,8 @@
         "重构复杂函数，降低圈复杂度",
         "修复 5 个代码风格问题"
       ],
-      "evaluated_at": "2026-03-01T06:32:49",
-      "duration_ms": 290
+      "evaluated_at": "2026-03-01T06:40:23",
+      "duration_ms": 295
     },
     "stock-portfolio-analyzer": {
       "skill_name": "stock-portfolio-analyzer",
@@ -1173,8 +1172,8 @@
         "修复 17 个代码风格问题",
         "修复代码中的安全问题"
       ],
-      "evaluated_at": "2026-03-01T06:32:49",
-      "duration_ms": 287
+      "evaluated_at": "2026-03-01T06:40:24",
+      "duration_ms": 289
     },
     "notification-service": {
       "skill_name": "notification-service",
@@ -1229,8 +1228,8 @@
         "部分函数复杂度偏高，建议优化",
         "修复 3 个代码风格问题"
       ],
-      "evaluated_at": "2026-03-01T06:32:50",
-      "duration_ms": 282
+      "evaluated_at": "2026-03-01T06:40:24",
+      "duration_ms": 278
     },
     "claude-domain-skills": {
       "skill_name": "claude-domain-skills",
@@ -1281,8 +1280,8 @@
         "代码量较少，建议增加更多功能",
         "考虑添加性能基准测试"
       ],
-      "evaluated_at": "2026-03-01T06:32:50",
-      "duration_ms": 296
+      "evaluated_at": "2026-03-01T06:40:24",
+      "duration_ms": 292
     }
   }
 }
