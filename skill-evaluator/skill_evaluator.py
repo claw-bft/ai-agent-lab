@@ -349,8 +349,10 @@ class SkillEvaluator:
             env = os.environ.copy()
             env["PYTHONPATH"] = str(skill_path) + ":" + env.get("PYTHONPATH", "")
             
+            # 排除性能测试文件（避免超时）
             result = subprocess.run(
-                [python_cmd, "-m", "pytest", "tests/", "-v", "--tb=no", "-q"],
+                [python_cmd, "-m", "pytest", "tests/", "-v", "--tb=no", "-q",
+                 "--ignore=tests/test_performance.py", "--ignore=tests/performance"],
                 capture_output=True,
                 text=True,
                 timeout=60,
