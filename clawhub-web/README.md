@@ -65,7 +65,7 @@ clawhub-web/
 
 ```javascript
 // API 端点
-const API_BASE = 'https://clawhub-registry.vercel.app';
+const API_BASE = 'https://claw-bft.github.io/ai-agent-lab/registry/api';
 
 // 获取技能列表
 GET /skills
