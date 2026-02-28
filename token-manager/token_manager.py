@@ -139,6 +139,36 @@ class TokenManager:
         """
         return list(self._tokens.keys())
 
+    def search_tokens(self, tags: Optional[List[str]] = None,
+                      service_pattern: Optional[str] = None) -> Dict[str, Dict[str, Any]]:
+        """
+        根据标签或服务名模式搜索凭证
+
+        Args:
+            tags: 标签列表，匹配任一标签即返回
+            service_pattern: 服务名包含的模式字符串
+
+        Returns:
+            匹配的凭证字典
+        """
+        results = {}
+        for service, data in self._tokens.items():
+            # 按服务名模式匹配
+            if service_pattern and service_pattern.lower() not in service.lower():
+                continue
+            
+            # 按标签匹配
+            if tags:
+                token_tags = data.get('tags', [])
+                if isinstance(token_tags, str):
+                    token_tags = [token_tags]
+                if not any(tag in token_tags for tag in tags):
+                    continue
+            
+            results[service] = data.copy()
+        
+        return results
+
     def has_token(self, service: str) -> bool:
         """
         检查是否存储了指定服务的凭证
