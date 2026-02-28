@@ -8,7 +8,6 @@ import json
 import urllib.request
 from typing import Optional, Dict, Any, List
 from dataclasses import dataclass, asdict
-from pathlib import Path
 
 
 @dataclass

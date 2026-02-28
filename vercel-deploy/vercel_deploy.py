@@ -7,7 +7,7 @@ import os
 import json
 import urllib.request
 import urllib.error
-from typing import Optional, Dict, Any, List, Union
+from typing import Optional, Dict, Any, List
 from dataclasses import dataclass, asdict
 from enum import Enum
 
@@ -92,7 +92,7 @@ class VercelClient:
         """
         url = f"{self.API_BASE}/{endpoint}"
         if params:
-            query_string = &quot;&quot;.join([f"{k}={v}" for k, v in params.items()])
+            query_string = "&".join([f"{k}={v}" for k, v in params.items()])
             url = f"{url}?{query_string}"
 
         headers = {
