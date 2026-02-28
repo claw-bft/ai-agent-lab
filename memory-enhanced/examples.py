@@ -16,7 +16,7 @@ def demo_basic_usage():
     print("=" * 60)
     print("示例1: 基础记忆存储与检索")
     print("=" * 60)
-    
+
     # 创建临时存储
     memory = MemoryStore(storage_path="/tmp/demo_memory.json")
     
@@ -27,27 +27,27 @@ def demo_basic_usage():
         priority=MemoryPriority.HIGH,
         metadata={"category": "programming", "user": "demo"}
     )
-    
+
     memory.store(
         content="用户喜欢暗色主题的IDE",
         memory_type=MemoryType.PREFERENCE,
         priority=MemoryPriority.MEDIUM,
         metadata={"category": "ui", "user": "demo"}
     )
-    
+
     memory.store(
         content="当前正在开发股票分析系统",
         memory_type=MemoryType.CONTEXT,
         priority=MemoryPriority.HIGH,
         metadata={"project": "stock-analyzer", "user": "demo"}
     )
-    
+
     # 检索记忆
     print("\n检索: '用户喜欢什么编程语言'")
     results = memory.search("用户喜欢什么编程语言", top_k=3)
     for entry, score in results:
         print(f"  [{score:.2f}] {entry.content}")
-    
+
     print("\n检索: '当前项目是什么'")
     results = memory.search("当前项目是什么", top_k=3)
     for entry, score in results:
@@ -59,7 +59,7 @@ def demo_conversation_context():
     print("\n" + "=" * 60)
     print("示例2: 对话上下文保持")
     print("=" * 60)
-    
+
     memory = MemoryStore(storage_path="/tmp/demo_memory.json")
     
     # 模拟对话历史
@@ -78,7 +78,7 @@ def demo_conversation_context():
             priority=MemoryPriority.LOW,
             metadata={"speaker": speaker}
         )
-    
+
     # 后续对话时检索上下文
     print("\n新对话: '部署完成了吗？'")
     context = memory.search("部署完成了吗？", top_k=3)
@@ -92,7 +92,7 @@ def demo_skill_memory():
     print("\n" + "=" * 60)
     print("示例3: 技能使用记录")
     print("=" * 60)
-    
+
     memory = MemoryStore(storage_path="/tmp/demo_memory.json")
     
     # 记录技能使用
@@ -109,13 +109,13 @@ def demo_skill_memory():
             priority=MemoryPriority.MEDIUM,
             metadata={"skill": skill, "project": project}
         )
-    
+
     # 检索技能使用历史
     print("\n检索: '使用过哪些技能'")
     results = memory.get_by_type(MemoryType.SKILL, limit=5)
     for entry in results:
         print(f"  - {entry.content}")
-    
+
     print("\n检索: 'finance相关'")
     results = memory.search("finance 股票", top_k=3)
     for entry, score in results:

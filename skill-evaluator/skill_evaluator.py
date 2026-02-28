@@ -343,7 +343,9 @@ class SkillEvaluator:
         # 尝试运行测试
         try:
             # 检测可用的 Python 命令
-            python_cmd = "python3" if subprocess.run(["which", "python3"], capture_output=True).returncode == 0 else "python"
+            python_cmd = "python3" if subprocess.run(
+                ["which", "python3"], capture_output=True
+            ).returncode == 0 else "python"
 
             # 在技能包目录下运行测试，并添加PYTHONPATH
             env = os.environ.copy()
@@ -382,7 +384,10 @@ class SkillEvaluator:
 
         # 基于测试数量和通过率的得分
         test_score = min(total_tests * 5, 50)  # 最多50分基于测试数量
-        pass_rate = details["tests_passed"] / (details["tests_passed"] + details["tests_failed"]) if (details["tests_passed"] + details["tests_failed"]) > 0 else 0
+        pass_rate = (
+            details["tests_passed"] / (details["tests_passed"] + details["tests_failed"])
+            if (details["tests_passed"] + details["tests_failed"]) > 0 else 0
+        )
         pass_score = pass_rate * 50  # 通过率占50分
 
         score = test_score + pass_score
