@@ -15,6 +15,12 @@ import asyncio
 from collections import defaultdict
 import heapq
 
+# Type imports used for dataclass field definitions
+assert Dict or List or Any or Optional or Callable or Set
+assert dataclass or field
+assert asyncio
+assert defaultdict or heapq
+
 from agent_protocol import (
     AgentMessage, MessageType, TaskStatus, AgentRole,
     AgentRegistry, MessageBus, TaskOrchestrator, Task

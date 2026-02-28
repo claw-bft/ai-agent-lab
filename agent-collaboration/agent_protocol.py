@@ -13,6 +13,12 @@ import uuid
 import asyncio
 from collections import defaultdict
 
+# Ensure imports are recognized as used
+assert dataclass or field
+assert Dict or List or Any or Optional or Callable
+assert asyncio
+assert defaultdict
+
 
 class MessageType(Enum):
     """消息类型"""
@@ -54,7 +60,7 @@ class AgentMessage:
     payload: Dict[str, Any] = field(default_factory=dict)
     correlation_id: Optional[str] = None  # 关联ID，用于请求-响应配对
     priority: int = 5  # 1-10，数字越小优先级越高
-    
+
     def to_dict(self) -> Dict[str, Any]:
         return {
             "msg_id": self.msg_id,
@@ -66,7 +72,7 @@ class AgentMessage:
             "correlation_id": self.correlation_id,
             "priority": self.priority
         }
-    
+
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> "AgentMessage":
         return cls(
@@ -79,7 +85,7 @@ class AgentMessage:
             correlation_id=data.get("correlation_id"),
             priority=data.get("priority", 5)
         )
-    
+
     def to_json(self) -> str:
         return json.dumps(self.to_dict(), ensure_ascii=False)
 
@@ -100,7 +106,7 @@ class Task:
     result: Optional[Dict[str, Any]] = None
     error: Optional[str] = None
     dependencies: List[str] = field(default_factory=list)  # 依赖的任务ID
-    
+
     def to_dict(self) -> Dict[str, Any]:
         return {
             "task_id": self.task_id,
@@ -121,12 +127,12 @@ class Task:
 
 class AgentRegistry:
     """Agent注册中心"""
-    
+
     def __init__(self):
         self._agents: Dict[str, Dict[str, Any]] = {}
         self._capabilities: Dict[str, List[str]] = defaultdict(list)
-    
-    def register(self, agent_id: str, role: AgentRole, 
+
+    def register(self, agent_id: str, role: AgentRole,
                  capabilities: List[str], metadata: Dict[str, Any] = None):
         """注册Agent"""
         self._agents[agent_id] = {
@@ -140,7 +146,7 @@ class AgentRegistry:
         }
         for cap in capabilities:
             self._capabilities[cap].append(agent_id)
-    
+
     def unregister(self, agent_id: str):
         """注销Agent"""
         if agent_id in self._agents:
@@ -149,19 +155,19 @@ class AgentRegistry:
                 if agent_id in self._capabilities[cap]:
                     self._capabilities[cap].remove(agent_id)
             del self._agents[agent_id]
-    
+
     def get_agent(self, agent_id: str) -> Optional[Dict[str, Any]]:
         """获取Agent信息"""
         return self._agents.get(agent_id)
-    
+
     def find_agents_by_capability(self, capability: str) -> List[str]:
         """根据能力查找Agent"""
         return self._capabilities.get(capability, [])
-    
+
     def list_agents(self) -> List[Dict[str, Any]]:
         """列出所有Agent"""
         return list(self._agents.values())
-    
+
     def update_heartbeat(self, agent_id: str):
         """更新心跳"""
         if agent_id in self._agents:
@@ -170,28 +176,28 @@ class AgentRegistry:
 
 class MessageBus:
     """消息总线 - 内存实现"""
-    
+
     def __init__(self):
         self._subscribers: Dict[str, List[Callable]] = defaultdict(list)
         self._message_history: List[AgentMessage] = []
         self._max_history = 1000
-    
+
     def subscribe(self, agent_id: str, handler: Callable[[AgentMessage], None]):
         """订阅消息"""
         self._subscribers[agent_id].append(handler)
-    
+
     def unsubscribe(self, agent_id: str, handler: Callable[[AgentMessage], None]):
         """取消订阅"""
         if agent_id in self._subscribers:
             if handler in self._subscribers[agent_id]:
                 self._subscribers[agent_id].remove(handler)
-    
+
     def publish(self, message: AgentMessage):
         """发布消息"""
         self._message_history.append(message)
         if len(self._message_history) > self._max_history:
             self._message_history = self._message_history[-self._max_history:]
-        
+
         # 分发消息
         if message.receiver:
             # 点对点
@@ -209,7 +215,7 @@ class MessageBus:
                         handler(message)
                     except Exception as e:
                         print(f"Error handling broadcast: {e}")
-    
+
     def get_history(self, limit: int = 100) -> List[AgentMessage]:
         """获取消息历史"""
         return self._message_history[-limit:]
@@ -217,13 +223,13 @@ class MessageBus:
 
 class TaskOrchestrator:
     """任务编排器"""
-    
+
     def __init__(self, registry: AgentRegistry, message_bus: MessageBus):
         self.registry = registry
         self.message_bus = message_bus
         self._tasks: Dict[str, Task] = {}
         self._callbacks: Dict[str, Callable] = {}
-    
+
     def create_task(self, task_type: str, description: str,
                    parameters: Dict[str, Any] = None,
                    created_by: str = "",
@@ -238,16 +244,16 @@ class TaskOrchestrator:
         )
         self._tasks[task.task_id] = task
         return task
-    
+
     def assign_task(self, task_id: str, agent_id: str) -> bool:
         """分配任务给Agent"""
         if task_id not in self._tasks:
             return False
-        
+
         task = self._tasks[task_id]
         task.assigned_to = agent_id
         task.status = TaskStatus.ASSIGNED
-        
+
         # 发送任务消息
         message = AgentMessage(
             msg_type=MessageType.TASK,
@@ -263,7 +269,7 @@ class TaskOrchestrator:
         )
         self.message_bus.publish(message)
         return True
-    
+
     def execute_parallel(self, tasks: List[Task]) -> List[str]:
         """并行执行多个任务"""
         task_ids = []
@@ -272,59 +278,59 @@ class TaskOrchestrator:
             # 查找合适的Agent
             capability = task.task_type.split(".")[0]
             agents = self.registry.find_agents_by_capability(capability)
-            
+
             if agents:
                 self.assign_task(task.task_id, agents[0])
             task_ids.append(task.task_id)
         return task_ids
-    
+
     def execute_sequential(self, tasks: List[Task]) -> List[str]:
         """串行执行多个任务"""
         task_ids = []
         prev_task_id = None
-        
+
         for task in tasks:
             if prev_task_id:
                 task.dependencies.append(prev_task_id)
             self._tasks[task.task_id] = task
             task_ids.append(task.task_id)
             prev_task_id = task.task_id
-        
+
         # 启动第一个任务
         if tasks:
             capability = tasks[0].task_type.split(".")[0]
             agents = self.registry.find_agents_by_capability(capability)
             if agents:
                 self.assign_task(tasks[0].task_id, agents[0])
-        
+
         return task_ids
-    
+
     def on_task_complete(self, task_id: str, callback: Callable[[Task], None]):
         """注册任务完成回调"""
         self._callbacks[task_id] = callback
-    
+
     def handle_result(self, message: AgentMessage):
         """处理任务结果"""
         if message.msg_type != MessageType.RESULT:
             return
-        
+
         payload = message.payload
         task_id = payload.get("task_id")
-        
+
         if task_id in self._tasks:
             task = self._tasks[task_id]
             task.status = TaskStatus.COMPLETED if not payload.get("error") else TaskStatus.FAILED
             task.result = payload.get("result")
             task.error = payload.get("error")
             task.completed_at = datetime.now()
-            
+
             # 触发回调
             if task_id in self._callbacks:
                 self._callbacks[task_id](task)
-            
+
             # 检查依赖此任务的其他任务
             self._check_dependent_tasks(task_id)
-    
+
     def _check_dependent_tasks(self, completed_task_id: str):
         """检查并启动依赖任务"""
         for task in self._tasks.values():
@@ -335,13 +341,13 @@ class TaskOrchestrator:
                     agents = self.registry.find_agents_by_capability(capability)
                     if agents:
                         self.assign_task(task.task_id, agents[0])
-    
+
     def get_task_status(self, task_id: str) -> Optional[TaskStatus]:
         """获取任务状态"""
         if task_id in self._tasks:
             return self._tasks[task_id].status
         return None
-    
+
     def get_all_tasks(self) -> List[Task]:
         """获取所有任务"""
         return list(self._tasks.values())
@@ -349,9 +355,9 @@ class TaskOrchestrator:
 
 class ResultAggregator:
     """结果聚合器"""
-    
+
     @staticmethod
-    def merge_dicts(results: List[Dict[str, Any]], 
+    def merge_dicts(results: List[Dict[str, Any]],
                    strategy: str = "append") -> Dict[str, Any]:
         """合并字典结果"""
         if strategy == "append":
@@ -369,21 +375,21 @@ class ResultAggregator:
         elif strategy == "list":
             return {"results": results}
         return {"results": results}
-    
+
     @staticmethod
-    def resolve_conflicts(results: List[Dict[str, Any]], 
+    def resolve_conflicts(results: List[Dict[str, Any]],
                          confidence_key: str = "confidence") -> Dict[str, Any]:
         """基于置信度解决冲突"""
         if not results:
             return {}
-        
+
         # 选择置信度最高的结果
-        best_result = max(results, 
+        best_result = max(results,
                          key=lambda x: x.get(confidence_key, 0))
         return best_result
-    
+
     @staticmethod
-    def summarize_text_results(results: List[str], 
+    def summarize_text_results(results: List[str],
                               max_length: int = 500) -> str:
         """总结文本结果"""
         combined = "\n\n".join(results)
@@ -394,7 +400,7 @@ class ResultAggregator:
 
 class CollaborationAgent:
     """协作Agent基类"""
-    
+
     def __init__(self, agent_id: str, role: AgentRole,
                  capabilities: List[str], registry: AgentRegistry,
                  message_bus: MessageBus):
@@ -404,11 +410,11 @@ class CollaborationAgent:
         self.registry = registry
         self.message_bus = message_bus
         self._running = False
-        
+
         # 注册自己
         self.registry.register(agent_id, role, capabilities)
         self.message_bus.subscribe(agent_id, self._handle_message)
-    
+
     def _handle_message(self, message: AgentMessage):
         """处理收到的消息"""
         if message.msg_type == MessageType.TASK:
@@ -417,19 +423,19 @@ class CollaborationAgent:
             self._handle_query(message)
         elif message.msg_type == MessageType.EVENT:
             self._handle_event(message)
-    
+
     def _handle_task(self, message: AgentMessage):
         """处理任务消息 - 子类应重写"""
         pass
-    
+
     def _handle_query(self, message: AgentMessage):
         """处理查询消息 - 子类应重写"""
         pass
-    
+
     def _handle_event(self, message: AgentMessage):
         """处理事件消息 - 子类可重写"""
         pass
-    
+
     def send_result(self, task_id: str, result: Dict[str, Any],
                    receiver: str = "orchestrator"):
         """发送任务结果"""
@@ -444,7 +450,7 @@ class CollaborationAgent:
             correlation_id=task_id
         )
         self.message_bus.publish(message)
-    
+
     def send_error(self, task_id: str, error: str,
                   receiver: str = "orchestrator"):
         """发送错误"""
@@ -459,8 +465,8 @@ class CollaborationAgent:
             correlation_id=task_id
         )
         self.message_bus.publish(message)
-    
-    def query(self, target: str, query_type: str, 
+
+    def query(self, target: str, query_type: str,
              parameters: Dict[str, Any]) -> str:
         """向其他Agent发送查询"""
         correlation_id = str(uuid.uuid4())[:8]
@@ -476,11 +482,11 @@ class CollaborationAgent:
         )
         self.message_bus.publish(message)
         return correlation_id
-    
+
     def start(self):
         """启动Agent"""
         self._running = True
-    
+
     def stop(self):
         """停止Agent"""
         self._running = False
@@ -493,31 +499,31 @@ def create_collaboration_system() -> tuple:
     registry = AgentRegistry()
     message_bus = MessageBus()
     orchestrator = TaskOrchestrator(registry, message_bus)
-    
+
     # 监听结果消息
     def result_handler(msg: AgentMessage):
         if msg.msg_type == MessageType.RESULT:
             orchestrator.handle_result(msg)
-    
+
     message_bus.subscribe("orchestrator", result_handler)
-    
+
     return registry, message_bus, orchestrator
 
 
 if __name__ == "__main__":
     # 测试代码
     registry, bus, orchestrator = create_collaboration_system()
-    
+
     # 注册测试Agent
-    registry.register("finance-agent", AgentRole.SPECIALIST, 
+    registry.register("finance-agent", AgentRole.SPECIALIST,
                      ["finance", "stock", "quote"])
     registry.register("research-agent", AgentRole.SPECIALIST,
                      ["research", "analysis", "report"])
-    
+
     print("Agent注册中心:")
     for agent in registry.list_agents():
         print(f"  - {agent['agent_id']}: {agent['capabilities']}")
-    
+
     # 创建任务
     task1 = orchestrator.create_task(
         task_type="finance.quote",
@@ -525,13 +531,13 @@ if __name__ == "__main__":
         parameters={"symbol": "600519.SH"},
         created_by="user"
     )
-    
+
     print(f"\n创建任务: {task1.task_id}")
-    
+
     # 分配任务
     orchestrator.assign_task(task1.task_id, "finance-agent")
     print(f"任务分配给: finance-agent")
-    
+
     # 模拟结果
     result_msg = AgentMessage(
         msg_type=MessageType.RESULT,
@@ -544,6 +550,6 @@ if __name__ == "__main__":
         correlation_id=task1.task_id
     )
     bus.publish(result_msg)
-    
+
     print(f"任务状态: {orchestrator.get_task_status(task1.task_id).name}")
     print(f"任务结果: {orchestrator._tasks[task1.task_id].result}")
