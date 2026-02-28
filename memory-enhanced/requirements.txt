@@ -1,0 +1,2 @@
+# Memory Enhanced - 依赖项
+numpy>=1.20.0

@@ -1,0 +1,2 @@
+# Notification Service - 依赖项
+# 纯标准库实现，无第三方依赖
