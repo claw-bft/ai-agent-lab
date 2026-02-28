@@ -5,9 +5,9 @@
 ## 功能特性
 
 - 🔍 **智能搜索** - 快速查找所需技能包
-- 🏷️ **分类浏览** - 按类别筛选技能包
+- 🏷️ **分类浏览*  - 按类别筛选技能包
 - 📊 **排序功能** - 支持按下载量、评分、更新时间排序
-- 🌙 **深色模式** - 支持深色/浅色主题切换
+- 🌙 **深色模式*  - 支持深色/浅色主题切换
 - 📱 **响应式设计** - 完美适配桌面和移动设备
 - 🎯 **一键安装** - 复制安装命令，快速使用
 
@@ -65,7 +65,7 @@ clawhub-web/
 
 ```javascript
 // API 端点
-const API_BASE = 'https://clawhub-registry.vercel.app';
+const API_BASE = 'https://claw-bft.github.io/ai-agent-lab/registry/api';
 
 // 获取技能列表
 GET /skills
