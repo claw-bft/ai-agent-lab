@@ -21,8 +21,13 @@ SKILLS_REGISTRY: Dict[str, dict] = {
         "downloads": 1250,
         "rating": 4.8,
         "updated_at": "2026-02-27T10:00:00Z",
-        "repository": "https://github.com/claw-bft/ai-agent-lab/tree/main/finance-pro",
-        "install_url": "https://github.com/claw-bft/ai-agent-lab/releases/download/finance-pro-v1.2.0/finance-pro.tar.gz"
+        "repository": (
+            "https://github.com/claw-bft/ai-agent-lab/tree/main/finance-pro"
+        ),
+        "install_url": (
+            "https://github.com/claw-bft/ai-agent-lab/releases/download/"
+            "finance-pro-v1.2.0/finance-pro.tar.gz"
+        )
     },
     "coding-pro": {
         "name": "coding-pro",
@@ -33,8 +38,13 @@ SKILLS_REGISTRY: Dict[str, dict] = {
         "downloads": 980,
         "rating": 4.6,
         "updated_at": "2026-02-26T08:00:00Z",
-        "repository": "https://github.com/claw-bft/ai-agent-lab/tree/main/coding-pro",
-        "install_url": "https://github.com/claw-bft/ai-agent-lab/releases/download/coding-pro-v1.1.0/coding-pro.tar.gz"
+        "repository": (
+            "https://github.com/claw-bft/ai-agent-lab/tree/main/coding-pro"
+        ),
+        "install_url": (
+            "https://github.com/claw-bft/ai-agent-lab/releases/download/"
+            "coding-pro-v1.1.0/coding-pro.tar.gz"
+        )
     },
     "research-pro": {
         "name": "research-pro",
@@ -45,8 +55,13 @@ SKILLS_REGISTRY: Dict[str, dict] = {
         "downloads": 750,
         "rating": 4.5,
         "updated_at": "2026-02-25T12:00:00Z",
-        "repository": "https://github.com/claw-bft/ai-agent-lab/tree/main/research-pro",
-        "install_url": "https://github.com/claw-bft/ai-agent-lab/releases/download/research-pro-v1.0.0/research-pro.tar.gz"
+        "repository": (
+            "https://github.com/claw-bft/ai-agent-lab/tree/main/research-pro"
+        ),
+        "install_url": (
+            "https://github.com/claw-bft/ai-agent-lab/releases/download/"
+            "research-pro-v1.0.0/research-pro.tar.gz"
+        )
     },
     "product-pro": {
         "name": "product-pro",
@@ -57,8 +72,13 @@ SKILLS_REGISTRY: Dict[str, dict] = {
         "downloads": 620,
         "rating": 4.7,
         "updated_at": "2026-02-24T14:00:00Z",
-        "repository": "https://github.com/claw-bft/ai-agent-lab/tree/main/product-pro",
-        "install_url": "https://github.com/claw-bft/ai-agent-lab/releases/download/product-pro-v1.0.0/product-pro.tar.gz"
+        "repository": (
+            "https://github.com/claw-bft/ai-agent-lab/tree/main/product-pro"
+        ),
+        "install_url": (
+            "https://github.com/claw-bft/ai-agent-lab/releases/download/"
+            "product-pro-v1.0.0/product-pro.tar.gz"
+        )
     },
     "skill-cli": {
         "name": "skill-cli",
@@ -69,8 +89,13 @@ SKILLS_REGISTRY: Dict[str, dict] = {
         "downloads": 2100,
         "rating": 4.9,
         "updated_at": "2026-02-28T04:00:00Z",
-        "repository": "https://github.com/claw-bft/ai-agent-lab/tree/main/skill-cli",
-        "install_url": "https://github.com/claw-bft/ai-agent-lab/releases/download/skill-cli-v2.0.0/skill-cli.tar.gz"
+        "repository": (
+            "https://github.com/claw-bft/ai-agent-lab/tree/main/skill-cli"
+        ),
+        "install_url": (
+            "https://github.com/claw-bft/ai-agent-lab/releases/download/"
+            "skill-cli-v2.0.0/skill-cli.tar.gz"
+        )
     },
     "memory-enhanced": {
         "name": "memory-enhanced",
@@ -81,8 +106,13 @@ SKILLS_REGISTRY: Dict[str, dict] = {
         "downloads": 540,
         "rating": 4.4,
         "updated_at": "2026-02-23T09:00:00Z",
-        "repository": "https://github.com/claw-bft/ai-agent-lab/tree/main/memory-enhanced",
-        "install_url": "https://github.com/claw-bft/ai-agent-lab/releases/download/memory-enhanced-v1.0.0/memory-enhanced.tar.gz"
+        "repository": (
+            "https://github.com/claw-bft/ai-agent-lab/tree/main/memory-enhanced"
+        ),
+        "install_url": (
+            "https://github.com/claw-bft/ai-agent-lab/releases/download/"
+            "memory-enhanced-v1.0.0/memory-enhanced.tar.gz"
+        )
     },
     "agent-collaboration": {
         "name": "agent-collaboration",
@@ -93,8 +123,14 @@ SKILLS_REGISTRY: Dict[str, dict] = {
         "downloads": 480,
         "rating": 4.6,
         "updated_at": "2026-02-22T11:00:00Z",
-        "repository": "https://github.com/claw-bft/ai-agent-lab/tree/main/agent-collaboration",
-        "install_url": "https://github.com/claw-bft/ai-agent-lab/releases/download/agent-collaboration-v1.0.0/agent-collaboration.tar.gz"
+        "repository": (
+            "https://github.com/claw-bft/ai-agent-lab/tree/main/"
+            "agent-collaboration"
+        ),
+        "install_url": (
+            "https://github.com/claw-bft/ai-agent-lab/releases/download/"
+            "agent-collaboration-v1.0.0/agent-collaboration.tar.gz"
+        )
     }
 }
 
@@ -224,7 +260,8 @@ def handle_categories() -> tuple:
 def handle_stats() -> tuple:
     """获取注册表统计信息"""
     total_downloads = sum(s.get("downloads", 0) for s in SKILLS_REGISTRY.values())
-    avg_rating = sum(s.get("rating", 0) for s in SKILLS_REGISTRY.values()) / len(SKILLS_REGISTRY) if SKILLS_REGISTRY else 0
+    total_rating = sum(s.get("rating", 0) for s in SKILLS_REGISTRY.values())
+    avg_rating = total_rating / len(SKILLS_REGISTRY) if SKILLS_REGISTRY else 0
 
     return json_response({
         "total_skills": len(SKILLS_REGISTRY),
