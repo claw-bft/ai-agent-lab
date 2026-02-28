@@ -19,7 +19,8 @@ from unittest.mock import Mock, patch, MagicMock
 
 # 导入被测模块
 import sys
-sys.path.insert(0, '/root/.openclaw/workspace/ai-agent-lab/skills/workflow-orchestrator')
+import os
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from workflow_engine import (
     NodeType, NodeStatus, WorkflowStatus,
