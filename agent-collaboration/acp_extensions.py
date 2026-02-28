@@ -244,6 +244,13 @@ class NegotiationManager:
         
         # 检查所有必需Agent是否都已响应并接受
         responses = proposal.responses
+        
+        # 首先检查是否所有必需Agent都已响应
+        all_responded = all(agent in responses for agent in required_agents)
+        if not all_responded:
+            return None  # 还有Agent未响应
+        
+        # 所有Agent都已响应，检查是否全部接受
         all_accepted = all(
             responses.get(agent, {}).get("accepted", False)
             for agent in required_agents
@@ -252,8 +259,10 @@ class NegotiationManager:
         if all_accepted:
             proposal.status = NegotiationStatus.ACCEPTED
             return True
-        
-        return None
+        else:
+            # 有人拒绝，标记为拒绝
+            proposal.status = NegotiationStatus.REJECTED
+            return False
 
 
 class VotingManager:
@@ -354,9 +363,10 @@ class VotingManager:
                 vote.status = "closed"
         
         elif vote.vote_type == VoteType.UNANIMOUS:
-            # 全体一致
+            # 全体一致 - 必须所有合格投票者都投票且选择相同
             choices = set(vote.votes.values())
-            if len(choices) == 1:
+            all_voted = len(vote.votes) == len(vote.weights)
+            if all_voted and len(choices) == 1:
                 vote.result = list(choices)[0]
                 vote.status = "closed"
         
@@ -397,15 +407,16 @@ class VotingManager:
         return vote.result
     
     def _instant_runoff(self, vote: Vote) -> str:
-        """即时复选计票"""
+        """即时复选计票 (IRV)"""
         candidates = set(vote.options)
         
         while candidates:
-            # 计算第一选择
+            # 计算当前轮次每个候选人的第一选择票数
             first_choices = defaultdict(float)
             for voter, ranking in vote.votes.items():
                 weight = vote.weights.get(voter, 1.0)
                 if isinstance(ranking, list):
+                    # 找到该选民在当前候选列表中的最高排名
                     for candidate in ranking:
                         if candidate in candidates:
                             first_choices[candidate] += weight
@@ -416,13 +427,21 @@ class VotingManager:
             
             total = sum(first_choices.values())
             
-            # 检查是否有候选人获得多数
+            # 检查是否有候选人获得多数 (>50%)
             for candidate, count in first_choices.items():
                 if count > total / 2:
                     return candidate
             
-            # 淘汰得票最少的候选人
-            loser = min(first_choices.items(), key=lambda x: x[1])[0]
+            # 如果没有多数，淘汰得票最少的候选人
+            min_votes = min(first_choices.values())
+            losers = [c for c, v in first_choices.items() if v == min_votes]
+            
+            # 如果只剩一个候选人，返回它
+            if len(candidates) == 1:
+                return list(candidates)[0]
+            
+            # 淘汰得票最少的（按字母顺序打破平局）
+            loser = sorted(losers)[0]
             candidates.remove(loser)
         
         return list(candidates)[0] if candidates else None
