@@ -1,19 +1,19 @@
 {
-  "generated_at": "2026-03-01T02:05:22",
+  "generated_at": "2026-03-01T03:23:03",
   "total_skills": 20,
   "summary": {
-    "average_score": 85.4,
+    "average_score": 86.5,
     "grade_distribution": {
-      "S": 3,
-      "A": 15,
-      "B": 2,
+      "S": 5,
+      "A": 14,
+      "B": 1,
       "C": 0,
       "D": 0
     },
     "top_skills": [
-      "context-compressor",
-      "quick-templates",
-      "claude-domain-skills"
+      "notification-service",
+      "token-manager",
+      "context-compressor"
     ],
     "needs_improvement": []
   },
@@ -83,8 +83,8 @@
         "添加 SKILL.md 文档，描述技能包功能和使用方法",
         "考虑添加性能基准测试"
       ],
-      "evaluated_at": "2026-03-01T02:04:43",
-      "duration_ms": 551
+      "evaluated_at": "2026-03-01T03:20:58",
+      "duration_ms": 857
     },
     "context-compressor": {
       "skill_name": "context-compressor",
@@ -145,8 +145,8 @@
         "修复 9 个代码风格问题",
         "考虑添加性能基准测试"
       ],
-      "evaluated_at": "2026-03-01T02:04:44",
-      "duration_ms": 271
+      "evaluated_at": "2026-03-01T03:20:59",
+      "duration_ms": 397
     },
     "finance-pro": {
       "skill_name": "finance-pro",
@@ -207,7 +207,7 @@
         ]
       },
       "performance_details": {
-        "import_time_ms": 481,
+        "import_time_ms": 690,
         "module_size_kb": 96.2783203125,
         "has_performance_tests": false
       },
@@ -222,8 +222,8 @@
         "修复代码中的安全问题",
         "考虑添加性能基准测试"
       ],
-      "evaluated_at": "2026-03-01T02:04:44",
-      "duration_ms": 1511
+      "evaluated_at": "2026-03-01T03:20:59",
+      "duration_ms": 2211
     },
     "skill-cli": {
       "skill_name": "skill-cli",
@@ -294,8 +294,8 @@
         "修复代码中的安全问题",
         "考虑添加性能基准测试"
       ],
-      "evaluated_at": "2026-03-01T02:04:46",
-      "duration_ms": 461
+      "evaluated_at": "2026-03-01T03:21:02",
+      "duration_ms": 691
     },
     "memory-enhanced": {
       "skill_name": "memory-enhanced",
@@ -311,7 +311,7 @@
         "total_files": 2,
         "total_lines": 707,
         "avg_complexity": 36.0,
-        "lint_issues": 99,
+        "lint_issues": 29,
         "style_issues": [
           "examples.py:11: 可能的未使用导入 'memory_system'",
           "examples.py:19: 存在尾随空格",
@@ -328,10 +328,10 @@
       "test_coverage_details": {
         "has_tests": true,
         "test_files": 2,
-        "test_count": 47,
+        "test_count": 41,
         "coverage_percent": 0.0,
         "tests_passed": 0,
-        "tests_failed": 1
+        "tests_failed": 41
       },
       "documentation_details": {
         "has_readme": true,
@@ -342,27 +342,29 @@
         "doc_completeness": 100.0
       },
       "security_details": {
-        "has_requirements": false,
-        "dependencies": [],
+        "has_requirements": true,
+        "dependencies": [
+          "numpy"
+        ],
         "vulnerabilities": [],
         "security_issues": []
       },
       "performance_details": {
         "import_time_ms": 0,
-        "module_size_kb": 47.123046875,
+        "module_size_kb": 42.373046875,
         "has_performance_tests": true
       },
       "issues": [
         "平均圈复杂度过高: 36.0",
-        "有 1 个测试失败"
+        "有 41 个测试失败"
       ],
       "suggestions": [
         "重构复杂函数，降低圈复杂度",
-        "修复 99 个代码风格问题",
+        "修复 29 个代码风格问题",
         "修复失败的测试用例"
       ],
-      "evaluated_at": "2026-03-01T02:04:46",
-      "duration_ms": 431
+      "evaluated_at": "2026-03-01T03:21:02",
+      "duration_ms": 60082
     },
     "coding-pro": {
       "skill_name": "coding-pro",
@@ -429,15 +431,15 @@
         "添加 README.md 文档",
         "考虑添加性能基准测试"
       ],
-      "evaluated_at": "2026-03-01T02:04:46",
-      "duration_ms": 4406
+      "evaluated_at": "2026-03-01T03:22:02",
+      "duration_ms": 4759
     },
     "financial-daily": {
       "skill_name": "financial-daily",
       "skill_path": "/root/.openclaw/workspace/ai-agent-lab/financial-daily",
-      "overall_score": 84.4,
+      "overall_score": 87.9,
       "grade": "A",
-      "code_quality_score": 72.0,
+      "code_quality_score": 86.0,
       "test_coverage_score": 79.54545454545455,
       "documentation_score": 90.0,
       "security_score": 100.0,
@@ -446,17 +448,10 @@
         "total_files": 2,
         "total_lines": 184,
         "avg_complexity": 11.0,
-        "lint_issues": 32,
+        "lint_issues": 3,
         "style_issues": [
           "generator.py:11: 可能的未使用导入 'typing'",
-          "generator.py:20: 存在尾随空格",
-          "generator.py:25: 存在尾随空格",
-          "generator.py:31: 存在尾随空格",
           "generator.py:36: 可能的未使用导入 'research_pro'",
-          "generator.py:38: 存在尾随空格",
-          "generator.py:46: 存在尾随空格",
-          "generator.py:51: 存在尾随空格",
-          "generator.py:56: 存在尾随空格",
           "generator.py:60: 可能的未使用导入 'data_adapter'"
         ]
       },
@@ -477,14 +472,14 @@
         "doc_completeness": 50.0
       },
       "security_details": {
-        "has_requirements": false,
+        "has_requirements": true,
         "dependencies": [],
         "vulnerabilities": [],
         "security_issues": []
       },
       "performance_details": {
         "import_time_ms": 0,
-        "module_size_kb": 19.2529296875,
+        "module_size_kb": 19.0185546875,
         "has_performance_tests": true
       },
       "issues": [
@@ -492,11 +487,11 @@
       ],
       "suggestions": [
         "部分函数复杂度偏高，建议优化",
-        "修复 32 个代码风格问题",
+        "修复 3 个代码风格问题",
         "修复失败的测试用例"
       ],
-      "evaluated_at": "2026-03-01T02:04:51",
-      "duration_ms": 299
+      "evaluated_at": "2026-03-01T03:22:07",
+      "duration_ms": 500
     },
     "clawhub-web": {
       "skill_name": "clawhub-web",
@@ -561,8 +556,8 @@
         "修复 53 个代码风格问题",
         "考虑添加性能基准测试"
       ],
-      "evaluated_at": "2026-03-01T02:04:51",
-      "duration_ms": 283
+      "evaluated_at": "2026-03-01T03:22:08",
+      "duration_ms": 484
     },
     "product-pro": {
       "skill_name": "product-pro",
@@ -620,7 +615,7 @@
         ]
       },
       "performance_details": {
-        "import_time_ms": 1,
+        "import_time_ms": 2,
         "module_size_kb": 39.62109375,
         "has_performance_tests": false
       },
@@ -635,8 +630,8 @@
         "修复代码中的安全问题",
         "考虑添加性能基准测试"
       ],
-      "evaluated_at": "2026-03-01T02:04:51",
-      "duration_ms": 343
+      "evaluated_at": "2026-03-01T03:22:08",
+      "duration_ms": 662
     },
     "skill-evaluator": {
       "skill_name": "skill-evaluator",
@@ -709,8 +704,8 @@
         "修复代码中的安全问题",
         "考虑添加性能基准测试"
       ],
-      "evaluated_at": "2026-03-01T02:04:52",
-      "duration_ms": 538
+      "evaluated_at": "2026-03-01T03:22:09",
+      "duration_ms": 1078
     },
     "quick-templates": {
       "skill_name": "quick-templates",
@@ -768,15 +763,15 @@
         "README.md 内容可以更完整，建议添加功能介绍和使用示例",
         "考虑添加性能基准测试"
       ],
-      "evaluated_at": "2026-03-01T02:04:52",
-      "duration_ms": 271
+      "evaluated_at": "2026-03-01T03:22:10",
+      "duration_ms": 472
     },
     "token-manager": {
       "skill_name": "token-manager",
       "skill_path": "/root/.openclaw/workspace/ai-agent-lab/token-manager",
-      "overall_score": 88.1,
-      "grade": "A",
-      "code_quality_score": 65.0,
+      "overall_score": 92.1,
+      "grade": "S",
+      "code_quality_score": 81.0,
       "test_coverage_score": 93.54838709677419,
       "documentation_score": 100,
       "security_score": 100.0,
@@ -785,18 +780,10 @@
         "total_files": 1,
         "total_lines": 242,
         "avg_complexity": 19.0,
-        "lint_issues": 46,
+        "lint_issues": 2,
         "style_issues": [
           "token_manager.py:10: 可能的未使用导入 'pathlib'",
-          "token_manager.py:11: 可能的未使用导入 'typing'",
-          "token_manager.py:16: 存在尾随空格",
-          "token_manager.py:19: 存在尾随空格",
-          "token_manager.py:23: 存在尾随空格",
-          "token_manager.py:30: 存在尾随空格",
-          "token_manager.py:41: 存在尾随空格",
-          "token_manager.py:47: 存在尾随空格",
-          "token_manager.py:51: 存在尾随空格",
-          "token_manager.py:55: 存在尾随空格"
+          "token_manager.py:11: 可能的未使用导入 'typing'"
         ]
       },
       "test_coverage_details": {
@@ -816,14 +803,14 @@
         "doc_completeness": 100.0
       },
       "security_details": {
-        "has_requirements": false,
+        "has_requirements": true,
         "dependencies": [],
         "vulnerabilities": [],
         "security_issues": []
       },
       "performance_details": {
         "import_time_ms": 0,
-        "module_size_kb": 25.982421875,
+        "module_size_kb": 25.6943359375,
         "has_performance_tests": true
       },
       "issues": [
@@ -832,11 +819,11 @@
       ],
       "suggestions": [
         "重构复杂函数，降低圈复杂度",
-        "修复 46 个代码风格问题",
+        "修复 2 个代码风格问题",
         "修复失败的测试用例"
       ],
-      "evaluated_at": "2026-03-01T02:04:53",
-      "duration_ms": 24569
+      "evaluated_at": "2026-03-01T03:22:10",
+      "duration_ms": 45658
     },
     "research-pro": {
       "skill_name": "research-pro",
@@ -910,8 +897,8 @@
         "修复代码中的安全问题",
         "考虑添加性能基准测试"
       ],
-      "evaluated_at": "2026-03-01T02:05:17",
-      "duration_ms": 2586
+      "evaluated_at": "2026-03-01T03:22:56",
+      "duration_ms": 3067
     },
     "vercel-deploy": {
       "skill_name": "vercel-deploy",
@@ -975,8 +962,8 @@
         "README.md 内容可以更完整，建议添加功能介绍和使用示例",
         "考虑添加性能基准测试"
       ],
-      "evaluated_at": "2026-03-01T02:05:20",
-      "duration_ms": 279
+      "evaluated_at": "2026-03-01T03:22:59",
+      "duration_ms": 404
     },
     "api": {
       "skill_name": "api",
@@ -1041,16 +1028,16 @@
         "修复 31 个代码风格问题",
         "考虑添加性能基准测试"
       ],
-      "evaluated_at": "2026-03-01T02:05:20",
-      "duration_ms": 282
+      "evaluated_at": "2026-03-01T03:22:59",
+      "duration_ms": 718
     },
     "agent-collaboration": {
       "skill_name": "agent-collaboration",
       "skill_path": "/root/.openclaw/workspace/ai-agent-lab/agent-collaboration",
-      "overall_score": 77.2,
-      "grade": "B",
+      "overall_score": 86.8,
+      "grade": "A",
       "code_quality_score": 65.0,
-      "test_coverage_score": 50.0,
+      "test_coverage_score": 88.15789473684211,
       "documentation_score": 100,
       "security_score": 100.0,
       "performance_score": 90.0,
@@ -1058,27 +1045,27 @@
         "total_files": 3,
         "total_lines": 1946,
         "avg_complexity": 76.0,
-        "lint_issues": 298,
+        "lint_issues": 160,
         "style_issues": [
           "acp_extensions.py:9: 可能的未使用导入 'dataclasses'",
           "acp_extensions.py:10: 可能的未使用导入 'typing'",
           "acp_extensions.py:14: 可能的未使用导入 'asyncio'",
           "acp_extensions.py:15: 可能的未使用导入 'collections'",
           "acp_extensions.py:16: 可能的未使用导入 'heapq'",
-          "acp_extensions.py:62: 存在尾随空格",
-          "acp_extensions.py:91: 存在尾随空格",
-          "acp_extensions.py:119: 存在尾随空格",
-          "acp_extensions.py:136: 存在尾随空格",
-          "acp_extensions.py:142: 存在尾随空格"
+          "agent_protocol.py:8: 可能的未使用导入 'dataclasses'",
+          "agent_protocol.py:9: 可能的未使用导入 'typing'",
+          "agent_protocol.py:13: 可能的未使用导入 'asyncio'",
+          "agent_protocol.py:14: 可能的未使用导入 'collections'",
+          "agent_protocol.py:57: 存在尾随空格"
         ]
       },
       "test_coverage_details": {
         "has_tests": true,
         "test_files": 2,
-        "test_count": 42,
+        "test_count": 38,
         "coverage_percent": 0.0,
-        "tests_passed": 0,
-        "tests_failed": 1
+        "tests_passed": 29,
+        "tests_failed": 9
       },
       "documentation_details": {
         "has_readme": true,
@@ -1089,27 +1076,27 @@
         "doc_completeness": 100.0
       },
       "security_details": {
-        "has_requirements": false,
+        "has_requirements": true,
         "dependencies": [],
         "vulnerabilities": [],
         "security_issues": []
       },
       "performance_details": {
         "import_time_ms": 0,
-        "module_size_kb": 98.8203125,
+        "module_size_kb": 94.306640625,
         "has_performance_tests": true
       },
       "issues": [
         "平均圈复杂度过高: 76.0",
-        "有 1 个测试失败"
+        "有 9 个测试失败"
       ],
       "suggestions": [
         "重构复杂函数，降低圈复杂度",
-        "修复 298 个代码风格问题",
+        "修复 160 个代码风格问题",
         "修复失败的测试用例"
       ],
-      "evaluated_at": "2026-03-01T02:05:20",
-      "duration_ms": 363
+      "evaluated_at": "2026-03-01T03:23:00",
+      "duration_ms": 751
     },
     "skill-recommender": {
       "skill_name": "skill-recommender",
@@ -1173,8 +1160,8 @@
         "重构复杂函数，降低圈复杂度",
         "修复 162 个代码风格问题"
       ],
-      "evaluated_at": "2026-03-01T02:05:21",
-      "duration_ms": 293
+      "evaluated_at": "2026-03-01T03:23:01",
+      "duration_ms": 417
     },
     "stock-portfolio-analyzer": {
       "skill_name": "stock-portfolio-analyzer",
@@ -1246,40 +1233,33 @@
         "修复 115 个代码风格问题",
         "修复代码中的安全问题"
       ],
-      "evaluated_at": "2026-03-01T02:05:21",
-      "duration_ms": 296
+      "evaluated_at": "2026-03-01T03:23:01",
+      "duration_ms": 429
     },
     "notification-service": {
       "skill_name": "notification-service",
       "skill_path": "/root/.openclaw/workspace/ai-agent-lab/notification-service",
-      "overall_score": 88.0,
-      "grade": "A",
-      "code_quality_score": 72.0,
+      "overall_score": 93.0,
+      "grade": "S",
+      "code_quality_score": 86.0,
       "test_coverage_score": 100,
       "documentation_score": 90.0,
       "security_score": 100.0,
-      "performance_score": 80.0,
+      "performance_score": 90.0,
       "code_quality_details": {
         "total_files": 2,
         "total_lines": 292,
         "avg_complexity": 10.5,
-        "lint_issues": 45,
+        "lint_issues": 3,
         "style_issues": [
           "notify.py:10: 可能的未使用导入 'typing'",
           "notify.py:11: 可能的未使用导入 'dataclasses'",
-          "notify.py:12: 可能的未使用导入 'enum'",
-          "notify.py:29: 存在尾随空格",
-          "notify.py:34: 存在尾随空格",
-          "notify.py:38: 存在尾随空格",
-          "notify.py:60: 存在尾随空格",
-          "notify.py:76: 存在尾随空格",
-          "notify.py:78: 存在尾随空格",
-          "notify.py:93: 存在尾随空格"
+          "notify.py:12: 可能的未使用导入 'enum'"
         ]
       },
       "test_coverage_details": {
         "has_tests": true,
-        "test_files": 1,
+        "test_files": 2,
         "test_count": 23,
         "coverage_percent": 0.0,
         "tests_passed": 23,
@@ -1294,24 +1274,23 @@
         "doc_completeness": 50.0
       },
       "security_details": {
-        "has_requirements": false,
+        "has_requirements": true,
         "dependencies": [],
         "vulnerabilities": [],
         "security_issues": []
       },
       "performance_details": {
         "import_time_ms": 0,
-        "module_size_kb": 15.4365234375,
-        "has_performance_tests": false
+        "module_size_kb": 20.73828125,
+        "has_performance_tests": true
       },
       "issues": [],
       "suggestions": [
         "部分函数复杂度偏高，建议优化",
-        "修复 45 个代码风格问题",
-        "考虑添加性能基准测试"
+        "修复 3 个代码风格问题"
       ],
-      "evaluated_at": "2026-03-01T02:05:21",
-      "duration_ms": 277
+      "evaluated_at": "2026-03-01T03:23:02",
+      "duration_ms": 414
     },
     "claude-domain-skills": {
       "skill_name": "claude-domain-skills",
@@ -1362,8 +1341,8 @@
         "代码量较少，建议增加更多功能",
         "考虑添加性能基准测试"
       ],
-      "evaluated_at": "2026-03-01T02:05:22",
-      "duration_ms": 292
+      "evaluated_at": "2026-03-01T03:23:02",
+      "duration_ms": 423
     }
   }
 }
