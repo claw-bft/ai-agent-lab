@@ -1,177 +1,19 @@
 /**
  * ClawHub Web - 技能包市场前端应用
+ * 从注册表API动态获取数据
  */
 
-// 模拟技能包数据（实际应从API获取）
-const skillsData = [
-    {
-        name: "finance-pro",
-        version: "1.2.0",
-        description: "多数据源金融数据获取，支持Yahoo/东方财富，含技术指标计算",
-        icon: "💰",
-        downloads: 342,
-        rating: 4.8,
-        tags: ["finance", "data"],
-        category: "finance",
-        author: "AI Agent Lab",
-        updated: "2026-02-25"
-    },
-    {
-        name: "stock-portfolio-analyzer",
-        version: "1.1.0",
-        description: "投资组合分析与早报生成，支持多维度风险评估",
-        icon: "📈",
-        downloads: 298,
-        rating: 4.7,
-        tags: ["finance", "analysis"],
-        category: "finance",
-        author: "AI Agent Lab",
-        updated: "2026-02-26"
-    },
-    {
-        name: "coding-pro",
-        version: "1.0.0",
-        description: "AI代码生成器，支持多语言和框架，含测试生成",
-        icon: "💻",
-        downloads: 256,
-        rating: 4.5,
-        tags: ["coding", "ai"],
-        category: "coding",
-        author: "AI Agent Lab",
-        updated: "2026-02-20"
-    },
-    {
-        name: "skill-cli",
-        version: "2.0.0",
-        description: "自然语言执行层，让AI理解并执行复杂任务",
-        icon: "🎯",
-        downloads: 412,
-        rating: 4.9,
-        tags: ["cli", "core"],
-        category: "ai",
-        author: "AI Agent Lab",
-        updated: "2026-02-27"
-    },
-    {
-        name: "research-pro",
-        version: "1.0.0",
-        description: "智能研究助手，文献综述与竞品分析",
-        icon: "🔬",
-        downloads: 189,
-        rating: 4.6,
-        tags: ["research", "analysis"],
-        category: "research",
-        author: "AI Agent Lab",
-        updated: "2026-02-22"
-    },
-    {
-        name: "product-pro",
-        version: "1.1.0",
-        description: "PRD生成与产品管理，快速产出专业文档",
-        icon: "📦",
-        downloads: 234,
-        rating: 4.7,
-        tags: ["product", "docs"],
-        category: "product",
-        author: "AI Agent Lab",
-        updated: "2026-02-24"
-    },
-    {
-        name: "memory-enhanced",
-        version: "1.0.0",
-        description: "向量记忆系统，基于sqlite-vec的长期记忆",
-        icon: "🧠",
-        downloads: 178,
-        rating: 4.4,
-        tags: ["ai", "memory"],
-        category: "ai",
-        author: "AI Agent Lab",
-        updated: "2026-02-18"
-    },
-    {
-        name: "agent-collaboration",
-        version: "1.0.0",
-        description: "ACP协议多智能体协作框架",
-        icon: "🤝",
-        downloads: 156,
-        rating: 4.5,
-        tags: ["ai", "collaboration"],
-        category: "ai",
-        author: "AI Agent Lab",
-        updated: "2026-02-19"
-    },
-    {
-        name: "workflow-orchestrator",
-        version: "1.0.0",
-        description: "可视化工作流引擎，拖拽式构建AI流程",
-        icon: "⚙️",
-        downloads: 201,
-        rating: 4.6,
-        tags: ["workflow", "automation"],
-        category: "ai",
-        author: "AI Agent Lab",
-        updated: "2026-02-21"
-    },
-    {
-        name: "claude-domain-skills",
-        version: "2.0.0",
-        description: "18个领域的专业知识库，涵盖商业/金融/创意等",
-        icon: "🎓",
-        downloads: 567,
-        rating: 4.9,
-        tags: ["domains", "knowledge"],
-        category: "ai",
-        author: "AI Agent Lab",
-        updated: "2026-02-28"
-    },
-    {
-        name: "context-compressor",
-        version: "1.0.0",
-        description: "上下文压缩与优化，提升长对话效率",
-        icon: "🗜️",
-        downloads: 145,
-        rating: 4.3,
-        tags: ["optimization", "ai"],
-        category: "ai",
-        author: "AI Agent Lab",
-        updated: "2026-02-15"
-    },
-    {
-        name: "token-manager",
-        version: "1.0.0",
-        description: "统一配置管理系统，多技能包配置共享",
-        icon: "🔐",
-        downloads: 312,
-        rating: 4.8,
-        tags: ["config", "core"],
-        category: "ai",
-        author: "AI Agent Lab",
-        updated: "2026-02-23"
-    }
-];
+// API配置
+const REGISTRY_API_URL = 'https://claw-bft.github.io/ai-agent-lab/registry/api';
 
-const categoriesData = [
-    { id: "finance", name: "金融分析", icon: "💰", description: "股票、基金、投资组合分析工具", count: 3 },
-    { id: "coding", name: "开发工具", icon: "💻", description: "代码生成、CLI工具、部署助手", count: 4 },
-    { id: "research", name: "研究分析", icon: "🔬", description: "文献综述、竞品分析、数据研究", count: 2 },
-    { id: "product", name: "产品管理", icon: "📦", description: "PRD生成、需求分析、项目管理", count: 2 },
-    { id: "ai", name: "AI增强", icon: "🧠", description: "记忆系统、多智能体、工作流", count: 8 },
-    { id: "productivity", name: "生产力", icon: "⚡", description: "通知服务、模板工具、效率提升", count: 3 },
-    { id: "domains", name: "领域知识", icon: "🎓", description: "18个领域的专业知识库", count: 1 },
-    { id: "infrastructure", name: "基础设施", icon: "🏗️", description: "核心框架、配置管理、协议实现", count: 4 }
-];
+// 全局数据存储
+let skillsData = [];
+let categoriesData = [];
+let isLoading = true;
+let loadError = null;
 
 // DOM 元素
-const skillsGrid = document.getElementById('skills-grid');
-const categoriesGrid = document.getElementById('categories-grid');
-const searchInput = document.getElementById('search-input');
-const searchBtn = document.getElementById('search-btn');
-const filterTags = document.getElementById('filter-tags');
-const sortSelect = document.getElementById('sort-select');
-const themeToggle = document.getElementById('theme-toggle');
-const skillModal = document.getElementById('skill-modal');
-const modalClose = document.getElementById('modal-close');
-const modalBody = document.getElementById('modal-body');
+let skillsGrid, categoriesGrid, searchInput, searchBtn, filterTags, sortSelect, themeToggle, skillModal, modalClose, modalBody;
 
 // 状态
 let currentCategory = 'all';
@@ -179,12 +21,337 @@ let currentSort = 'downloads';
 let searchQuery = '';
 
 // 初始化
-function init() {
-    renderSkills();
-    renderCategories();
+async function init() {
+    // 获取DOM元素
+    skillsGrid = document.getElementById('skills-grid');
+    categoriesGrid = document.getElementById('categories-grid');
+    searchInput = document.getElementById('search-input');
+    searchBtn = document.getElementById('search-btn');
+    filterTags = document.getElementById('filter-tags');
+    sortSelect = document.getElementById('sort-select');
+    themeToggle = document.getElementById('theme-toggle');
+    skillModal = document.getElementById('skill-modal');
+    modalClose = document.getElementById('modal-close');
+    modalBody = document.getElementById('modal-body');
+    
+    // 显示加载状态
+    showLoading();
+    
+    // 从API加载数据
+    await loadDataFromAPI();
+    
+    // 设置事件监听
     setupEventListeners();
+    
+    // 加载主题
     loadTheme();
+    
+    // 动画统计数字
     animateStats();
+}
+
+// 显示加载状态
+function showLoading() {
+    if (skillsGrid) {
+        skillsGrid.innerHTML = `
+            <div class="loading-state" style="grid-column: 1 / -1; text-align: center; padding: 60px;">
+                <div class="loading-spinner" style="
+                    width: 48px;
+                    height: 48px;
+                    border: 3px solid var(--border);
+                    border-top-color: var(--primary);
+                    border-radius: 50%;
+                    animation: spin 1s linear infinite;
+                    margin: 0 auto 16px;
+                "></div>
+                <p style="color: var(--text-muted);">正在加载技能包数据...</p>
+            </div>
+        `;
+    }
+}
+
+// 从API加载数据
+async function loadDataFromAPI() {
+    try {
+        // 并行加载技能和分类数据
+        const [skillsResponse, categoriesResponse] = await Promise.all([
+            fetch(`${REGISTRY_API_URL}/skills.json`).catch(() => null),
+            fetch(`${REGISTRY_API_URL}/categories.json`).catch(() => null)
+        ]);
+        
+        if (skillsResponse && skillsResponse.ok) {
+            const skillsResult = await skillsResponse.json();
+            skillsData = skillsResult.skills || [];
+            
+            // 转换API数据格式为前端格式
+            skillsData = skillsData.map(skill => ({
+                name: skill.name || skill.id,
+                displayName: skill.display_name || skill.name || skill.id,
+                version: skill.version || '1.0.0',
+                description: skill.description || '',
+                icon: skill.icon || getDefaultIcon(skill.category),
+                downloads: skill.downloads || 0,
+                rating: skill.rating || 0,
+                tags: skill.tags || [],
+                category: skill.category || 'other',
+                author: skill.author || 'claw-bft',
+                updated: skill.updated_at || skill.created_at || '2026-02-01',
+                coverage: skill.coverage || 'N/A',
+                installUrl: skill.install_url || '',
+                docsUrl: skill.docs_url || ''
+            }));
+        } else {
+            // API加载失败，使用备用数据
+            console.warn('API加载失败，使用备用数据');
+            loadFallbackData();
+        }
+        
+        if (categoriesResponse && categoriesResponse.ok) {
+            const categoriesResult = await categoriesResponse.json();
+            const categoriesMap = categoriesResult.categories || {};
+            
+            // 转换分类数据格式
+            categoriesData = Object.entries(categoriesMap).map(([id, cat]) => ({
+                id: id,
+                name: cat.name || id,
+                icon: cat.icon || getCategoryIcon(id),
+                description: cat.description || '',
+                count: cat.skills ? cat.skills.length : skillsData.filter(s => s.category === id).length
+            }));
+        } else {
+            // 从技能数据生成分类
+            generateCategoriesFromSkills();
+        }
+        
+        isLoading = false;
+        renderSkills();
+        renderCategories();
+        
+    } catch (error) {
+        console.error('加载数据失败:', error);
+        loadError = error.message;
+        loadFallbackData();
+        isLoading = false;
+        renderSkills();
+        renderCategories();
+    }
+}
+
+// 加载备用数据（当API不可用时）
+function loadFallbackData() {
+    skillsData = [
+        {
+            name: "finance-pro",
+            displayName: "Finance Pro",
+            version: "1.2.0",
+            description: "多数据源金融数据获取，支持Yahoo/东方财富，含技术指标计算",
+            icon: "💰",
+            downloads: 342,
+            rating: 4.8,
+            tags: ["finance", "data"],
+            category: "finance",
+            author: "claw-bft",
+            updated: "2026-02-25"
+        },
+        {
+            name: "stock-portfolio-analyzer",
+            displayName: "Stock Portfolio Analyzer",
+            version: "1.1.0",
+            description: "投资组合分析与早报生成，支持多维度风险评估",
+            icon: "📈",
+            downloads: 298,
+            rating: 4.7,
+            tags: ["finance", "analysis"],
+            category: "finance",
+            author: "claw-bft",
+            updated: "2026-02-26"
+        },
+        {
+            name: "coding-pro",
+            displayName: "Coding Pro",
+            version: "1.0.0",
+            description: "AI代码生成器，支持多语言和框架，含测试生成",
+            icon: "💻",
+            downloads: 256,
+            rating: 4.5,
+            tags: ["coding", "ai"],
+            category: "coding",
+            author: "claw-bft",
+            updated: "2026-02-20"
+        },
+        {
+            name: "skill-cli",
+            displayName: "Skill CLI",
+            version: "2.0.0",
+            description: "自然语言执行层，让AI理解并执行复杂任务",
+            icon: "🎯",
+            downloads: 412,
+            rating: 4.9,
+            tags: ["cli", "core"],
+            category: "ai",
+            author: "claw-bft",
+            updated: "2026-02-27"
+        },
+        {
+            name: "research-pro",
+            displayName: "Research Pro",
+            version: "1.0.0",
+            description: "智能研究助手，文献综述与竞品分析",
+            icon: "🔬",
+            downloads: 189,
+            rating: 4.6,
+            tags: ["research", "analysis"],
+            category: "research",
+            author: "claw-bft",
+            updated: "2026-02-22"
+        },
+        {
+            name: "product-pro",
+            displayName: "Product Pro",
+            version: "1.1.0",
+            description: "PRD生成与产品管理，快速产出专业文档",
+            icon: "📦",
+            downloads: 234,
+            rating: 4.7,
+            tags: ["product", "docs"],
+            category: "product",
+            author: "claw-bft",
+            updated: "2026-02-24"
+        },
+        {
+            name: "memory-enhanced",
+            displayName: "Memory Enhanced",
+            version: "1.0.0",
+            description: "向量记忆系统，基于sqlite-vec的长期记忆",
+            icon: "🧠",
+            downloads: 178,
+            rating: 4.4,
+            tags: ["ai", "memory"],
+            category: "ai",
+            author: "claw-bft",
+            updated: "2026-02-18"
+        },
+        {
+            name: "agent-collaboration",
+            displayName: "Agent Collaboration",
+            version: "1.0.0",
+            description: "ACP协议多智能体协作框架",
+            icon: "🤝",
+            downloads: 156,
+            rating: 4.5,
+            tags: ["ai", "collaboration"],
+            category: "ai",
+            author: "claw-bft",
+            updated: "2026-02-19"
+        },
+        {
+            name: "claude-domain-skills",
+            displayName: "Claude Domain Skills",
+            version: "2.0.0",
+            description: "18个领域的专业知识库，涵盖商业/金融/创意等",
+            icon: "🎓",
+            downloads: 567,
+            rating: 4.9,
+            tags: ["domains", "knowledge"],
+            category: "ai",
+            author: "claw-bft",
+            updated: "2026-02-28"
+        },
+        {
+            name: "token-manager",
+            displayName: "Token Manager",
+            version: "1.0.0",
+            description: "统一配置管理系统，多技能包配置共享",
+            icon: "🔐",
+            downloads: 312,
+            rating: 4.8,
+            tags: ["config", "core"],
+            category: "productivity",
+            author: "claw-bft",
+            updated: "2026-02-23"
+        }
+    ];
+    generateCategoriesFromSkills();
+}
+
+// 从技能数据生成分类
+function generateCategoriesFromSkills() {
+    const categoryMap = {};
+    
+    skillsData.forEach(skill => {
+        const cat = skill.category || 'other';
+        if (!categoryMap[cat]) {
+            categoryMap[cat] = {
+                id: cat,
+                name: getCategoryName(cat),
+                icon: getCategoryIcon(cat),
+                description: getCategoryDescription(cat),
+                count: 0
+            };
+        }
+        categoryMap[cat].count++;
+    });
+    
+    categoriesData = Object.values(categoryMap);
+}
+
+// 获取分类名称
+function getCategoryName(id) {
+    const names = {
+        finance: '金融分析',
+        coding: '开发工具',
+        research: '研究分析',
+        product: '产品管理',
+        ai: 'AI增强',
+        productivity: '生产力',
+        domains: '领域知识',
+        infrastructure: '基础设施',
+        ai_enhancement: 'AI增强',
+        development: '开发工具',
+        other: '其他'
+    };
+    return names[id] || id;
+}
+
+// 获取分类描述
+function getCategoryDescription(id) {
+    const descriptions = {
+        finance: '股票、基金、投资组合分析工具',
+        coding: '代码生成、CLI工具、部署助手',
+        research: '文献综述、竞品分析、数据研究',
+        product: 'PRD生成、需求分析、项目管理',
+        ai: '记忆系统、多智能体、工作流',
+        productivity: '通知服务、模板工具、效率提升',
+        domains: '18个领域的专业知识库',
+        infrastructure: '核心框架、配置管理、协议实现',
+        ai_enhancement: 'AI增强功能与工具',
+        development: '开发与部署工具',
+        other: '其他技能包'
+    };
+    return descriptions[id] || '';
+}
+
+// 获取分类图标
+function getCategoryIcon(id) {
+    const icons = {
+        finance: '💰',
+        coding: '💻',
+        research: '🔬',
+        product: '📦',
+        ai: '🧠',
+        productivity: '⚡',
+        domains: '🎓',
+        infrastructure: '🏗️',
+        ai_enhancement: '🤖',
+        development: '🔧',
+        other: '📂'
+    };
+    return icons[id] || '📦';
+}
+
+// 获取默认图标
+function getDefaultIcon(category) {
+    return getCategoryIcon(category);
 }
 
 // 渲染技能包列表
@@ -422,10 +589,14 @@ function loadTheme() {
 
 // 动画统计数字
 function animateStats() {
+    const totalSkills = skillsData.length || 24;
+    const totalDownloads = skillsData.reduce((sum, s) => sum + (s.downloads || 0), 0);
+    const totalCategories = categoriesData.length || 8;
+    
     const stats = [
-        { id: 'stat-skills', target: 24, suffix: '' },
-        { id: 'stat-downloads', target: 1.2, suffix: 'K', decimals: 1 },
-        { id: 'stat-categories', target: 8, suffix: '' }
+        { id: 'stat-skills', target: totalSkills, suffix: '' },
+        { id: 'stat-downloads', target: totalDownloads / 1000, suffix: 'K', decimals: 1 },
+        { id: 'stat-categories', target: totalCategories, suffix: '' }
     ];
     
     stats.forEach(({ id, target, suffix, decimals = 0 }) => {
@@ -444,6 +615,22 @@ function animateStats() {
         }, 50);
     });
 }
+
+// 刷新数据（供外部调用）
+async function refreshData() {
+    showLoading();
+    await loadDataFromAPI();
+    renderSkills();
+    renderCategories();
+    animateStats();
+    showToast('数据已刷新');
+}
+
+// 导出全局函数
+window.showSkillDetail = showSkillDetail;
+window.filterByCategory = filterByCategory;
+window.copyInstallCommand = copyInstallCommand;
+window.refreshData = refreshData;
 
 // 添加CSS动画
 const style = document.createElement('style');
@@ -467,13 +654,14 @@ style.textContent = `
             opacity: 0;
         }
     }
+    
+    @keyframes spin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
 `;
 document.head.appendChild(style);
 
 // 启动
 document.addEventListener('DOMContentLoaded', init);
-
-// 导出全局函数
-window.showSkillDetail = showSkillDetail;
-window.filterByCategory = filterByCategory;
-window.copyInstallCommand = copyInstallCommand;
