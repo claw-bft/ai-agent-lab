@@ -188,6 +188,74 @@
             flex: 1;
         }
 
+        .toolbar-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .validation-panel {
+            position: absolute;
+            top: 80px;
+            right: 16px;
+            width: 300px;
+            max-height: 300px;
+            background: #1e293b;
+            border-radius: 8px;
+            border: 1px solid #334155;
+            z-index: 100;
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .validation-panel.active {
+            display: flex;
+        }
+
+        .validation-header {
+            padding: 12px 16px;
+            border-bottom: 1px solid #334155;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .validation-header h3 {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .validation-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 12px 16px;
+        }
+
+        .validation-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            padding: 8px;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            font-size: 12px;
+        }
+
+        .validation-item.error {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+        }
+
+        .validation-item.warning {
+            background: rgba(245, 158, 11, 0.1);
+            color: #f59e0b;
+        }
+
+        .validation-item.success {
+            background: rgba(16, 185, 129, 0.1);
+            color: #10b981;
+        }
+
         .canvas {
             width: 100%;
             height: 100%;
@@ -705,7 +773,19 @@
                 <button class="toolbar-btn" onclick="app.showTemplates()">
                     <span>📋</span> 模板
                 </button>
+                <button class="toolbar-btn" onclick="app.undo()" id="undoBtn" disabled>
+                    <span>↩️</span> 撤销
+                </button>
+                <button class="toolbar-btn" onclick="app.redo()" id="redoBtn" disabled>
+                    <span>↪️</span> 重做
+                </button>
+                <button class="toolbar-btn" onclick="app.duplicateNode()" id="duplicateBtn" disabled>
+                    <span>📋</span> 复制
+                </button>
                 <div class="toolbar-separator"></div>
+                <button class="toolbar-btn" onclick="app.validateWorkflow()">
+                    <span>✓</span> 验证
+                </button>
                 <button class="toolbar-btn" onclick="app.importWorkflow()">
                     <span>📥</span> 导入
                 </button>
@@ -723,6 +803,15 @@
 
             <div class="canvas" id="canvas">
                 <svg class="connections" id="connections"></svg>
+            </div>
+
+            <!-- 验证面板 -->
+            <div class="validation-panel" id="validationPanel">
+                <div class="validation-header">
+                    <h3>验证结果</h3>
+                    <button class="modal-close" onclick="app.closeValidationPanel()">&times;</button>
+                </div>
+                <div class="validation-content" id="validationContent"></div>
             </div>
 
             <!-- 执行状态面板 -->
@@ -816,13 +905,322 @@
                 this.workflowId = this.generateId();
                 this.workflowName = '未命名工作流';
                 
+                // 撤销/重做历史
+                this.history = [];
+                this.historyIndex = -1;
+                this.maxHistorySize = 50;
+                this.isUndoing = false;
+                
+                // 剪贴板
+                this.clipboard = null;
+                
                 this.init();
+                this.saveState(); // 保存初始状态
             }
 
             init() {
                 this.setupDragAndDrop();
                 this.setupCanvasEvents();
+                this.setupKeyboardShortcuts();
+                this.loadAutoSave();
                 this.log('工作流编辑器初始化完成', 'info');
+                
+                // 自动保存定时器
+                setInterval(() => this.autoSave(), 30000); // 每30秒自动保存
+            }
+
+            // 保存状态到历史记录
+            saveState() {
+                if (this.isUndoing) return;
+                
+                const state = {
+                    nodes: JSON.parse(JSON.stringify(this.nodes)),
+                    edges: JSON.parse(JSON.stringify(this.edges)),
+                    workflowId: this.workflowId,
+                    workflowName: this.workflowName
+                };
+                
+                // 删除当前索引之后的历史记录
+                this.history = this.history.slice(0, this.historyIndex + 1);
+                
+                // 添加新状态
+                this.history.push(state);
+                
+                // 限制历史记录大小
+                if (this.history.length > this.maxHistorySize) {
+                    this.history.shift();
+                } else {
+                    this.historyIndex++;
+                }
+                
+                this.updateUndoRedoButtons();
+            }
+
+            // 撤销
+            undo() {
+                if (this.historyIndex > 0) {
+                    this.isUndoing = true;
+                    this.historyIndex--;
+                    this.restoreState(this.history[this.historyIndex]);
+                    this.log('已撤销', 'info');
+                    this.isUndoing = false;
+                    this.updateUndoRedoButtons();
+                }
+            }
+
+            // 重做
+            redo() {
+                if (this.historyIndex < this.history.length - 1) {
+                    this.isUndoing = true;
+                    this.historyIndex++;
+                    this.restoreState(this.history[this.historyIndex]);
+                    this.log('已重做', 'info');
+                    this.isUndoing = false;
+                    this.updateUndoRedoButtons();
+                }
+            }
+
+            // 恢复状态
+            restoreState(state) {
+                // 清除当前画布
+                this.nodes.forEach(n => document.getElementById(n.id)?.remove());
+                this.connections.innerHTML = '';
+                
+                // 恢复状态
+                this.nodes = JSON.parse(JSON.stringify(state.nodes));
+                this.edges = JSON.parse(JSON.stringify(state.edges));
+                this.workflowId = state.workflowId;
+                this.workflowName = state.workflowName;
+                
+                // 重新渲染
+                this.nodes.forEach(node => this.renderNode(node));
+                this.edges.forEach(edge => this.renderConnection(edge));
+                
+                this.deselectNode();
+            }
+
+            // 更新撤销/重做按钮状态
+            updateUndoRedoButtons() {
+                const undoBtn = document.getElementById('undoBtn');
+                const redoBtn = document.getElementById('redoBtn');
+                if (undoBtn) undoBtn.disabled = this.historyIndex <= 0;
+                if (redoBtn) redoBtn.disabled = this.historyIndex >= this.history.length - 1;
+            }
+
+            // 设置键盘快捷键
+            setupKeyboardShortcuts() {
+                document.addEventListener('keydown', (e) => {
+                    // Ctrl/Cmd + Z: 撤销
+                    if ((e.ctrlKey || e.metaKey) && e.key === 'z' && !e.shiftKey) {
+                        e.preventDefault();
+                        this.undo();
+                    }
+                    // Ctrl/Cmd + Shift + Z 或 Ctrl/Cmd + Y: 重做
+                    if ((e.ctrlKey || e.metaKey) && (e.key === 'y' || (e.key === 'z' && e.shiftKey))) {
+                        e.preventDefault();
+                        this.redo();
+                    }
+                    // Ctrl/Cmd + C: 复制节点
+                    if ((e.ctrlKey || e.metaKey) && e.key === 'c' && this.selectedNode) {
+                        e.preventDefault();
+                        this.copyNode();
+                    }
+                    // Ctrl/Cmd + V: 粘贴节点
+                    if ((e.ctrlKey || e.metaKey) && e.key === 'v') {
+                        e.preventDefault();
+                        this.pasteNode();
+                    }
+                    // Ctrl/Cmd + D: 复制并粘贴节点
+                    if ((e.ctrlKey || e.metaKey) && e.key === 'd' && this.selectedNode) {
+                        e.preventDefault();
+                        this.duplicateNode();
+                    }
+                });
+            }
+
+            // 复制节点
+            copyNode() {
+                if (this.selectedNode) {
+                    this.clipboard = JSON.parse(JSON.stringify(this.selectedNode));
+                    this.log(`已复制节点: ${this.selectedNode.name}`, 'info');
+                }
+            }
+
+            // 粘贴节点
+            pasteNode() {
+                if (this.clipboard) {
+                    const newNode = {
+                        ...JSON.parse(JSON.stringify(this.clipboard)),
+                        id: this.generateId(),
+                        x: this.clipboard.x + 20,
+                        y: this.clipboard.y + 20
+                    };
+                    this.nodes.push(newNode);
+                    this.renderNode(newNode);
+                    this.selectNode(newNode);
+                    this.saveState();
+                    this.log(`已粘贴节点: ${newNode.name}`, 'success');
+                }
+            }
+
+            // 复制并粘贴节点（Duplicate）
+            duplicateNode() {
+                if (this.selectedNode) {
+                    this.copyNode();
+                    this.pasteNode();
+                }
+            }
+
+            // 更新复制按钮状态
+            updateDuplicateButton() {
+                const duplicateBtn = document.getElementById('duplicateBtn');
+                if (duplicateBtn) duplicateBtn.disabled = !this.selectedNode;
+            }
+
+            // 自动保存
+            autoSave() {
+                const workflow = {
+                    workflow_id: this.workflowId,
+                    name: this.workflowName,
+                    nodes: this.nodes,
+                    edges: this.edges,
+                    autoSaveTime: new Date().toISOString()
+                };
+                localStorage.setItem('workflow_autosave', JSON.stringify(workflow));
+            }
+
+            // 加载自动保存
+            loadAutoSave() {
+                const saved = localStorage.getItem('workflow_autosave');
+                if (saved) {
+                    try {
+                        const workflow = JSON.parse(saved);
+                        if (workflow.nodes && workflow.nodes.length > 0) {
+                            this.log('发现自动保存的工作流', 'info');
+                        }
+                    } catch (e) {
+                        // 忽略解析错误
+                    }
+                }
+            }
+
+            // 验证工作流
+            validateWorkflow() {
+                const issues = [];
+                
+                // 检查是否有开始节点
+                const startNodes = this.nodes.filter(n => n.type === 'START');
+                if (startNodes.length === 0) {
+                    issues.push({ type: 'error', message: '工作流缺少开始节点' });
+                } else if (startNodes.length > 1) {
+                    issues.push({ type: 'error', message: '工作流只能有一个开始节点' });
+                }
+                
+                // 检查是否有结束节点
+                const endNodes = this.nodes.filter(n => n.type === 'END');
+                if (endNodes.length === 0) {
+                    issues.push({ type: 'error', message: '工作流缺少结束节点' });
+                }
+                
+                // 检查孤立节点
+                const connectedNodeIds = new Set();
+                this.edges.forEach(e => {
+                    connectedNodeIds.add(e.source);
+                    connectedNodeIds.add(e.target);
+                });
+                
+                this.nodes.forEach(node => {
+                    if (!connectedNodeIds.has(node.id) && node.type !== 'START' && node.type !== 'END') {
+                        issues.push({ type: 'warning', message: `节点 "${node.name}" 未连接` });
+                    }
+                });
+                
+                // 检查是否有节点
+                if (this.nodes.length === 0) {
+                    issues.push({ type: 'error', message: '工作流为空' });
+                }
+                
+                // 检查循环依赖（简化检查）
+                const hasCycle = this.detectCycle();
+                if (hasCycle) {
+                    issues.push({ type: 'error', message: '检测到循环依赖' });
+                }
+                
+                // 检查TASK节点配置
+                this.nodes.filter(n => n.type === 'TASK').forEach(node => {
+                    if (!node.data.agent_id) {
+                        issues.push({ type: 'warning', message: `任务节点 "${node.name}" 未配置Agent` });
+                    }
+                    if (!node.data.task_type) {
+                        issues.push({ type: 'warning', message: `任务节点 "${node.name}" 未配置任务类型` });
+                    }
+                });
+                
+                // 显示验证结果
+                this.showValidationResults(issues);
+                
+                if (issues.length === 0) {
+                    issues.push({ type: 'success', message: '工作流验证通过！' });
+                    this.showValidationResults(issues);
+                    this.log('工作流验证通过', 'success');
+                } else {
+                    const errorCount = issues.filter(i => i.type === 'error').length;
+                    const warningCount = issues.filter(i => i.type === 'warning').length;
+                    this.log(`验证完成: ${errorCount}个错误, ${warningCount}个警告`, errorCount > 0 ? 'error' : 'info');
+                }
+            }
+
+            // 检测循环依赖
+            detectCycle() {
+                const visited = new Set();
+                const recursionStack = new Set();
+                
+                const hasCycleFromNode = (nodeId) => {
+                    visited.add(nodeId);
+                    recursionStack.add(nodeId);
+                    
+                    const outgoingEdges = this.edges.filter(e => e.source === nodeId);
+                    for (const edge of outgoingEdges) {
+                        if (!visited.has(edge.target)) {
+                            if (hasCycleFromNode(edge.target)) return true;
+                        } else if (recursionStack.has(edge.target)) {
+                            return true;
+                        }
+                    }
+                    
+                    recursionStack.delete(nodeId);
+                    return false;
+                };
+                
+                for (const node of this.nodes) {
+                    if (!visited.has(node.id)) {
+                        if (hasCycleFromNode(node.id)) return true;
+                    }
+                }
+                return false;
+            }
+
+            // 显示验证结果
+            showValidationResults(issues) {
+                const panel = document.getElementById('validationPanel');
+                const content = document.getElementById('validationContent');
+                
+                if (issues.length === 0) {
+                    content.innerHTML = '<div class="validation-item success">✓ 工作流验证通过</div>';
+                } else {
+                    content.innerHTML = issues.map(issue => `
+                        <div class="validation-item ${issue.type}">
+                            ${issue.type === 'error' ? '❌' : issue.type === 'warning' ? '⚠️' : '✓'} ${issue.message}
+                        </div>
+                    `).join('');
+                }
+                
+                panel.classList.add('active');
+            }
+
+            // 关闭验证面板
+            closeValidationPanel() {
+                document.getElementById('validationPanel').classList.remove('active');
             }
 
             generateId() {
@@ -901,6 +1299,7 @@
                 this.nodes.push(node);
                 this.renderNode(node);
                 this.selectNode(node);
+                this.saveState();
                 this.log(`添加节点: ${node.name}`, 'success');
             }
 
@@ -1002,6 +1401,7 @@
                 const el = document.getElementById(node.id);
                 el.classList.add('selected');
                 this.showProperties(node);
+                this.updateDuplicateButton();
             }
 
             // 取消选择
@@ -1012,6 +1412,7 @@
                     this.selectedNode = null;
                 }
                 this.showEmptyProperties();
+                this.updateDuplicateButton();
             }
 
             // 删除节点
@@ -1024,6 +1425,7 @@
                 
                 this.updateConnections();
                 this.showEmptyProperties();
+                this.saveState();
                 this.log(`删除节点: ${node.name}`, 'info');
             }
 
@@ -1155,6 +1557,7 @@
 
                 this.edges.push(edge);
                 this.renderConnection(edge);
+                this.saveState();
                 this.log(`创建连接: ${this.connecting.node.name} → ${targetNode.name}`, 'success');
                 
                 this.cancelConnection();
@@ -1248,7 +1651,17 @@
 
             loadTemplate(templateName) {
                 this.closeTemplates();
-                this.newWorkflow();
+                
+                // 保存当前状态以便可以撤销
+                this.saveState();
+                
+                // 清除当前画布但不保存状态（因为已经在上面保存了）
+                this.nodes.forEach(n => document.getElementById(n.id)?.remove());
+                this.connections.innerHTML = '';
+                this.nodes = [];
+                this.edges = [];
+                
+                const templates = {
                 
                 const templates = {
                     'stock-research': [
@@ -1303,6 +1716,7 @@
                     });
                     
                     this.edges.forEach(e => this.renderConnection(e));
+                    this.saveState();
                     this.log(`加载模板: ${templateName}`, 'success');
                 }
             }
@@ -1394,6 +1808,7 @@
                 });
 
                 this.edges.forEach(e => this.renderConnection(e));
+                this.saveState();
             }
 
             executeWorkflow() {
