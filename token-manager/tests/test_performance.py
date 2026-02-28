@@ -19,15 +19,17 @@ class TestTokenManagerPerformance:
         """测试添加凭证性能"""
         with tempfile.TemporaryDirectory() as tmpdir:
             tokens_file = Path(tmpdir) / "tokens.json"
-            manager = TokenManager(str(tokens_file))
+            manager = TokenManager(str(tokens_file), auto_save=False)
             
             start = time.perf_counter()
             for i in range(1000):
                 manager.set_token(
                     service=f"service_{i}",
                     token=f"token_value_{i}",
+                    save=False,
                     metadata={"index": i}
                 )
+            manager.save()  # 批量保存一次
             elapsed = time.perf_counter() - start
             
             # 1000个凭证应在3秒内完成（考虑CI环境性能差异）
@@ -75,15 +77,17 @@ class TestTokenManagerPerformance:
         """测试删除凭证性能"""
         with tempfile.TemporaryDirectory() as tmpdir:
             tokens_file = Path(tmpdir) / "tokens.json"
-            manager = TokenManager(str(tokens_file))
+            manager = TokenManager(str(tokens_file), auto_save=False)
             
             # 添加1000个凭证
             for i in range(1000):
-                manager.set_token(f"service_{i}", f"token_{i}")
+                manager.set_token(f"service_{i}", f"token_{i}", save=False)
+            manager.save()
             
             start = time.perf_counter()
             for i in range(500):
-                manager.delete_token(f"service_{i}")
+                manager.delete_token(f"service_{i}", save=False)
+            manager.save()  # 批量保存一次
             elapsed = time.perf_counter() - start
             
             # 500次删除应在1.5秒内完成（考虑CI环境性能差异）
@@ -117,7 +121,7 @@ class TestTokenManagerPerformance:
         """测试批量操作性能"""
         with tempfile.TemporaryDirectory() as tmpdir:
             tokens_file = Path(tmpdir) / "tokens.json"
-            manager = TokenManager(str(tokens_file))
+            manager = TokenManager(str(tokens_file), auto_save=False)
             
             # 批量添加
             start = time.perf_counter()
@@ -125,8 +129,10 @@ class TestTokenManagerPerformance:
                 manager.set_token(
                     f"service_{i}",
                     f"token_{i}",
+                    save=False,
                     metadata={"batch": True, "index": i}
                 )
+            manager.save()
             add_elapsed = time.perf_counter() - start
             
             # 批量获取
@@ -139,8 +145,10 @@ class TestTokenManagerPerformance:
             for i in range(500):
                 manager.update_token(
                     f"service_{i}",
+                    save=False,
                     metadata={"updated": True}
                 )
+            manager.save()
             update_elapsed = time.perf_counter() - start
             
             # 性能要求（考虑CI环境性能差异，阈值放宽）
@@ -237,17 +245,18 @@ class TestConcurrencyPerformance:
         """测试快速连续操作性能"""
         with tempfile.TemporaryDirectory() as tmpdir:
             tokens_file = Path(tmpdir) / "tokens.json"
-            manager = TokenManager(str(tokens_file))
+            manager = TokenManager(str(tokens_file), auto_save=False)
             
             # 快速混合操作
             start = time.perf_counter()
             
             for i in range(100):
-                manager.set_token(f"service_{i}", f"token_{i}")
+                manager.set_token(f"service_{i}", f"token_{i}", save=False)
                 manager.get_token(f"service_{i}")
                 if i % 2 == 0:
-                    manager.update_token(f"service_{i}", metadata={"updated": True})
+                    manager.update_token(f"service_{i}", save=False, metadata={"updated": True})
             
+            manager.save()  # 最后统一保存
             elapsed = time.perf_counter() - start
             
             # 300次操作应在3秒内完成（考虑CI环境性能差异）

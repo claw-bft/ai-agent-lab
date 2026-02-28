@@ -17,15 +17,17 @@ class TokenManager:
     DEFAULT_CONFIG_DIR = Path.home() / '.openclaw'
     DEFAULT_TOKENS_FILE = DEFAULT_CONFIG_DIR / 'secrets' / 'tokens.json'
 
-    def __init__(self, tokens_file: Optional[str] = None):
+    def __init__(self, tokens_file: Optional[str] = None, auto_save: bool = True):
         """
         初始化凭证管理器
 
         Args:
             tokens_file: 自定义凭证文件路径，默认使用 ~/.openclaw/secrets/tokens.json
+            auto_save: 是否自动保存到文件，批量操作时设为False可提升性能
         """
         self.tokens_file = Path(tokens_file) if tokens_file else self.DEFAULT_TOKENS_FILE
         self._tokens: Dict[str, Dict[str, Any]] = {}
+        self._auto_save = auto_save
         self._load_tokens()
 
     def _load_tokens(self) -> None:
@@ -71,13 +73,14 @@ class TokenManager:
 
         return service_data.get(key)
 
-    def set_token(self, service: str, token: str, **metadata) -> None:
+    def set_token(self, service: str, token: str, save: bool = True, **metadata) -> None:
         """
         设置/更新服务的凭证
 
         Args:
             service: 服务名称
             token: API密钥或访问令牌
+            save: 是否立即保存到文件（批量操作时设为False）
             **metadata: 额外元数据 (username, scopes, note等)
 
         Example:
@@ -92,14 +95,16 @@ class TokenManager:
             'created_at': datetime.now().isoformat(),
             **metadata
         }
-        self._save_tokens()
+        if save and self._auto_save:
+            self._save_tokens()
 
-    def update_token(self, service: str, **updates) -> bool:
+    def update_token(self, service: str, save: bool = True, **updates) -> bool:
         """
         更新现有凭证的部分字段
 
         Args:
             service: 服务名称
+            save: 是否立即保存到文件（批量操作时设为False）
             **updates: 要更新的字段
 
         Returns:
@@ -110,15 +115,17 @@ class TokenManager:
 
         self._tokens[service].update(updates)
         self._tokens[service]['updated_at'] = datetime.now().isoformat()
-        self._save_tokens()
+        if save and self._auto_save:
+            self._save_tokens()
         return True
 
-    def delete_token(self, service: str) -> bool:
+    def delete_token(self, service: str, save: bool = True) -> bool:
         """
         删除指定服务的凭证
 
         Args:
             service: 服务名称
+            save: 是否立即保存到文件（批量操作时设为False）
 
         Returns:
             是否成功删除
@@ -127,7 +134,8 @@ class TokenManager:
             return False
 
         del self._tokens[service]
-        self._save_tokens()
+        if save and self._auto_save:
+            self._save_tokens()
         return True
 
     def list_services(self) -> List[str]:
@@ -228,6 +236,35 @@ class TokenManager:
     def clear_all(self) -> None:
         """清除所有凭证（谨慎使用）"""
         self._tokens = {}
+        self._save_tokens()
+
+    def set_tokens_batch(self, tokens: Dict[str, Dict[str, Any]]) -> None:
+        """
+        批量设置凭证（高性能模式，只保存一次）
+
+        Args:
+            tokens: 凭证字典，格式为 {service: {'token': 'xxx', ...metadata}}
+
+        Example:
+            >>> tm = TokenManager(auto_save=False)
+            >>> tm.set_tokens_batch({
+            ...     'github': {'token': 'ghp_xxx', 'username': 'user1'},
+            ...     'vercel': {'token': 'vc_xxx', 'username': 'user2'}
+            ... })
+            >>> tm.save()  # 手动保存
+        """
+        for service, data in tokens.items():
+            token_value = data.pop('token', '')
+            self._tokens[service] = {
+                'token': token_value,
+                'created_at': datetime.now().isoformat(),
+                **data
+            }
+        if self._auto_save:
+            self._save_tokens()
+
+    def save(self) -> None:
+        """手动保存凭证到文件（用于批量操作后）"""
         self._save_tokens()
 
 
