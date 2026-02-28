@@ -403,8 +403,8 @@ function renderSkills() {
             <p class="skill-description">${skill.description}</p>
             <div class="skill-footer">
                 <div class="skill-stats">
-                    <span>⭐ ${skill.rating}</span>
-                    <span>📥 ${skill.downloads}</span>
+                    <span class="skill-rating">⭐ ${skill.rating ? skill.rating.toFixed(1) : '0.0'}</span>
+                    <span class="skill-downloads">📥 ${skill.downloads}</span>
                 </div>
                 <div class="skill-tags">
                     ${skill.tags.slice(0, 2).map(t => `<span class="skill-tag">${t}</span>`).join('')}
@@ -446,6 +446,9 @@ function showSkillDetail(skillName) {
     const skill = skillsData.find(s => s.name === skillName);
     if (!skill) return;
     
+    const userRating = getUserRating(skillName);
+    const ratingData = getRatingDistribution(skillName);
+    
     modalBody.innerHTML = `
         <div class="modal-header">
             <div class="modal-icon">${skill.icon}</div>
@@ -455,9 +458,26 @@ function showSkillDetail(skillName) {
             </div>
         </div>
         <p class="modal-description">${skill.description}</p>
+        
+        <!-- 评分区域 -->
+        <div class="rating-section">
+            <div class="rating-summary">
+                <div class="rating-big">
+                    <span class="rating-score">${skill.rating ? skill.rating.toFixed(1) : '0.0'}</span>
+                    <div class="rating-stars-display">${renderStars(skill.rating || 0)}</div>
+                    <span class="rating-count">${ratingData ? ratingData.total + ' 个评分' : '暂无评分'}</span>
+                </div>
+                <div class="rating-user">
+                    <div class="rating-user-label">您的评分</div>
+                    ${renderInteractiveStars(skillName, userRating)}
+                </div>
+            </div>
+            ${renderRatingDistribution(skillName)}
+        </div>
+        
         <div class="modal-stats">
             <div class="modal-stat">
-                <div class="modal-stat-value">⭐ ${skill.rating}</div>
+                <div class="modal-stat-value">⭐ ${skill.rating ? skill.rating.toFixed(1) : '0.0'}</div>
                 <div class="modal-stat-label">评分</div>
             </div>
             <div class="modal-stat">
@@ -491,6 +511,176 @@ function showSkillDetail(skillName) {
 function copyInstallCommand(skillName) {
     navigator.clipboard.writeText(`claw install ${skillName}`);
     showToast('已复制到剪贴板');
+}
+
+// ==================== 评分系统 ====================
+
+// 获取用户已评分数据（从localStorage）
+function getUserRatings() {
+    try {
+        return JSON.parse(localStorage.getItem('skillRatings') || '{}');
+    } catch {
+        return {};
+    }
+}
+
+// 保存用户评分
+function saveUserRating(skillName, rating) {
+    const ratings = getUserRatings();
+    ratings[skillName] = {
+        rating: rating,
+        timestamp: Date.now()
+    };
+    localStorage.setItem('skillRatings', JSON.stringify(ratings));
+}
+
+// 获取用户评分
+function getUserRating(skillName) {
+    const ratings = getUserRatings();
+    return ratings[skillName]?.rating || 0;
+}
+
+// 渲染星级评分（只读）
+function renderStars(rating, maxStars = 5) {
+    const fullStars = Math.floor(rating);
+    const hasHalfStar = rating % 1 >= 0.5;
+    const emptyStars = maxStars - fullStars - (hasHalfStar ? 1 : 0);
+    
+    let html = '';
+    for (let i = 0; i < fullStars; i++) {
+        html += '<span class="star filled">★</span>';
+    }
+    if (hasHalfStar) {
+        html += '<span class="star half">★</span>';
+    }
+    for (let i = 0; i < emptyStars; i++) {
+        html += '<span class="star empty">★</span>';
+    }
+    return html;
+}
+
+// 渲染交互式星级评分
+function renderInteractiveStars(skillName, currentRating = 0) {
+    let html = '<div class="rating-stars interactive" data-skill="' + skillName + '">';
+    for (let i = 1; i <= 5; i++) {
+        const filled = i <= currentRating ? 'filled' : 'empty';
+        html += `<span class="star ${filled}" data-rating="${i}" onclick="submitRating('${skillName}', ${i})" onmouseover="hoverRating(this, ${i})" onmouseout="resetRating(this, ${currentRating})">★</span>`;
+    }
+    html += '</div>';
+    return html;
+}
+
+// 悬停评分效果
+function hoverRating(container, rating) {
+    const stars = container.parentElement.querySelectorAll('.star');
+    stars.forEach((star, index) => {
+        if (index < rating) {
+            star.classList.add('hover');
+        } else {
+            star.classList.remove('hover');
+        }
+    });
+}
+
+// 重置评分显示
+function resetRating(container, currentRating) {
+    const stars = container.parentElement.querySelectorAll('.star');
+    stars.forEach((star, index) => {
+        star.classList.remove('hover');
+        if (index < currentRating) {
+            star.classList.add('filled');
+            star.classList.remove('empty');
+        } else {
+            star.classList.add('empty');
+            star.classList.remove('filled');
+        }
+    });
+}
+
+// 提交评分
+function submitRating(skillName, rating) {
+    // 保存到本地存储
+    saveUserRating(skillName, rating);
+    
+    // 更新技能数据（模拟）
+    const skill = skillsData.find(s => s.name === skillName);
+    if (skill) {
+        // 模拟更新评分（实际应该发送到后端API）
+        const oldRating = skill.rating || 0;
+        const oldCount = skill.ratingCount || Math.floor(skill.downloads / 10) || 1;
+        const newCount = oldCount + 1;
+        skill.rating = ((oldRating * oldCount) + rating) / newCount;
+        skill.ratingCount = newCount;
+        skill.userRating = rating;
+        
+        // 刷新显示
+        showSkillDetail(skillName);
+        renderSkills();
+    }
+    
+    showToast(`已评分: ${rating} ⭐`);
+    
+    // 模拟发送到后端（实际项目中应该调用API）
+    console.log(`[Rating] Skill: ${skillName}, Rating: ${rating}`);
+}
+
+// 获取评分分布（模拟数据）
+function getRatingDistribution(skillName) {
+    // 模拟评分分布数据
+    const skill = skillsData.find(s => s.name === skillName);
+    if (!skill) return null;
+    
+    const total = skill.ratingCount || Math.floor(skill.downloads / 10) || 10;
+    const avgRating = skill.rating || 4.0;
+    
+    // 根据平均分生成合理的分布
+    const distribution = [0, 0, 0, 0, 0];
+    let remaining = total;
+    
+    // 5星最多，依次递减
+    for (let i = 4; i >= 0; i--) {
+        const weight = (i + 1) / 15; // 权重因子
+        const count = Math.floor(remaining * weight * (avgRating / 3));
+        distribution[i] = Math.min(count, remaining);
+        remaining -= distribution[i];
+    }
+    distribution[0] += remaining; // 剩余给1星
+    
+    return {
+        total: total,
+        average: avgRating.toFixed(1),
+        distribution: distribution.reverse() // 1星到5星
+    };
+}
+
+// 渲染评分分布条形图
+function renderRatingDistribution(skillName) {
+    const data = getRatingDistribution(skillName);
+    if (!data) return '';
+    
+    const maxCount = Math.max(...data.distribution);
+    
+    let html = '<div class="rating-distribution">';
+    html += '<div class="rating-distribution-title">评分分布</div>';
+    
+    for (let i = 5; i >= 1; i--) {
+        const count = data.distribution[i - 1];
+        const percentage = maxCount > 0 ? (count / data.total * 100).toFixed(0) : 0;
+        const barWidth = maxCount > 0 ? (count / maxCount * 100).toFixed(0) : 0;
+        
+        html += `
+            <div class="rating-bar">
+                <span class="rating-bar-label">${i}星</span>
+                <div class="rating-bar-track">
+                    <div class="rating-bar-fill" style="width: ${barWidth}%"></div>
+                </div>
+                <span class="rating-bar-count">${count}</span>
+            </div>
+        `;
+    }
+    
+    html += '</div>';
+    return html;
 }
 
 // 显示提示
@@ -631,6 +821,9 @@ window.showSkillDetail = showSkillDetail;
 window.filterByCategory = filterByCategory;
 window.copyInstallCommand = copyInstallCommand;
 window.refreshData = refreshData;
+window.submitRating = submitRating;
+window.hoverRating = hoverRating;
+window.resetRating = resetRating;
 
 // 添加CSS动画
 const style = document.createElement('style');
