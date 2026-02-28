@@ -1,12 +1,12 @@
 {
-  "generated_at": "2026-03-01T01:40:39",
+  "generated_at": "2026-03-01T02:52:01",
   "total_skills": 20,
   "summary": {
-    "average_score": 86.5,
+    "average_score": 85.9,
     "grade_distribution": {
       "S": 3,
-      "A": 17,
-      "B": 0,
+      "A": 16,
+      "B": 1,
       "C": 0,
       "D": 0
     },
@@ -83,8 +83,8 @@
         "添加 SKILL.md 文档，描述技能包功能和使用方法",
         "考虑添加性能基准测试"
       ],
-      "evaluated_at": "2026-03-01T01:40:24",
-      "duration_ms": 1273
+      "evaluated_at": "2026-03-01T02:50:23",
+      "duration_ms": 861
     },
     "context-compressor": {
       "skill_name": "context-compressor",
@@ -145,8 +145,8 @@
         "修复 9 个代码风格问题",
         "考虑添加性能基准测试"
       ],
-      "evaluated_at": "2026-03-01T01:40:25",
-      "duration_ms": 295
+      "evaluated_at": "2026-03-01T02:50:24",
+      "duration_ms": 394
     },
     "finance-pro": {
       "skill_name": "finance-pro",
@@ -207,7 +207,7 @@
         ]
       },
       "performance_details": {
-        "import_time_ms": 479,
+        "import_time_ms": 703,
         "module_size_kb": 96.2783203125,
         "has_performance_tests": false
       },
@@ -222,8 +222,8 @@
         "修复代码中的安全问题",
         "考虑添加性能基准测试"
       ],
-      "evaluated_at": "2026-03-01T01:40:26",
-      "duration_ms": 1774
+      "evaluated_at": "2026-03-01T02:50:25",
+      "duration_ms": 2182
     },
     "skill-cli": {
       "skill_name": "skill-cli",
@@ -294,19 +294,19 @@
         "修复代码中的安全问题",
         "考虑添加性能基准测试"
       ],
-      "evaluated_at": "2026-03-01T01:40:27",
-      "duration_ms": 460
+      "evaluated_at": "2026-03-01T02:50:27",
+      "duration_ms": 689
     },
     "memory-enhanced": {
       "skill_name": "memory-enhanced",
       "skill_path": "/root/.openclaw/workspace/ai-agent-lab/memory-enhanced",
-      "overall_score": 88.2,
-      "grade": "A",
+      "overall_score": 77.2,
+      "grade": "B",
       "code_quality_score": 65.0,
-      "test_coverage_score": 100,
+      "test_coverage_score": 50.0,
       "documentation_score": 100,
       "security_score": 100.0,
-      "performance_score": 80.0,
+      "performance_score": 90.0,
       "code_quality_details": {
         "total_files": 2,
         "total_lines": 707,
@@ -327,11 +327,11 @@
       },
       "test_coverage_details": {
         "has_tests": true,
-        "test_files": 1,
-        "test_count": 34,
+        "test_files": 2,
+        "test_count": 41,
         "coverage_percent": 0.0,
-        "tests_passed": 34,
-        "tests_failed": 0
+        "tests_passed": 0,
+        "tests_failed": 41
       },
       "documentation_details": {
         "has_readme": true,
@@ -349,19 +349,20 @@
       },
       "performance_details": {
         "import_time_ms": 0,
-        "module_size_kb": 37.013671875,
-        "has_performance_tests": false
+        "module_size_kb": 42.74609375,
+        "has_performance_tests": true
       },
       "issues": [
-        "平均圈复杂度过高: 36.0"
+        "平均圈复杂度过高: 36.0",
+        "有 41 个测试失败"
       ],
       "suggestions": [
         "重构复杂函数，降低圈复杂度",
         "修复 99 个代码风格问题",
-        "考虑添加性能基准测试"
+        "修复失败的测试用例"
       ],
-      "evaluated_at": "2026-03-01T01:40:28",
-      "duration_ms": 386
+      "evaluated_at": "2026-03-01T02:50:28",
+      "duration_ms": 60031
     },
     "coding-pro": {
       "skill_name": "coding-pro",
@@ -428,19 +429,19 @@
         "添加 README.md 文档",
         "考虑添加性能基准测试"
       ],
-      "evaluated_at": "2026-03-01T01:40:28",
-      "duration_ms": 4407
+      "evaluated_at": "2026-03-01T02:51:28",
+      "duration_ms": 4406
     },
     "financial-daily": {
       "skill_name": "financial-daily",
       "skill_path": "/root/.openclaw/workspace/ai-agent-lab/financial-daily",
-      "overall_score": 88.0,
+      "overall_score": 84.4,
       "grade": "A",
       "code_quality_score": 72.0,
-      "test_coverage_score": 100,
+      "test_coverage_score": 79.54545454545455,
       "documentation_score": 90.0,
       "security_score": 100.0,
-      "performance_score": 80.0,
+      "performance_score": 90.0,
       "code_quality_details": {
         "total_files": 2,
         "total_lines": 184,
@@ -461,11 +462,11 @@
       },
       "test_coverage_details": {
         "has_tests": true,
-        "test_files": 1,
-        "test_count": 13,
+        "test_files": 2,
+        "test_count": 22,
         "coverage_percent": 0.0,
         "tests_passed": 13,
-        "tests_failed": 0
+        "tests_failed": 9
       },
       "documentation_details": {
         "has_readme": true,
@@ -483,17 +484,19 @@
       },
       "performance_details": {
         "import_time_ms": 0,
-        "module_size_kb": 11.5263671875,
-        "has_performance_tests": false
+        "module_size_kb": 19.2529296875,
+        "has_performance_tests": true
       },
-      "issues": [],
+      "issues": [
+        "有 9 个测试失败"
+      ],
       "suggestions": [
         "部分函数复杂度偏高，建议优化",
         "修复 32 个代码风格问题",
-        "考虑添加性能基准测试"
+        "修复失败的测试用例"
       ],
-      "evaluated_at": "2026-03-01T01:40:33",
-      "duration_ms": 279
+      "evaluated_at": "2026-03-01T02:51:32",
+      "duration_ms": 361
     },
     "clawhub-web": {
       "skill_name": "clawhub-web",
@@ -558,8 +561,8 @@
         "修复 53 个代码风格问题",
         "考虑添加性能基准测试"
       ],
-      "evaluated_at": "2026-03-01T01:40:33",
-      "duration_ms": 282
+      "evaluated_at": "2026-03-01T02:51:32",
+      "duration_ms": 283
     },
     "product-pro": {
       "skill_name": "product-pro",
@@ -632,8 +635,8 @@
         "修复代码中的安全问题",
         "考虑添加性能基准测试"
       ],
-      "evaluated_at": "2026-03-01T01:40:33",
-      "duration_ms": 339
+      "evaluated_at": "2026-03-01T02:51:33",
+      "duration_ms": 345
     },
     "skill-evaluator": {
       "skill_name": "skill-evaluator",
@@ -706,8 +709,8 @@
         "修复代码中的安全问题",
         "考虑添加性能基准测试"
       ],
-      "evaluated_at": "2026-03-01T01:40:34",
-      "duration_ms": 554
+      "evaluated_at": "2026-03-01T02:51:33",
+      "duration_ms": 541
     },
     "quick-templates": {
       "skill_name": "quick-templates",
@@ -765,19 +768,19 @@
         "README.md 内容可以更完整，建议添加功能介绍和使用示例",
         "考虑添加性能基准测试"
       ],
-      "evaluated_at": "2026-03-01T01:40:34",
-      "duration_ms": 271
+      "evaluated_at": "2026-03-01T02:51:34",
+      "duration_ms": 275
     },
     "token-manager": {
       "skill_name": "token-manager",
       "skill_path": "/root/.openclaw/workspace/ai-agent-lab/token-manager",
-      "overall_score": 88.2,
+      "overall_score": 88.1,
       "grade": "A",
       "code_quality_score": 65.0,
-      "test_coverage_score": 100,
+      "test_coverage_score": 93.54838709677419,
       "documentation_score": 100,
       "security_score": 100.0,
-      "performance_score": 80.0,
+      "performance_score": 90.0,
       "code_quality_details": {
         "total_files": 1,
         "total_lines": 242,
@@ -798,11 +801,11 @@
       },
       "test_coverage_details": {
         "has_tests": true,
-        "test_files": 1,
-        "test_count": 21,
+        "test_files": 2,
+        "test_count": 31,
         "coverage_percent": 0.0,
-        "tests_passed": 21,
-        "tests_failed": 0
+        "tests_passed": 27,
+        "tests_failed": 4
       },
       "documentation_details": {
         "has_readme": true,
@@ -820,19 +823,20 @@
       },
       "performance_details": {
         "import_time_ms": 0,
-        "module_size_kb": 16.498046875,
-        "has_performance_tests": false
+        "module_size_kb": 25.982421875,
+        "has_performance_tests": true
       },
       "issues": [
-        "平均圈复杂度过高: 19.0"
+        "平均圈复杂度过高: 19.0",
+        "有 4 个测试失败"
       ],
       "suggestions": [
         "重构复杂函数，降低圈复杂度",
         "修复 46 个代码风格问题",
-        "考虑添加性能基准测试"
+        "修复失败的测试用例"
       ],
-      "evaluated_at": "2026-03-01T01:40:34",
-      "duration_ms": 279
+      "evaluated_at": "2026-03-01T02:51:34",
+      "duration_ms": 22672
     },
     "research-pro": {
       "skill_name": "research-pro",
@@ -906,8 +910,8 @@
         "修复代码中的安全问题",
         "考虑添加性能基准测试"
       ],
-      "evaluated_at": "2026-03-01T01:40:35",
-      "duration_ms": 2598
+      "evaluated_at": "2026-03-01T02:51:56",
+      "duration_ms": 2584
     },
     "vercel-deploy": {
       "skill_name": "vercel-deploy",
@@ -971,8 +975,8 @@
         "README.md 内容可以更完整，建议添加功能介绍和使用示例",
         "考虑添加性能基准测试"
       ],
-      "evaluated_at": "2026-03-01T01:40:37",
-      "duration_ms": 277
+      "evaluated_at": "2026-03-01T02:51:59",
+      "duration_ms": 278
     },
     "api": {
       "skill_name": "api",
@@ -1037,19 +1041,19 @@
         "修复 31 个代码风格问题",
         "考虑添加性能基准测试"
       ],
-      "evaluated_at": "2026-03-01T01:40:38",
-      "duration_ms": 283
+      "evaluated_at": "2026-03-01T02:51:59",
+      "duration_ms": 297
     },
     "agent-collaboration": {
       "skill_name": "agent-collaboration",
       "skill_path": "/root/.openclaw/workspace/ai-agent-lab/agent-collaboration",
-      "overall_score": 88.2,
+      "overall_score": 86.8,
       "grade": "A",
       "code_quality_score": 65.0,
-      "test_coverage_score": 100,
+      "test_coverage_score": 88.15789473684211,
       "documentation_score": 100,
       "security_score": 100.0,
-      "performance_score": 80.0,
+      "performance_score": 90.0,
       "code_quality_details": {
         "total_files": 3,
         "total_lines": 1946,
@@ -1070,11 +1074,11 @@
       },
       "test_coverage_details": {
         "has_tests": true,
-        "test_files": 1,
-        "test_count": 29,
+        "test_files": 2,
+        "test_count": 38,
         "coverage_percent": 0.0,
         "tests_passed": 29,
-        "tests_failed": 0
+        "tests_failed": 9
       },
       "documentation_details": {
         "has_readme": true,
@@ -1092,30 +1096,31 @@
       },
       "performance_details": {
         "import_time_ms": 0,
-        "module_size_kb": 88.3125,
-        "has_performance_tests": false
+        "module_size_kb": 95.2333984375,
+        "has_performance_tests": true
       },
       "issues": [
-        "平均圈复杂度过高: 76.0"
+        "平均圈复杂度过高: 76.0",
+        "有 9 个测试失败"
       ],
       "suggestions": [
         "重构复杂函数，降低圈复杂度",
         "修复 298 个代码风格问题",
-        "考虑添加性能基准测试"
+        "修复失败的测试用例"
       ],
-      "evaluated_at": "2026-03-01T01:40:38",
-      "duration_ms": 299
+      "evaluated_at": "2026-03-01T02:52:00",
+      "duration_ms": 317
     },
     "skill-recommender": {
       "skill_name": "skill-recommender",
       "skill_path": "/root/.openclaw/workspace/ai-agent-lab/skill-recommender",
-      "overall_score": 86.9,
+      "overall_score": 88.4,
       "grade": "A",
       "code_quality_score": 65.0,
       "test_coverage_score": 100,
       "documentation_score": 93.33333333333333,
       "security_score": 100.0,
-      "performance_score": 80.0,
+      "performance_score": 90.0,
       "code_quality_details": {
         "total_files": 3,
         "total_lines": 1099,
@@ -1136,7 +1141,7 @@
       },
       "test_coverage_details": {
         "has_tests": true,
-        "test_files": 1,
+        "test_files": 2,
         "test_count": 22,
         "coverage_percent": 0.0,
         "tests_passed": 22,
@@ -1158,30 +1163,29 @@
       },
       "performance_details": {
         "import_time_ms": 0,
-        "module_size_kb": 49.63671875,
-        "has_performance_tests": false
+        "module_size_kb": 54.451171875,
+        "has_performance_tests": true
       },
       "issues": [
         "平均圈复杂度过高: 42.0"
       ],
       "suggestions": [
         "重构复杂函数，降低圈复杂度",
-        "修复 162 个代码风格问题",
-        "考虑添加性能基准测试"
+        "修复 162 个代码风格问题"
       ],
-      "evaluated_at": "2026-03-01T01:40:38",
-      "duration_ms": 289
+      "evaluated_at": "2026-03-01T02:52:00",
+      "duration_ms": 296
     },
     "stock-portfolio-analyzer": {
       "skill_name": "stock-portfolio-analyzer",
       "skill_path": "/root/.openclaw/workspace/ai-agent-lab/stock-portfolio-analyzer",
-      "overall_score": 86.8,
+      "overall_score": 88.2,
       "grade": "A",
       "code_quality_score": 65.0,
       "test_coverage_score": 100,
       "documentation_score": 100,
       "security_score": 90.0,
-      "performance_score": 80.0,
+      "performance_score": 90.0,
       "code_quality_details": {
         "total_files": 1,
         "total_lines": 813,
@@ -1202,7 +1206,7 @@
       },
       "test_coverage_details": {
         "has_tests": true,
-        "test_files": 1,
+        "test_files": 2,
         "test_count": 25,
         "coverage_percent": 0.0,
         "tests_passed": 25,
@@ -1230,8 +1234,8 @@
       },
       "performance_details": {
         "import_time_ms": 0,
-        "module_size_kb": 41.697265625,
-        "has_performance_tests": false
+        "module_size_kb": 44.2666015625,
+        "has_performance_tests": true
       },
       "issues": [
         "平均圈复杂度过高: 121.0",
@@ -1240,11 +1244,10 @@
       "suggestions": [
         "重构复杂函数，降低圈复杂度",
         "修复 115 个代码风格问题",
-        "修复代码中的安全问题",
-        "考虑添加性能基准测试"
+        "修复代码中的安全问题"
       ],
-      "evaluated_at": "2026-03-01T01:40:38",
-      "duration_ms": 287
+      "evaluated_at": "2026-03-01T02:52:00",
+      "duration_ms": 294
     },
     "notification-service": {
       "skill_name": "notification-service",
@@ -1307,8 +1310,8 @@
         "修复 45 个代码风格问题",
         "考虑添加性能基准测试"
       ],
-      "evaluated_at": "2026-03-01T01:40:39",
-      "duration_ms": 279
+      "evaluated_at": "2026-03-01T02:52:01",
+      "duration_ms": 281
     },
     "claude-domain-skills": {
       "skill_name": "claude-domain-skills",
@@ -1359,8 +1362,8 @@
         "代码量较少，建议增加更多功能",
         "考虑添加性能基准测试"
       ],
-      "evaluated_at": "2026-03-01T01:40:39",
-      "duration_ms": 292
+      "evaluated_at": "2026-03-01T02:52:01",
+      "duration_ms": 299
     }
   }
 }
