@@ -1,11 +1,11 @@
 {
-  "generated_at": "2026-03-01T06:10:22",
+  "generated_at": "2026-03-01T06:14:12",
   "total_skills": 20,
   "summary": {
-    "average_score": 88.4,
+    "average_score": 88.7,
     "grade_distribution": {
-      "S": 10,
-      "A": 10,
+      "S": 12,
+      "A": 8,
       "B": 0,
       "C": 0,
       "D": 0
@@ -83,8 +83,8 @@
         "添加 SKILL.md 文档，描述技能包功能和使用方法",
         "考虑添加性能基准测试"
       ],
-      "evaluated_at": "2026-03-01T06:10:08",
-      "duration_ms": 549
+      "evaluated_at": "2026-03-01T06:13:58",
+      "duration_ms": 553
     },
     "context-compressor": {
       "skill_name": "context-compressor",
@@ -145,7 +145,7 @@
         "修复 9 个代码风格问题",
         "考虑添加性能基准测试"
       ],
-      "evaluated_at": "2026-03-01T06:10:09",
+      "evaluated_at": "2026-03-01T06:13:58",
       "duration_ms": 268
     },
     "finance-pro": {
@@ -207,7 +207,7 @@
         ]
       },
       "performance_details": {
-        "import_time_ms": 484,
+        "import_time_ms": 477,
         "module_size_kb": 93.9296875,
         "has_performance_tests": false
       },
@@ -222,8 +222,8 @@
         "修复代码中的安全问题",
         "考虑添加性能基准测试"
       ],
-      "evaluated_at": "2026-03-01T06:10:09",
-      "duration_ms": 1513
+      "evaluated_at": "2026-03-01T06:13:59",
+      "duration_ms": 1512
     },
     "skill-cli": {
       "skill_name": "skill-cli",
@@ -294,15 +294,15 @@
         "修复代码中的安全问题",
         "考虑添加性能基准测试"
       ],
-      "evaluated_at": "2026-03-01T06:10:10",
+      "evaluated_at": "2026-03-01T06:14:00",
       "duration_ms": 463
     },
     "memory-enhanced": {
       "skill_name": "memory-enhanced",
       "skill_path": "/root/.openclaw/workspace/ai-agent-lab/memory-enhanced",
-      "overall_score": 88.4,
-      "grade": "A",
-      "code_quality_score": 65.0,
+      "overall_score": 90.9,
+      "grade": "S",
+      "code_quality_score": 75.0,
       "test_coverage_score": 100,
       "documentation_score": 93.33333333333333,
       "security_score": 100.0,
@@ -311,18 +311,13 @@
         "total_files": 3,
         "total_lines": 708,
         "avg_complexity": 24.333333333333332,
-        "lint_issues": 29,
+        "lint_issues": 5,
         "style_issues": [
           "examples.py:11: 可能的未使用导入 'memory_system'",
-          "examples.py:19: 存在尾随空格",
-          "examples.py:22: 存在尾随空格",
-          "examples.py:30: 存在尾随空格",
-          "examples.py:37: 存在尾随空格",
-          "examples.py:44: 存在尾随空格",
-          "examples.py:50: 存在尾随空格",
-          "examples.py:62: 存在尾随空格",
-          "examples.py:64: 存在尾随空格",
-          "examples.py:72: 存在尾随空格"
+          "memory_system.py:10: 可能的未使用导入 'typing'",
+          "memory_system.py:11: 可能的未使用导入 'dataclasses'",
+          "memory_system.py:12: 可能的未使用导入 'enum'",
+          "memory_system.py:13: 可能的未使用导入 'numpy'"
         ]
       },
       "test_coverage_details": {
@@ -351,7 +346,7 @@
       },
       "performance_details": {
         "import_time_ms": 0,
-        "module_size_kb": 43.658203125,
+        "module_size_kb": 43.564453125,
         "has_performance_tests": true
       },
       "issues": [
@@ -359,10 +354,10 @@
       ],
       "suggestions": [
         "重构复杂函数，降低圈复杂度",
-        "修复 29 个代码风格问题"
+        "修复 5 个代码风格问题"
       ],
-      "evaluated_at": "2026-03-01T06:10:11",
-      "duration_ms": 393
+      "evaluated_at": "2026-03-01T06:14:01",
+      "duration_ms": 389
     },
     "coding-pro": {
       "skill_name": "coding-pro",
@@ -429,8 +424,8 @@
         "添加 README.md 文档",
         "考虑添加性能基准测试"
       ],
-      "evaluated_at": "2026-03-01T06:10:11",
-      "duration_ms": 4405
+      "evaluated_at": "2026-03-01T06:14:01",
+      "duration_ms": 4404
     },
     "financial-daily": {
       "skill_name": "financial-daily",
@@ -485,8 +480,8 @@
         "部分函数复杂度偏高，建议优化",
         "修复 3 个代码风格问题"
       ],
-      "evaluated_at": "2026-03-01T06:10:16",
-      "duration_ms": 281
+      "evaluated_at": "2026-03-01T06:14:05",
+      "duration_ms": 278
     },
     "clawhub-web": {
       "skill_name": "clawhub-web",
@@ -542,8 +537,8 @@
         "重构复杂函数，降低圈复杂度",
         "修复 2 个代码风格问题"
       ],
-      "evaluated_at": "2026-03-01T06:10:16",
-      "duration_ms": 285
+      "evaluated_at": "2026-03-01T06:14:06",
+      "duration_ms": 288
     },
     "product-pro": {
       "skill_name": "product-pro",
@@ -610,37 +605,35 @@
         "修复代码中的安全问题",
         "考虑添加性能基准测试"
       ],
-      "evaluated_at": "2026-03-01T06:10:16",
-      "duration_ms": 340
+      "evaluated_at": "2026-03-01T06:14:06",
+      "duration_ms": 339
     },
     "skill-evaluator": {
       "skill_name": "skill-evaluator",
       "skill_path": "/root/.openclaw/workspace/ai-agent-lab/skill-evaluator",
-      "overall_score": 88.0,
-      "grade": "A",
-      "code_quality_score": 73.0,
+      "overall_score": 90.5,
+      "grade": "S",
+      "code_quality_score": 77.0,
       "test_coverage_score": 100,
       "documentation_score": 100,
       "security_score": 85.0,
-      "performance_score": 80.0,
+      "performance_score": 90.0,
       "code_quality_details": {
         "total_files": 1,
-        "total_lines": 736,
+        "total_lines": 741,
         "avg_complexity": 135.0,
-        "lint_issues": 6,
+        "lint_issues": 4,
         "style_issues": [
           "skill_evaluator.py:19: 可能的未使用导入 'ast'",
           "skill_evaluator.py:23: 可能的未使用导入 'pathlib'",
           "skill_evaluator.py:24: 可能的未使用导入 'typing'",
-          "skill_evaluator.py:25: 可能的未使用导入 'dataclasses'",
-          "skill_evaluator.py:346: 行长度超过120字符",
-          "skill_evaluator.py:385: 行长度超过120字符"
+          "skill_evaluator.py:25: 可能的未使用导入 'dataclasses'"
         ]
       },
       "test_coverage_details": {
         "has_tests": true,
-        "test_files": 1,
-        "test_count": 12,
+        "test_files": 2,
+        "test_count": 19,
         "coverage_percent": 0.0,
         "tests_passed": 9,
         "tests_failed": 0
@@ -665,8 +658,8 @@
       },
       "performance_details": {
         "import_time_ms": 0,
-        "module_size_kb": 34.0712890625,
-        "has_performance_tests": false
+        "module_size_kb": 39.0224609375,
+        "has_performance_tests": true
       },
       "issues": [
         "平均圈复杂度过高: 135.0",
@@ -676,11 +669,10 @@
       ],
       "suggestions": [
         "重构复杂函数，降低圈复杂度",
-        "修复 6 个代码风格问题",
-        "修复代码中的安全问题",
-        "考虑添加性能基准测试"
+        "修复 4 个代码风格问题",
+        "修复代码中的安全问题"
       ],
-      "evaluated_at": "2026-03-01T06:10:17",
+      "evaluated_at": "2026-03-01T06:14:06",
       "duration_ms": 544
     },
     "quick-templates": {
@@ -739,8 +731,8 @@
         "README.md 内容可以更完整，建议添加功能介绍和使用示例",
         "考虑添加性能基准测试"
       ],
-      "evaluated_at": "2026-03-01T06:10:17",
-      "duration_ms": 272
+      "evaluated_at": "2026-03-01T06:14:07",
+      "duration_ms": 271
     },
     "token-manager": {
       "skill_name": "token-manager",
@@ -799,7 +791,7 @@
         "重构复杂函数，降低圈复杂度",
         "修复 5 个代码风格问题"
       ],
-      "evaluated_at": "2026-03-01T06:10:17",
+      "evaluated_at": "2026-03-01T06:14:07",
       "duration_ms": 282
     },
     "research-pro": {
@@ -874,8 +866,8 @@
         "修复代码中的安全问题",
         "考虑添加性能基准测试"
       ],
-      "evaluated_at": "2026-03-01T06:10:18",
-      "duration_ms": 2613
+      "evaluated_at": "2026-03-01T06:14:07",
+      "duration_ms": 2585
     },
     "vercel-deploy": {
       "skill_name": "vercel-deploy",
@@ -931,7 +923,7 @@
         "修复 3 个代码风格问题",
         "README.md 内容可以更完整，建议添加功能介绍和使用示例"
       ],
-      "evaluated_at": "2026-03-01T06:10:20",
+      "evaluated_at": "2026-03-01T06:14:10",
       "duration_ms": 280
     },
     "api": {
@@ -995,8 +987,8 @@
         "修复 8 个代码风格问题",
         "考虑添加性能基准测试"
       ],
-      "evaluated_at": "2026-03-01T06:10:21",
-      "duration_ms": 286
+      "evaluated_at": "2026-03-01T06:14:10",
+      "duration_ms": 283
     },
     "agent-collaboration": {
       "skill_name": "agent-collaboration",
@@ -1056,8 +1048,8 @@
         "重构复杂函数，降低圈复杂度",
         "修复 6 个代码风格问题"
       ],
-      "evaluated_at": "2026-03-01T06:10:21",
-      "duration_ms": 303
+      "evaluated_at": "2026-03-01T06:14:11",
+      "duration_ms": 302
     },
     "skill-recommender": {
       "skill_name": "skill-recommender",
@@ -1116,8 +1108,8 @@
         "重构复杂函数，降低圈复杂度",
         "修复 5 个代码风格问题"
       ],
-      "evaluated_at": "2026-03-01T06:10:21",
-      "duration_ms": 290
+      "evaluated_at": "2026-03-01T06:14:11",
+      "duration_ms": 296
     },
     "stock-portfolio-analyzer": {
       "skill_name": "stock-portfolio-analyzer",
@@ -1189,8 +1181,8 @@
         "修复 18 个代码风格问题",
         "修复代码中的安全问题"
       ],
-      "evaluated_at": "2026-03-01T06:10:21",
-      "duration_ms": 288
+      "evaluated_at": "2026-03-01T06:14:11",
+      "duration_ms": 289
     },
     "notification-service": {
       "skill_name": "notification-service",
@@ -1245,8 +1237,8 @@
         "部分函数复杂度偏高，建议优化",
         "修复 3 个代码风格问题"
       ],
-      "evaluated_at": "2026-03-01T06:10:22",
-      "duration_ms": 284
+      "evaluated_at": "2026-03-01T06:14:11",
+      "duration_ms": 281
     },
     "claude-domain-skills": {
       "skill_name": "claude-domain-skills",
@@ -1297,7 +1289,7 @@
         "代码量较少，建议增加更多功能",
         "考虑添加性能基准测试"
       ],
-      "evaluated_at": "2026-03-01T06:10:22",
+      "evaluated_at": "2026-03-01T06:14:12",
       "duration_ms": 291
     }
   }
