@@ -342,8 +342,10 @@ class SkillEvaluator:
         
         # 尝试运行测试
         try:
+            # 检测可用的 Python 命令
+            python_cmd = "python3" if subprocess.run(["which", "python3"], capture_output=True).returncode == 0 else "python"
             result = subprocess.run(
-                ["python", "-m", "pytest", str(skill_path), "-v", "--tb=no", "-q"],
+                [python_cmd, "-m", "pytest", str(skill_path), "-v", "--tb=no", "-q"],
                 capture_output=True,
                 text=True,
                 timeout=60,
