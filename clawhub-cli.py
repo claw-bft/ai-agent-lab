@@ -253,7 +253,11 @@ def cmd_stats(args):
 
 
 def cmd_install(args):
-    """安装技能包命令（模拟）"""
+    """安装技能包命令 - 从GitHub下载并安装"""
+    import subprocess
+    import shutil
+    import tempfile
+    
     client = ClawHubClient(args.registry)
     
     if not client.connected:
@@ -264,29 +268,117 @@ def cmd_install(args):
     # 确保安装目录存在
     SKILLS_DIR.mkdir(parents=True, exist_ok=True)
     
+    # 检查是否已安装
+    target_dir = SKILLS_DIR / args.name
+    if target_dir.exists() and not args.force:
+        print(f"⚠️  技能包 '{args.name}' 已安装")
+        print(f"   使用 --force 覆盖安装")
+        return 1
+    
     try:
         # 获取技能信息
+        skill = None
         if client.connected:
             result = client.get_skill(args.name)
             skill = result.get("skill", {})
             print(f"   版本: {skill.get('version', 'unknown')}")
             print(f"   作者: {skill.get('author', 'unknown')}")
+            install_url = skill.get('install_url', '')
+        else:
+            # 离线模式使用默认URL格式
+            install_url = f"https://github.com/claw-bft/ai-agent-lab/tree/main/{args.name}"
         
-        # 模拟安装过程
-        print(f"   下载中...")
-        print(f"   解压中...")
-        print(f"   配置中...")
+        # 解析GitHub URL
+        # 格式: https://github.com/claw-bft/ai-agent-lab/tree/main/skill-name
+        # 转换为: https://github.com/claw-bft/ai-agent-lab.git
+        if 'github.com' in install_url:
+            # 提取仓库地址
+            parts = install_url.replace('https://github.com/', '').split('/')
+            if len(parts) >= 2:
+                repo_owner = parts[0]
+                repo_name = parts[1]
+                repo_url = f"https://github.com/{repo_owner}/{repo_name}.git"
+                
+                # 提取子目录路径
+                subdir = None
+                if '/tree/' in install_url:
+                    tree_idx = install_url.find('/tree/')
+                    after_tree = install_url[tree_idx + 6:]  # 跳过 '/tree/'
+                    path_parts = after_tree.split('/', 1)
+                    if len(path_parts) > 1:
+                        subdir = path_parts[1]
+        else:
+            print(f"❌ 不支持的安装URL: {install_url}")
+            return 1
         
-        # 创建安装标记文件
-        install_marker = SKILLS_DIR / f"{args.name}.installed"
-        install_marker.write_text(json.dumps({
-            "name": args.name,
-            "installed_at": "2026-02-28T04:30:00Z",
-            "version": skill.get("version", "unknown") if client.connected else "unknown"
-        }))
+        # 使用临时目录克隆
+        with tempfile.TemporaryDirectory() as tmpdir:
+            print(f"   正在从GitHub克隆...")
+            
+            # 执行git clone，设置30秒超时
+            clone_cmd = ['git', 'clone', '--depth', '1', '--single-branch', repo_url, tmpdir]
+            result = subprocess.run(clone_cmd, capture_output=True, text=True, timeout=30)
+            
+            if result.returncode != 0:
+                print(f"❌ Git克隆失败: {result.stderr}")
+                return 1
+            
+            print(f"   克隆成功")
+            
+            # 确定源目录
+            if subdir:
+                source_dir = Path(tmpdir) / subdir
+            else:
+                source_dir = Path(tmpdir)
+            
+            if not source_dir.exists():
+                print(f"❌ 找不到技能包目录: {subdir}")
+                return 1
+            
+            # 如果目标目录存在，先删除（force模式）
+            if target_dir.exists():
+                print(f"   删除旧版本...")
+                shutil.rmtree(target_dir)
+            
+            # 复制文件到安装目录
+            print(f"   复制文件...")
+            shutil.copytree(source_dir, target_dir, ignore=shutil.ignore_patterns('.git', '__pycache__', '.pytest_cache'))
+            
+            # 安装依赖
+            req_file = target_dir / "requirements.txt"
+            if req_file.exists():
+                print(f"   安装依赖...")
+                pip_cmd = [sys.executable, '-m', 'pip', 'install', '-r', str(req_file), '-q']
+                pip_result = subprocess.run(pip_cmd, capture_output=True, text=True)
+                if pip_result.returncode != 0:
+                    print(f"⚠️  依赖安装警告: {pip_result.stderr}")
+                else:
+                    print(f"   依赖安装完成")
+            
+            # 创建安装标记文件
+            install_marker = SKILLS_DIR / f"{args.name}.installed"
+            install_info = {
+                "name": args.name,
+                "installed_at": subprocess.check_output(['date', '+%Y-%m-%dT%H:%M:%SZ']).decode().strip(),
+                "version": skill.get("version", "unknown") if skill else "unknown",
+                "source": repo_url,
+                "path": str(target_dir)
+            }
+            install_marker.write_text(json.dumps(install_info, indent=2))
         
         print(f"✅ 技能包 '{args.name}' 安装成功!")
-        print(f"   安装位置: {SKILLS_DIR / args.name}")
+        print(f"   安装位置: {target_dir}")
+        
+        # 显示SKILL.md内容（如果存在）
+        skill_md = target_dir / "SKILL.md"
+        if skill_md.exists():
+            print(f"\n📖 快速开始:")
+            content = skill_md.read_text()
+            # 显示前10行
+            lines = content.split('\n')[:10]
+            for line in lines:
+                if line.strip():
+                    print(f"   {line}")
         
     except urllib.error.HTTPError as e:
         if e.code == 404:
@@ -294,8 +386,13 @@ def cmd_install(args):
         else:
             print(f"❌ 请求失败: {e.code} {e.reason}")
         return 1
+    except subprocess.CalledProcessError as e:
+        print(f"❌ 命令执行失败: {e}")
+        return 1
     except Exception as e:
         print(f"❌ 安装失败: {e}")
+        import traceback
+        traceback.print_exc()
         return 1
     
     return 0
@@ -359,6 +456,7 @@ def main():
     # install 命令
     install_parser = subparsers.add_parser("install", help="安装技能包")
     install_parser.add_argument("name", help="技能包名称")
+    install_parser.add_argument("--force", "-f", action="store_true", help="强制重新安装")
     
     # categories 命令
     subparsers.add_parser("categories", help="查看技能分类")
