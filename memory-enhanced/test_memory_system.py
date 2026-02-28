@@ -51,6 +51,14 @@ class TestSimpleEmbedding:
         sim = emb.similarity(v1, v2)
         assert sim == 0.0
 
+    def test_similarity_zero_vector(self):
+        """测试零向量的相似度处理"""
+        emb = SimpleEmbedding(dim=64)
+        v1 = [0.0] * 64
+        v2 = [1.0] + [0.0] * 63
+        sim = emb.similarity(v1, v2)
+        assert sim == 0.0
+
 
 class TestMemoryEntry:
     """测试记忆条目"""
@@ -170,6 +178,27 @@ class TestMemoryStore:
         # 第一个结果应该与编程相关
         assert "编程" in results[0][0].content or "开发" in results[0][0].content
     
+    def test_search_with_type_filter(self, temp_store):
+        """测试带类型过滤的搜索"""
+        temp_store.store("Python编程语言", MemoryType.FACT)
+        temp_store.store("JavaScript前端开发", MemoryType.SKILL)
+        temp_store.store("股票投资分析", MemoryType.FACT)
+        
+        # 只搜索 FACT 类型
+        results = temp_store.search("编程", top_k=5, memory_type=MemoryType.FACT)
+        assert len(results) >= 1
+        assert all(r[0].memory_type == MemoryType.FACT for r in results)
+    
+    def test_search_skips_expired(self, temp_store):
+        """测试搜索跳过过期记忆"""
+        temp_store.store("Python编程语言", MemoryType.FACT, MemoryPriority.EPHEMERAL)
+        # 手动设置过期
+        for entry in temp_store.memories.values():
+            entry.expiration = time.time() - 1
+        
+        results = temp_store.search("编程", top_k=5)
+        assert len(results) == 0
+
     def test_get_by_type(self, temp_store):
         temp_store.store("偏好1", MemoryType.PREFERENCE)
         temp_store.store("偏好2", MemoryType.PREFERENCE)
@@ -179,6 +208,11 @@ class TestMemoryStore:
         assert len(prefs) == 2
         assert all(p.memory_type == MemoryType.PREFERENCE for p in prefs)
     
+    def test_delete_not_found(self, temp_store):
+        """测试删除不存在的记忆"""
+        deleted = temp_store.delete("non-existent-id")
+        assert deleted is False
+
     def test_delete(self, temp_store):
         mid = temp_store.store("待删除")
         assert temp_store.retrieve(mid) is not None
@@ -221,6 +255,31 @@ class TestMemoryStore:
             entry = store2.retrieve(mid)
             assert entry is not None
             assert entry.content == "持久化测试"
+        finally:
+            os.unlink(path)
+
+    def test_persistence_invalid_json(self):
+        """测试加载无效JSON文件"""
+        with tempfile.NamedTemporaryFile(suffix='.json', delete=False, mode='w') as f:
+            f.write("invalid json content")
+            path = f.name
+        
+        try:
+            # 应该能正常创建，只是没有加载内容
+            store = MemoryStore(path)
+            assert len(store.memories) == 0
+        finally:
+            os.unlink(path)
+
+    def test_persistence_empty_file(self):
+        """测试加载空文件"""
+        with tempfile.NamedTemporaryFile(suffix='.json', delete=False, mode='w') as f:
+            f.write("")
+            path = f.name
+        
+        try:
+            store = MemoryStore(path)
+            assert len(store.memories) == 0
         finally:
             os.unlink(path)
 
