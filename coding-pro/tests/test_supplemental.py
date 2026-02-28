@@ -618,6 +618,158 @@ class TestEdgeCasesAdvanced(unittest.TestCase):
         gitignore_file = next(f for f in files if f.path == ".gitignore")
         self.assertIn("__pycache__/", gitignore_file.content)
 
+    def test_init_api_client_import_error(self):
+        """测试API客户端初始化时ImportError处理"""
+        # 模拟 anthropic 包未安装
+        with patch.dict('sys.modules', {'anthropic': None}):
+            with patch.object(AICodeGenerator, '_get_api_key', return_value="test-key"):
+                generator = AICodeGenerator(api_provider="claude")
+                # 由于无法导入anthropic，api_client应该为None
+                self.assertIsNone(generator.api_client)
+
+    def test_init_api_client_openai_import_error(self):
+        """测试OpenAI API客户端初始化时ImportError处理"""
+        with patch.dict('sys.modules', {'openai': None}):
+            with patch.object(AICodeGenerator, '_get_api_key', return_value="test-key"):
+                generator = AICodeGenerator(api_provider="openai")
+                self.assertIsNone(generator.api_client)
+
+    def test_init_api_client_kimi_import_error(self):
+        """测试Kimi API客户端初始化时ImportError处理"""
+        with patch.dict('sys.modules', {'openai': None}):
+            with patch.object(AICodeGenerator, '_get_api_key', return_value="test-key"):
+                generator = AICodeGenerator(api_provider="kimi")
+                self.assertIsNone(generator.api_client)
+
+    def test_generate_exception_handling(self):
+        """测试生成过程中的异常处理"""
+        generator = AICodeGenerator()
+        
+        # 模拟 _analyze_requirements 抛出异常
+        with patch.object(generator, '_analyze_requirements', side_effect=Exception("Test error")):
+            request = CodeGenerationRequest(prompt="test", language="python")
+            result = generator.generate(request)
+            
+            self.assertFalse(result.success)
+            self.assertEqual(result.generation_method, "failed")
+            self.assertIn("Test error", result.error)
+
+    def test_generate_with_ai_no_gitignore(self):
+        """测试AI生成时没有.gitignore的情况"""
+        generator = AICodeGenerator(api_provider="claude")
+        generator.api_client = Mock()
+        generator.api_key = "test-key"
+        
+        # AI响应不包含.gitignore
+        ai_response = """
+=== main.py ===
+print("hello")
+=== end ===
+"""
+        generator.api_client.messages.create.return_value = Mock(
+            content=[Mock(text=ai_response)]
+        )
+        
+        request = CodeGenerationRequest(prompt="test", language="python")
+        architecture = {"project_type": "generic"}
+        
+        result = generator._generate_with_ai(request, architecture)
+        self.assertIsNotNone(result)
+        self.assertTrue(result.success)
+        # 验证自动添加了.gitignore
+        paths = [f.path for f in result.files]
+        self.assertIn(".gitignore", paths)
+
+    def test_generate_with_ai_returns_none(self):
+        """测试AI生成返回None时的情况"""
+        generator = AICodeGenerator(api_provider="claude")
+        generator.api_client = Mock()
+        generator.api_key = "test-key"
+        
+        # 模拟API返回空响应
+        generator.api_client.messages.create.return_value = Mock(
+            content=[Mock(text="")]
+        )
+        
+        request = CodeGenerationRequest(prompt="test", language="python")
+        architecture = {"project_type": "generic"}
+        
+        result = generator._generate_with_ai(request, architecture)
+        # 当AI返回空时，应该返回None，让generate方法回退到模板
+        self.assertIsNone(result)
+
+    def test_analyze_requirements_flask_framework(self):
+        """测试分析Flask框架"""
+        generator = AICodeGenerator()
+        request = CodeGenerationRequest(
+            prompt="Create a flask web application",
+            language="python"
+        )
+        architecture = generator._analyze_requirements(request)
+        self.assertEqual(architecture["framework"], "flask")
+
+    def test_analyze_requirements_django_framework(self):
+        """测试分析Django框架"""
+        generator = AICodeGenerator()
+        request = CodeGenerationRequest(
+            prompt="Build a django website",
+            language="python"
+        )
+        architecture = generator._analyze_requirements(request)
+        self.assertEqual(architecture["framework"], "django")
+
+    def test_analyze_requirements_express_framework(self):
+        """测试分析Express框架"""
+        generator = AICodeGenerator()
+        request = CodeGenerationRequest(
+            prompt="Create an express server",
+            language="javascript"
+        )
+        architecture = generator._analyze_requirements(request)
+        self.assertEqual(architecture["framework"], "express")
+
+    def test_analyze_requirements_react_framework(self):
+        """测试分析React框架"""
+        generator = AICodeGenerator()
+        request = CodeGenerationRequest(
+            prompt="Build a react application",
+            language="javascript"
+        )
+        architecture = generator._analyze_requirements(request)
+        self.assertEqual(architecture["framework"], "react")
+
+    def test_generate_files_with_web_project(self):
+        """测试生成Web项目文件"""
+        generator = AICodeGenerator()
+        request = CodeGenerationRequest(
+            prompt="Create a web app",
+            language="python",
+            include_tests=True,
+            include_docs=True
+        )
+        architecture = {"project_type": "web"}
+        
+        files = generator._generate_files(request, architecture)
+        self.assertGreater(len(files), 0)
+
+    def test_main_with_save_error(self):
+        """测试main函数保存文件失败的情况"""
+        with patch('sys.argv', ['ai_code_generator', 'Create app']):
+            with patch('ai_code_generator.AICodeGenerator') as mock_generator:
+                mock_instance = Mock()
+                mock_result = Mock()
+                mock_result.success = True
+                mock_result.files = [Mock()]
+                mock_result.generation_method = "template"
+                mock_result.api_provider = None
+                mock_instance.generate.return_value = mock_result
+                # 模拟保存失败返回空列表
+                mock_instance.save_files.return_value = []
+                mock_generator.return_value = mock_instance
+                
+                result = ai_main()
+                self.assertEqual(result, 0)
+
 
 def run_tests():
     """运行所有补充测试"""
