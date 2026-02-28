@@ -1,29 +1,29 @@
 {
-  "generated_at": "2026-02-28T22:50:28",
+  "generated_at": "2026-03-01T00:08:16",
   "total_skills": 20,
   "summary": {
-    "average_score": 57.3,
+    "average_score": 65.4,
     "grade_distribution": {
       "S": 0,
       "A": 0,
-      "B": 0,
+      "B": 6,
       "C": 11,
-      "D": 9
+      "D": 3
     },
     "top_skills": [
-      "multi-tenant",
-      "memory-enhanced",
-      "coding-pro"
+      "context-compressor",
+      "quick-templates",
+      "claude-domain-skills"
     ],
     "needs_improvement": [
       {
         "name": "clawhub-web",
-        "score": 35.0,
+        "score": 43.0,
         "grade": "D"
       },
       {
-        "name": "token-manager",
-        "score": 35.0,
+        "name": "vercel-deploy",
+        "score": 41.0,
         "grade": "D"
       },
       {
@@ -101,23 +101,23 @@
         "添加 SKILL.md 文档，描述技能包功能和使用方法",
         "考虑添加性能基准测试"
       ],
-      "evaluated_at": "2026-02-28T22:50:28",
-      "duration_ms": 17
+      "evaluated_at": "2026-03-01T00:08:15",
+      "duration_ms": 18
     },
     "context-compressor": {
       "skill_name": "context-compressor",
       "skill_path": "/root/.openclaw/workspace/ai-agent-lab/context-compressor",
-      "overall_score": 57.5,
-      "grade": "D",
-      "code_quality_score": 74.0,
-      "test_coverage_score": 0.0,
-      "documentation_score": 60.0,
+      "overall_score": 78.0,
+      "grade": "B",
+      "code_quality_score": 82.0,
+      "test_coverage_score": 50.0,
+      "documentation_score": 90.0,
       "security_score": 100.0,
       "performance_score": 80.0,
       "code_quality_details": {
-        "total_files": 1,
-        "total_lines": 77,
-        "avg_complexity": 12.0,
+        "total_files": 2,
+        "total_lines": 78,
+        "avg_complexity": 6.5,
         "lint_issues": 9,
         "style_issues": [
           "compressor.py:19: 存在尾随空格",
@@ -132,20 +132,20 @@
         ]
       },
       "test_coverage_details": {
-        "has_tests": false,
-        "test_files": 0,
-        "test_count": 0,
+        "has_tests": true,
+        "test_files": 1,
+        "test_count": 13,
         "coverage_percent": 0.0,
         "tests_passed": 0,
-        "tests_failed": 0
+        "tests_failed": 13
       },
       "documentation_details": {
-        "has_readme": false,
+        "has_readme": true,
         "has_skill_md": true,
         "has_api_docs": false,
-        "readme_length": 0,
+        "readme_length": 929,
         "skill_md_length": 2678,
-        "doc_completeness": 100.0
+        "doc_completeness": 50.0
       },
       "security_details": {
         "has_requirements": false,
@@ -155,22 +155,19 @@
       },
       "performance_details": {
         "import_time_ms": 0,
-        "module_size_kb": 2.21484375,
+        "module_size_kb": 6.9560546875,
         "has_performance_tests": false
       },
       "issues": [
-        "未找到测试文件",
-        "缺少 README.md 文件"
+        "有 13 个测试失败"
       ],
       "suggestions": [
-        "部分函数复杂度偏高，建议优化",
         "修复 9 个代码风格问题",
-        "添加单元测试，建议测试覆盖率至少达到70%",
-        "添加 README.md 文档",
+        "修复失败的测试用例",
         "考虑添加性能基准测试"
       ],
-      "evaluated_at": "2026-02-28T22:50:28",
-      "duration_ms": 0
+      "evaluated_at": "2026-03-01T00:08:15",
+      "duration_ms": 2
     },
     "finance-pro": {
       "skill_name": "finance-pro",
@@ -231,7 +228,7 @@
         ]
       },
       "performance_details": {
-        "import_time_ms": 482,
+        "import_time_ms": 485,
         "module_size_kb": 96.2783203125,
         "has_performance_tests": false
       },
@@ -249,8 +246,8 @@
         "修复代码中的安全问题",
         "考虑添加性能基准测试"
       ],
-      "evaluated_at": "2026-02-28T22:50:28",
-      "duration_ms": 500
+      "evaluated_at": "2026-03-01T00:08:15",
+      "duration_ms": 503
     },
     "skill-cli": {
       "skill_name": "skill-cli",
@@ -323,8 +320,8 @@
         "修复代码中的安全问题",
         "考虑添加性能基准测试"
       ],
-      "evaluated_at": "2026-02-28T22:50:28",
-      "duration_ms": 27
+      "evaluated_at": "2026-03-01T00:08:15",
+      "duration_ms": 28
     },
     "memory-enhanced": {
       "skill_name": "memory-enhanced",
@@ -393,7 +390,7 @@
         "添加 README.md 文档",
         "考虑添加性能基准测试"
       ],
-      "evaluated_at": "2026-02-28T22:50:28",
+      "evaluated_at": "2026-03-01T00:08:15",
       "duration_ms": 6
     },
     "coding-pro": {
@@ -463,23 +460,23 @@
         "添加 README.md 文档",
         "考虑添加性能基准测试"
       ],
-      "evaluated_at": "2026-02-28T22:50:28",
+      "evaluated_at": "2026-03-01T00:08:15",
       "duration_ms": 15
     },
     "financial-daily": {
       "skill_name": "financial-daily",
       "skill_path": "/root/.openclaw/workspace/ai-agent-lab/financial-daily",
-      "overall_score": 55.2,
-      "grade": "D",
-      "code_quality_score": 65.0,
-      "test_coverage_score": 0.0,
-      "documentation_score": 60.0,
+      "overall_score": 75.5,
+      "grade": "B",
+      "code_quality_score": 72.0,
+      "test_coverage_score": 50.0,
+      "documentation_score": 90.0,
       "security_score": 100.0,
       "performance_score": 80.0,
       "code_quality_details": {
-        "total_files": 1,
-        "total_lines": 183,
-        "avg_complexity": 21.0,
+        "total_files": 2,
+        "total_lines": 184,
+        "avg_complexity": 11.0,
         "lint_issues": 32,
         "style_issues": [
           "generator.py:11: 可能的未使用导入 'typing'",
@@ -495,20 +492,20 @@
         ]
       },
       "test_coverage_details": {
-        "has_tests": false,
-        "test_files": 0,
-        "test_count": 0,
+        "has_tests": true,
+        "test_files": 1,
+        "test_count": 13,
         "coverage_percent": 0.0,
         "tests_passed": 0,
-        "tests_failed": 0
+        "tests_failed": 13
       },
       "documentation_details": {
-        "has_readme": false,
+        "has_readme": true,
         "has_skill_md": true,
         "has_api_docs": false,
-        "readme_length": 0,
-        "skill_md_length": 1583,
-        "doc_completeness": 100.0
+        "readme_length": 1231,
+        "skill_md_length": 4426,
+        "doc_completeness": 50.0
       },
       "security_details": {
         "has_requirements": false,
@@ -518,32 +515,29 @@
       },
       "performance_details": {
         "import_time_ms": 0,
-        "module_size_kb": 5.810546875,
+        "module_size_kb": 11.5263671875,
         "has_performance_tests": false
       },
       "issues": [
-        "平均圈复杂度过高: 21.0",
-        "未找到测试文件",
-        "缺少 README.md 文件"
+        "有 13 个测试失败"
       ],
       "suggestions": [
-        "重构复杂函数，降低圈复杂度",
+        "部分函数复杂度偏高，建议优化",
         "修复 32 个代码风格问题",
-        "添加单元测试，建议测试覆盖率至少达到70%",
-        "添加 README.md 文档",
+        "修复失败的测试用例",
         "考虑添加性能基准测试"
       ],
-      "evaluated_at": "2026-02-28T22:50:28",
-      "duration_ms": 1
+      "evaluated_at": "2026-03-01T00:08:15",
+      "duration_ms": 3
     },
     "clawhub-web": {
       "skill_name": "clawhub-web",
       "skill_path": "/root/.openclaw/workspace/ai-agent-lab/clawhub-web",
-      "overall_score": 35.0,
+      "overall_score": 43.0,
       "grade": "D",
       "code_quality_score": 0.0,
       "test_coverage_score": 0.0,
-      "documentation_score": 40.0,
+      "documentation_score": 80.0,
       "security_score": 100.0,
       "performance_score": 80.0,
       "code_quality_details": {
@@ -563,10 +557,10 @@
       },
       "documentation_details": {
         "has_readme": true,
-        "has_skill_md": false,
+        "has_skill_md": true,
         "has_api_docs": false,
         "readme_length": 1210,
-        "skill_md_length": 0,
+        "skill_md_length": 1883,
         "doc_completeness": 0.0
       },
       "security_details": {
@@ -582,16 +576,14 @@
       },
       "issues": [
         "未找到Python源代码文件",
-        "未找到测试文件",
-        "缺少 SKILL.md 文件"
+        "未找到测试文件"
       ],
       "suggestions": [
         "添加核心功能Python模块",
         "添加单元测试，建议测试覆盖率至少达到70%",
-        "添加 SKILL.md 文档，描述技能包功能和使用方法",
         "考虑添加性能基准测试"
       ],
-      "evaluated_at": "2026-02-28T22:50:28",
+      "evaluated_at": "2026-03-01T00:08:15",
       "duration_ms": 0
     },
     "product-pro": {
@@ -668,8 +660,8 @@
         "修复代码中的安全问题",
         "考虑添加性能基准测试"
       ],
-      "evaluated_at": "2026-02-28T22:50:28",
-      "duration_ms": 9
+      "evaluated_at": "2026-03-01T00:08:15",
+      "duration_ms": 10
     },
     "skill-evaluator": {
       "skill_name": "skill-evaluator",
@@ -746,23 +738,23 @@
         "修复代码中的安全问题",
         "考虑添加性能基准测试"
       ],
-      "evaluated_at": "2026-02-28T22:50:28",
+      "evaluated_at": "2026-03-01T00:08:15",
       "duration_ms": 8
     },
     "quick-templates": {
       "skill_name": "quick-templates",
       "skill_path": "/root/.openclaw/workspace/ai-agent-lab/quick-templates",
-      "overall_score": 59.5,
-      "grade": "D",
-      "code_quality_score": 82.0,
-      "test_coverage_score": 0.0,
-      "documentation_score": 60.0,
+      "overall_score": 78.0,
+      "grade": "B",
+      "code_quality_score": 90.0,
+      "test_coverage_score": 50.0,
+      "documentation_score": 80.0,
       "security_score": 100.0,
       "performance_score": 80.0,
       "code_quality_details": {
-        "total_files": 1,
-        "total_lines": 105,
-        "avg_complexity": 13.0,
+        "total_files": 2,
+        "total_lines": 106,
+        "avg_complexity": 7.0,
         "lint_issues": 5,
         "style_issues": [
           "matcher.py:59: 存在尾随空格",
@@ -773,19 +765,86 @@
         ]
       },
       "test_coverage_details": {
-        "has_tests": false,
-        "test_files": 0,
-        "test_count": 0,
+        "has_tests": true,
+        "test_files": 1,
+        "test_count": 23,
         "coverage_percent": 0.0,
         "tests_passed": 0,
-        "tests_failed": 0
+        "tests_failed": 23
+      },
+      "documentation_details": {
+        "has_readme": true,
+        "has_skill_md": true,
+        "has_api_docs": false,
+        "readme_length": 1232,
+        "skill_md_length": 5071,
+        "doc_completeness": 50.0
+      },
+      "security_details": {
+        "has_requirements": false,
+        "dependencies": [],
+        "vulnerabilities": [],
+        "security_issues": []
+      },
+      "performance_details": {
+        "import_time_ms": 0,
+        "module_size_kb": 9.892578125,
+        "has_performance_tests": false
+      },
+      "issues": [
+        "有 23 个测试失败"
+      ],
+      "suggestions": [
+        "修复 5 个代码风格问题",
+        "修复失败的测试用例",
+        "README.md 内容可以更完整，建议添加功能介绍和使用示例",
+        "考虑添加性能基准测试"
+      ],
+      "evaluated_at": "2026-03-01T00:08:15",
+      "duration_ms": 2
+    },
+    "token-manager": {
+      "skill_name": "token-manager",
+      "skill_path": "/root/.openclaw/workspace/ai-agent-lab/token-manager",
+      "overall_score": 67.8,
+      "grade": "C",
+      "code_quality_score": 65.0,
+      "test_coverage_score": 50.0,
+      "documentation_score": 60.0,
+      "security_score": 100.0,
+      "performance_score": 80.0,
+      "code_quality_details": {
+        "total_files": 1,
+        "total_lines": 242,
+        "avg_complexity": 19.0,
+        "lint_issues": 46,
+        "style_issues": [
+          "token_manager.py:10: 可能的未使用导入 'pathlib'",
+          "token_manager.py:11: 可能的未使用导入 'typing'",
+          "token_manager.py:16: 存在尾随空格",
+          "token_manager.py:19: 存在尾随空格",
+          "token_manager.py:23: 存在尾随空格",
+          "token_manager.py:30: 存在尾随空格",
+          "token_manager.py:41: 存在尾随空格",
+          "token_manager.py:47: 存在尾随空格",
+          "token_manager.py:51: 存在尾随空格",
+          "token_manager.py:55: 存在尾随空格"
+        ]
+      },
+      "test_coverage_details": {
+        "has_tests": true,
+        "test_files": 1,
+        "test_count": 21,
+        "coverage_percent": 0.0,
+        "tests_passed": 0,
+        "tests_failed": 21
       },
       "documentation_details": {
         "has_readme": false,
         "has_skill_md": true,
         "has_api_docs": false,
         "readme_length": 0,
-        "skill_md_length": 1005,
+        "skill_md_length": 3057,
         "doc_completeness": 100.0
       },
       "security_details": {
@@ -796,80 +855,23 @@
       },
       "performance_details": {
         "import_time_ms": 0,
-        "module_size_kb": 3.208984375,
+        "module_size_kb": 16.498046875,
         "has_performance_tests": false
       },
       "issues": [
-        "未找到测试文件",
+        "平均圈复杂度过高: 19.0",
+        "有 21 个测试失败",
         "缺少 README.md 文件"
       ],
       "suggestions": [
-        "部分函数复杂度偏高，建议优化",
-        "修复 5 个代码风格问题",
-        "添加单元测试，建议测试覆盖率至少达到70%",
+        "重构复杂函数，降低圈复杂度",
+        "修复 46 个代码风格问题",
+        "修复失败的测试用例",
         "添加 README.md 文档",
         "考虑添加性能基准测试"
       ],
-      "evaluated_at": "2026-02-28T22:50:28",
-      "duration_ms": 1
-    },
-    "token-manager": {
-      "skill_name": "token-manager",
-      "skill_path": "/root/.openclaw/workspace/ai-agent-lab/token-manager",
-      "overall_score": 35.0,
-      "grade": "D",
-      "code_quality_score": 0.0,
-      "test_coverage_score": 0.0,
-      "documentation_score": 40.0,
-      "security_score": 100.0,
-      "performance_score": 80.0,
-      "code_quality_details": {
-        "total_files": 0,
-        "total_lines": 0,
-        "avg_complexity": 0.0,
-        "lint_issues": 0,
-        "style_issues": []
-      },
-      "test_coverage_details": {
-        "has_tests": false,
-        "test_files": 0,
-        "test_count": 0,
-        "coverage_percent": 0.0,
-        "tests_passed": 0,
-        "tests_failed": 0
-      },
-      "documentation_details": {
-        "has_readme": false,
-        "has_skill_md": true,
-        "has_api_docs": false,
-        "readme_length": 0,
-        "skill_md_length": 458,
-        "doc_completeness": 0.0
-      },
-      "security_details": {
-        "has_requirements": false,
-        "dependencies": [],
-        "vulnerabilities": [],
-        "security_issues": []
-      },
-      "performance_details": {
-        "import_time_ms": 0,
-        "module_size_kb": 0.0,
-        "has_performance_tests": false
-      },
-      "issues": [
-        "未找到Python源代码文件",
-        "未找到测试文件",
-        "缺少 README.md 文件"
-      ],
-      "suggestions": [
-        "添加核心功能Python模块",
-        "添加单元测试，建议测试覆盖率至少达到70%",
-        "添加 README.md 文档",
-        "考虑添加性能基准测试"
-      ],
-      "evaluated_at": "2026-02-28T22:50:28",
-      "duration_ms": 0
+      "evaluated_at": "2026-03-01T00:08:15",
+      "duration_ms": 3
     },
     "research-pro": {
       "skill_name": "research-pro",
@@ -946,7 +948,7 @@
         "修复代码中的安全问题",
         "考虑添加性能基准测试"
       ],
-      "evaluated_at": "2026-02-28T22:50:28",
+      "evaluated_at": "2026-03-01T00:08:15",
       "duration_ms": 13
     },
     "vercel-deploy": {
@@ -1003,23 +1005,23 @@
         "README.md 内容可以更完整，建议添加功能介绍和使用示例",
         "考虑添加性能基准测试"
       ],
-      "evaluated_at": "2026-02-28T22:50:28",
+      "evaluated_at": "2026-03-01T00:08:15",
       "duration_ms": 0
     },
     "api": {
       "skill_name": "api",
       "skill_path": "/root/.openclaw/workspace/ai-agent-lab/api",
-      "overall_score": 55.2,
-      "grade": "D",
+      "overall_score": 73.8,
+      "grade": "B",
       "code_quality_score": 65.0,
-      "test_coverage_score": 0.0,
-      "documentation_score": 60.0,
+      "test_coverage_score": 50.0,
+      "documentation_score": 90.0,
       "security_score": 100.0,
       "performance_score": 80.0,
       "code_quality_details": {
-        "total_files": 1,
-        "total_lines": 350,
-        "avg_complexity": 44.0,
+        "total_files": 2,
+        "total_lines": 351,
+        "avg_complexity": 22.5,
         "lint_issues": 31,
         "style_issues": [
           "index.py:9: 可能的未使用导入 'typing'",
@@ -1035,20 +1037,20 @@
         ]
       },
       "test_coverage_details": {
-        "has_tests": false,
-        "test_files": 0,
-        "test_count": 0,
+        "has_tests": true,
+        "test_files": 1,
+        "test_count": 15,
         "coverage_percent": 0.0,
         "tests_passed": 0,
-        "tests_failed": 0
+        "tests_failed": 15
       },
       "documentation_details": {
-        "has_readme": false,
+        "has_readme": true,
         "has_skill_md": true,
         "has_api_docs": false,
-        "readme_length": 0,
-        "skill_md_length": 1984,
-        "doc_completeness": 100.0
+        "readme_length": 1757,
+        "skill_md_length": 4851,
+        "doc_completeness": 50.0
       },
       "security_details": {
         "has_requirements": false,
@@ -1058,23 +1060,21 @@
       },
       "performance_details": {
         "import_time_ms": 0,
-        "module_size_kb": 12.0166015625,
+        "module_size_kb": 18.947265625,
         "has_performance_tests": false
       },
       "issues": [
-        "平均圈复杂度过高: 44.0",
-        "未找到测试文件",
-        "缺少 README.md 文件"
+        "平均圈复杂度过高: 22.5",
+        "有 15 个测试失败"
       ],
       "suggestions": [
         "重构复杂函数，降低圈复杂度",
         "修复 31 个代码风格问题",
-        "添加单元测试，建议测试覆盖率至少达到70%",
-        "添加 README.md 文档",
+        "修复失败的测试用例",
         "考虑添加性能基准测试"
       ],
-      "evaluated_at": "2026-02-28T22:50:28",
-      "duration_ms": 3
+      "evaluated_at": "2026-03-01T00:08:15",
+      "duration_ms": 4
     },
     "agent-collaboration": {
       "skill_name": "agent-collaboration",
@@ -1143,17 +1143,17 @@
         "添加 README.md 文档",
         "考虑添加性能基准测试"
       ],
-      "evaluated_at": "2026-02-28T22:50:28",
+      "evaluated_at": "2026-03-01T00:08:15",
       "duration_ms": 18
     },
     "skill-recommender": {
       "skill_name": "skill-recommender",
       "skill_path": "/root/.openclaw/workspace/ai-agent-lab/skill-recommender",
-      "overall_score": 66.4,
-      "grade": "C",
+      "overall_score": 74.4,
+      "grade": "B",
       "code_quality_score": 65.0,
       "test_coverage_score": 50.0,
-      "documentation_score": 53.33333333333333,
+      "documentation_score": 93.33333333333333,
       "security_score": 100.0,
       "performance_score": 80.0,
       "code_quality_details": {
@@ -1184,10 +1184,10 @@
       },
       "documentation_details": {
         "has_readme": true,
-        "has_skill_md": false,
+        "has_skill_md": true,
         "has_api_docs": false,
         "readme_length": 684,
-        "skill_md_length": 0,
+        "skill_md_length": 4089,
         "doc_completeness": 66.66666666666666
       },
       "security_details": {
@@ -1203,17 +1203,15 @@
       },
       "issues": [
         "平均圈复杂度过高: 42.0",
-        "有 22 个测试失败",
-        "缺少 SKILL.md 文件"
+        "有 22 个测试失败"
       ],
       "suggestions": [
         "重构复杂函数，降低圈复杂度",
         "修复 162 个代码风格问题",
         "修复失败的测试用例",
-        "添加 SKILL.md 文档，描述技能包功能和使用方法",
         "考虑添加性能基准测试"
       ],
-      "evaluated_at": "2026-02-28T22:50:28",
+      "evaluated_at": "2026-03-01T00:08:16",
       "duration_ms": 11
     },
     "stock-portfolio-analyzer": {
@@ -1289,7 +1287,7 @@
         "修复代码中的安全问题",
         "考虑添加性能基准测试"
       ],
-      "evaluated_at": "2026-02-28T22:50:28",
+      "evaluated_at": "2026-03-01T00:08:16",
       "duration_ms": 9
     },
     "notification-service": {
@@ -1322,7 +1320,7 @@
         "has_skill_md": true,
         "has_api_docs": false,
         "readme_length": 0,
-        "skill_md_length": 524,
+        "skill_md_length": 4092,
         "doc_completeness": 0.0
       },
       "security_details": {
@@ -1347,33 +1345,33 @@
         "添加 README.md 文档",
         "考虑添加性能基准测试"
       ],
-      "evaluated_at": "2026-02-28T22:50:28",
+      "evaluated_at": "2026-03-01T00:08:16",
       "duration_ms": 0
     },
     "claude-domain-skills": {
       "skill_name": "claude-domain-skills",
       "skill_path": "/root/.openclaw/workspace/ai-agent-lab/claude-domain-skills",
-      "overall_score": 43.0,
-      "grade": "D",
-      "code_quality_score": 0.0,
-      "test_coverage_score": 0.0,
+      "overall_score": 78.0,
+      "grade": "B",
+      "code_quality_score": 90.0,
+      "test_coverage_score": 50.0,
       "documentation_score": 80.0,
       "security_score": 100.0,
       "performance_score": 80.0,
       "code_quality_details": {
-        "total_files": 0,
-        "total_lines": 0,
-        "avg_complexity": 0.0,
+        "total_files": 1,
+        "total_lines": 1,
+        "avg_complexity": 1.0,
         "lint_issues": 0,
         "style_issues": []
       },
       "test_coverage_details": {
-        "has_tests": false,
-        "test_files": 0,
-        "test_count": 0,
+        "has_tests": true,
+        "test_files": 1,
+        "test_count": 18,
         "coverage_percent": 0.0,
         "tests_passed": 0,
-        "tests_failed": 0
+        "tests_failed": 18
       },
       "documentation_details": {
         "has_readme": true,
@@ -1391,20 +1389,19 @@
       },
       "performance_details": {
         "import_time_ms": 0,
-        "module_size_kb": 0.0,
+        "module_size_kb": 7.888671875,
         "has_performance_tests": false
       },
       "issues": [
-        "未找到Python源代码文件",
-        "未找到测试文件"
+        "有 18 个测试失败"
       ],
       "suggestions": [
-        "添加核心功能Python模块",
-        "添加单元测试，建议测试覆盖率至少达到70%",
+        "代码量较少，建议增加更多功能",
+        "修复失败的测试用例",
         "考虑添加性能基准测试"
       ],
-      "evaluated_at": "2026-02-28T22:50:28",
-      "duration_ms": 18
+      "evaluated_at": "2026-03-01T00:08:16",
+      "duration_ms": 19
     }
   }
 }
