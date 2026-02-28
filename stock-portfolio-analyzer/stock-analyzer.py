@@ -14,7 +14,6 @@ from pathlib import Path
 from datetime import datetime
 from typing import Dict, List, Optional, Any
 from dataclasses import dataclass, asdict
-from urllib.parse import quote
 
 # 配置路径
 SKILLS_DIR = Path("/root/.openclaw/workspace/skills")
