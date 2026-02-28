@@ -24,11 +24,11 @@ class SkillPackage:
     install_command: str
     author: str = ""
     version: str = "1.0.0"
-    
+
     def to_dict(self) -> Dict[str, Any]:
         """转换为字典"""
         return asdict(self)
-    
+
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> "SkillPackage":
         """从字典创建对象"""
@@ -57,18 +57,18 @@ class Category:
 
 class ClawHubAPI:
     """ClawHub API客户端"""
-    
+
     DEFAULT_REGISTRY_URL = "https://claw-bft.github.io/ai-agent-lab/registry/api"
-    
+
     def __init__(self, registry_url: Optional[str] = None):
         """
         初始化ClawHub API客户端
-        
+
         Args:
             registry_url: 注册表URL，默认使用GitHub Pages地址
         """
         self.registry_url = registry_url or self.DEFAULT_REGISTRY_URL
-    
+
     def _fetch_json(self, endpoint: str) -> Dict[str, Any]:
         """获取JSON数据"""
         url = f"{self.registry_url}/{endpoint}"
@@ -78,7 +78,7 @@ class ClawHubAPI:
         except Exception as e:
             # 返回模拟数据作为后备
             return self._get_mock_data(endpoint)
-    
+
     def _get_mock_data(self, endpoint: str) -> Dict[str, Any]:
         """获取模拟数据"""
         if endpoint == "skills":
@@ -133,38 +133,38 @@ class ClawHubAPI:
                 "lastUpdated": "2026-03-01T00:00:00Z"
             }
         return {}
-    
+
     def list_skills(self, category: Optional[str] = None,
                    search: Optional[str] = None,
                    sort_by: str = "downloads") -> List[SkillPackage]:
         """
         获取技能包列表
-        
+
         Args:
             category: 分类筛选
             search: 搜索关键词
             sort_by: 排序方式 (downloads/rating/name)
-            
+
         Returns:
             技能包列表
         """
         data = self._fetch_json("skills")
         skills = [SkillPackage.from_dict(s) for s in data.get('skills', [])]
-        
+
         # 分类筛选
         if category:
             skills = [s for s in skills if s.category == category]
-        
+
         # 搜索筛选
         if search:
             search_lower = search.lower()
             skills = [
-                s for s in skills 
-                if search_lower in s.name.lower() 
+                s for s in skills
+                if search_lower in s.name.lower()
                 or search_lower in s.description.lower()
                 or any(search_lower in t.lower() for t in s.tags)
             ]
-        
+
         # 排序
         if sort_by == "downloads":
             skills.sort(key=lambda x: x.downloads, reverse=True)
@@ -172,34 +172,34 @@ class ClawHubAPI:
             skills.sort(key=lambda x: x.rating, reverse=True)
         elif sort_by == "name":
             skills.sort(key=lambda x: x.display_name)
-        
+
         return skills
-    
+
     def get_skill(self, name: str) -> Optional[SkillPackage]:
         """
         获取技能包详情
-        
+
         Args:
             name: 技能包名称
-            
+
         Returns:
             技能包信息，不存在则返回None
         """
         data = self._fetch_json(f"skills/{name}")
         if data and 'name' in data:
             return SkillPackage.from_dict(data)
-        
+
         # 尝试从列表中查找
         skills = self.list_skills()
         for skill in skills:
             if skill.name == name:
                 return skill
         return None
-    
+
     def list_categories(self) -> List[Category]:
         """
         获取分类列表
-        
+
         Returns:
             分类列表
         """
@@ -213,11 +213,11 @@ class ClawHubAPI:
             )
             for c in data.get('categories', [])
         ]
-    
+
     def get_stats(self) -> Dict[str, Any]:
         """
         获取统计信息
-        
+
         Returns:
             统计数据
         """
@@ -226,35 +226,35 @@ class ClawHubAPI:
 
 class ClawHubWeb:
     """ClawHub Web工具类"""
-    
+
     def __init__(self, registry_url: Optional[str] = None):
         """
         初始化ClawHub Web工具
-        
+
         Args:
             registry_url: 注册表URL
         """
         self.api = ClawHubAPI(registry_url)
-    
+
     def search_skills(self, query: str) -> List[SkillPackage]:
         """
         搜索技能包
-        
+
         Args:
             query: 搜索关键词
-            
+
         Returns:
             匹配的技能包列表
         """
         return self.api.list_skills(search=query)
-    
+
     def get_install_command(self, skill_name: str) -> str:
         """
         获取安装命令
-        
+
         Args:
             skill_name: 技能包名称
-            
+
         Returns:
             安装命令
         """
@@ -262,47 +262,47 @@ class ClawHubWeb:
         if skill:
             return skill.install_command
         return f"claw install {skill_name}"
-    
+
     def get_top_skills(self, limit: int = 5) -> List[SkillPackage]:
         """
         获取热门技能包
-        
+
         Args:
             limit: 返回数量
-            
+
         Returns:
             热门技能包列表
         """
         skills = self.api.list_skills(sort_by="downloads")
         return skills[:limit]
-    
+
     def get_highest_rated(self, limit: int = 5) -> List[SkillPackage]:
         """
         获取评分最高的技能包
-        
+
         Args:
             limit: 返回数量
-            
+
         Returns:
             高评分技能包列表
         """
         skills = self.api.list_skills(sort_by="rating")
         return skills[:limit]
-    
+
     def generate_readme(self, skill_name: str) -> str:
         """
         生成技能包README模板
-        
+
         Args:
             skill_name: 技能包名称
-            
+
         Returns:
             README模板内容
         """
         skill = self.api.get_skill(skill_name)
         if not skill:
             return f"# {skill_name}\n\n技能包信息未找到"
-        
+
         return f"""# {skill.display_name}
 
 {skill.description}
@@ -334,13 +334,13 @@ class ClawHubWeb:
 def search(query: str) -> List[Dict[str, Any]]:
     """
     快速搜索技能包
-    
+
     Args:
         query: 搜索关键词
-        
+
     Returns:
         技能包列表(字典格式)
-        
+
     Example:
         >>> results = search("finance")
         >>> print(results[0]['display_name'])
@@ -354,13 +354,13 @@ def search(query: str) -> List[Dict[str, Any]]:
 def install_cmd(skill_name: str) -> str:
     """
     获取技能包安装命令
-    
+
     Args:
         skill_name: 技能包名称
-        
+
     Returns:
         安装命令
-        
+
     Example:
         >>> install_cmd("coding-pro")
         'claw install coding-pro'
@@ -372,9 +372,9 @@ def install_cmd(skill_name: str) -> str:
 if __name__ == "__main__":
     # 简单测试
     import sys
-    
+
     hub = ClawHubWeb()
-    
+
     if len(sys.argv) > 1:
         query = sys.argv[1]
         results = hub.search_skills(query)

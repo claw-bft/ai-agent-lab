@@ -39,21 +39,21 @@ def get_stock_quote_a_share(symbol: str) -> Dict[str, Any]:
             "success": False,
             "error": "akshare未安装，请运行: pip install akshare"
         }
-    
+
     try:
         # 处理symbol格式 (000001.SZ -> 000001)
         code = symbol.split('.')[0] if '.' in symbol else symbol
-        
+
         # 获取实时行情
         df = ak.stock_zh_a_spot_em()
         stock_info = df[df['代码'] == code]
-        
+
         if stock_info.empty:
             return {
                 "success": False,
                 "error": f"未找到股票: {symbol}"
             }
-        
+
         row = stock_info.iloc[0]
         return {
             "success": True,
@@ -83,25 +83,25 @@ def get_stock_history(symbol: str, period: str = "1mo") -> Dict[str, Any]:
             "success": False,
             "error": "akshare未安装"
         }
-    
+
     try:
         code = symbol.split('.')[0] if '.' in symbol else symbol
-        
+
         # 获取历史数据
-        df = ak.stock_zh_a_hist(symbol=code, period="daily", 
+        df = ak.stock_zh_a_hist(symbol=code, period="daily",
                                 start_date=(datetime.now() - timedelta(days=90)).strftime("%Y%m%d"),
                                 end_date=datetime.now().strftime("%Y%m%d"),
                                 adjust="qfq")
-        
+
         if df.empty:
             return {
                 "success": False,
                 "error": f"未找到历史数据: {symbol}"
             }
-        
+
         # 转换为列表
         records = df.tail(30).to_dict('records')
-        
+
         return {
             "success": True,
             "symbol": symbol,
@@ -129,17 +129,17 @@ def calculate_ma(data: List[Dict], periods: List[int] = [5, 10, 20, 60]) -> Dict
     """计算移动平均线"""
     if not data or not PANDAS_AVAILABLE:
         return {"success": False, "error": "数据不足或未安装pandas"}
-    
+
     try:
         df = pd.DataFrame(data)
         df['close'] = pd.to_numeric(df['close'])
-        
+
         ma_results = {}
         for period in periods:
             if len(df) >= period:
                 ma = df['close'].tail(period).mean()
                 ma_results[f"MA{period}"] = round(ma, 2)
-        
+
         return {
             "success": True,
             "ma": ma_results
@@ -154,25 +154,25 @@ def calculate_rsi(data: List[Dict], period: int = 14) -> Dict[str, Any]:
     """计算RSI指标"""
     if not data or not PANDAS_AVAILABLE:
         return {"success": False, "error": "数据不足或未安装pandas"}
-    
+
     try:
         df = pd.DataFrame(data)
         df['close'] = pd.to_numeric(df['close'])
-        
+
         delta = df['close'].diff()
         gain = (delta.where(delta > 0, 0)).rolling(window=period).mean()
         loss = (-delta.where(delta < 0, 0)).rolling(window=period).mean()
         rs = gain / loss
         rsi = 100 - (100 / (1 + rs))
-        
+
         current_rsi = rsi.iloc[-1]
-        
+
         signal = "中性"
         if current_rsi > 70:
             signal = "超买"
         elif current_rsi < 30:
             signal = "超卖"
-        
+
         return {
             "success": True,
             "rsi": round(current_rsi, 2),
@@ -191,15 +191,15 @@ def technical_analysis(symbol: str, indicators: List[str]) -> Dict[str, Any]:
     history = get_stock_history(symbol)
     if not history.get("success"):
         return history
-    
+
     data = history.get("data", [])
-    
+
     results = {
         "success": True,
         "symbol": symbol,
         "indicators": {}
     }
-    
+
     for indicator in indicators:
         indicator = indicator.upper()
         if indicator == "MA":
@@ -211,7 +211,7 @@ def technical_analysis(symbol: str, indicators: List[str]) -> Dict[str, Any]:
                 "success": False,
                 "error": f"暂未实现指标: {indicator}"
             }
-    
+
     return results
 
 def get_financial_report(symbol: str, quarter: str = "latest") -> Dict[str, Any]:
@@ -221,22 +221,22 @@ def get_financial_report(symbol: str, quarter: str = "latest") -> Dict[str, Any]
             "success": False,
             "error": "akshare未安装"
         }
-    
+
     try:
         code = symbol.split('.')[0] if '.' in symbol else symbol
-        
+
         # 获取主要财务指标
         df = ak.stock_financial_report_sina(stock=code, symbol="利润表")
-        
+
         if df.empty:
             return {
                 "success": False,
                 "error": f"未找到财务数据: {symbol}"
             }
-        
+
         # 获取最新一期
         latest = df.iloc[0]
-        
+
         return {
             "success": True,
             "symbol": symbol,
@@ -259,9 +259,9 @@ def main():
     parser.add_argument("--indicators", default="MA,RSI", help="技术指标 (逗号分隔)")
     parser.add_argument("--quarter", default="latest", help="财报季度")
     parser.add_argument("--json", action="store_true", help="JSON格式输出")
-    
+
     args = parser.parse_args()
-    
+
     if args.command == "quote":
         result = get_stock_quote_a_share(args.symbol)
     elif args.command == "history":
@@ -273,7 +273,7 @@ def main():
         result = get_financial_report(args.symbol, args.quarter)
     else:
         result = {"success": False, "error": "未知命令"}
-    
+
     if args.json:
         print(json.dumps(result, indent=2, ensure_ascii=False))
     else:

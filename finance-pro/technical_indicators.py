@@ -40,24 +40,24 @@ class IndicatorResult:
 
 class TechnicalIndicators:
     """技术指标计算器"""
-    
+
     def __init__(self, data: List[Dict]):
         """
         初始化
-        
+
         Args:
             data: K线数据列表，每项包含 open, high, low, close, volume
         """
         self.data = data
         self.df = None
-        
+
         if PANDAS_AVAILABLE and data:
             self.df = pd.DataFrame(data)
             # 确保数值类型正确
             for col in ['open', 'high', 'low', 'close', 'volume']:
                 if col in self.df.columns:
                     self.df[col] = pd.to_numeric(self.df[col], errors='coerce')
-    
+
     def _check_data(self, min_length: int = 1) -> bool:
         """检查数据是否足够"""
         if not PANDAS_AVAILABLE:
@@ -65,11 +65,11 @@ class TechnicalIndicators:
         if self.df is None or len(self.df) < min_length:
             return False
         return True
-    
+
     def ma(self, period: int = 20) -> IndicatorResult:
         """
         计算移动平均线 (Moving Average)
-        
+
         Args:
             period: 周期，默认20日
         """
@@ -80,10 +80,10 @@ class TechnicalIndicators:
                 signal=SignalType.NEUTRAL,
                 description="数据不足"
             )
-        
+
         ma_value = self.df['close'].tail(period).mean()
         current_price = self.df['close'].iloc[-1]
-        
+
         # 信号判断
         if current_price > ma_value * 1.02:
             signal = SignalType.BUY
@@ -94,7 +94,7 @@ class TechnicalIndicators:
         else:
             signal = SignalType.HOLD
             desc = f"价格围绕MA{period}震荡"
-        
+
         return IndicatorResult(
             name=f"MA{period}",
             value=round(ma_value, 2),
@@ -106,7 +106,7 @@ class TechnicalIndicators:
                 "ma_value": round(ma_value, 2)
             }
         )
-    
+
     def ema(self, period: int = 12) -> IndicatorResult:
         """计算指数移动平均线"""
         if not self._check_data(period):
@@ -116,9 +116,9 @@ class TechnicalIndicators:
                 signal=SignalType.NEUTRAL,
                 description="数据不足"
             )
-        
+
         ema_value = self.df['close'].ewm(span=period, adjust=False).mean().iloc[-1]
-        
+
         return IndicatorResult(
             name=f"EMA{period}",
             value=round(ema_value, 2),
@@ -126,11 +126,11 @@ class TechnicalIndicators:
             description=f"{period}日指数移动平均线",
             raw_data={"period": period}
         )
-    
+
     def rsi(self, period: int = 14) -> IndicatorResult:
         """
         计算RSI指标 (Relative Strength Index)
-        
+
         RSI > 70: 超买
         RSI < 30: 超卖
         """
@@ -141,15 +141,15 @@ class TechnicalIndicators:
                 signal=SignalType.NEUTRAL,
                 description="数据不足"
             )
-        
+
         delta = self.df['close'].diff()
         gain = delta.where(delta > 0, 0).rolling(window=period).mean()
         loss = (-delta.where(delta < 0, 0)).rolling(window=period).mean()
-        
+
         rs = gain / loss
         rsi = 100 - (100 / (1 + rs))
         rsi_value = rsi.iloc[-1]
-        
+
         if rsi_value > 70:
             signal = SignalType.OVERBOUGHT
             desc = f"RSI={rsi_value:.1f} > 70，超买区域，可能回调"
@@ -159,7 +159,7 @@ class TechnicalIndicators:
         else:
             signal = SignalType.NEUTRAL
             desc = f"RSI={rsi_value:.1f}，中性区域"
-        
+
         return IndicatorResult(
             name=f"RSI{period}",
             value=round(rsi_value, 2),
@@ -167,11 +167,11 @@ class TechnicalIndicators:
             description=desc,
             raw_data={"period": period, "overbought": 70, "oversold": 30}
         )
-    
+
     def macd(self, fast: int = 12, slow: int = 26, signal: int = 9) -> IndicatorResult:
         """
         计算MACD指标
-        
+
         MACD = EMA(fast) - EMA(slow)
         Signal = EMA(MACD, signal)
         Histogram = MACD - Signal
@@ -183,18 +183,18 @@ class TechnicalIndicators:
                 signal=SignalType.NEUTRAL,
                 description="数据不足"
             )
-        
+
         ema_fast = self.df['close'].ewm(span=fast, adjust=False).mean()
         ema_slow = self.df['close'].ewm(span=slow, adjust=False).mean()
         macd_line = ema_fast - ema_slow
         signal_line = macd_line.ewm(span=signal, adjust=False).mean()
         histogram = macd_line - signal_line
-        
+
         current_macd = macd_line.iloc[-1]
         current_signal = signal_line.iloc[-1]
         current_hist = histogram.iloc[-1]
         prev_hist = histogram.iloc[-2] if len(histogram) > 1 else 0
-        
+
         # 信号判断
         if current_macd > current_signal and current_hist > 0:
             if current_hist > prev_hist:
@@ -219,7 +219,7 @@ class TechnicalIndicators:
         else:
             sig = SignalType.NEUTRAL
             desc = "MACD无明显信号"
-        
+
         return IndicatorResult(
             name="MACD",
             value={
@@ -235,11 +235,11 @@ class TechnicalIndicators:
                 "signal_period": signal
             }
         )
-    
+
     def bollinger(self, period: int = 20, std_dev: float = 2.0) -> IndicatorResult:
         """
         计算布林带 (Bollinger Bands)
-        
+
         上轨 = MA + 2 * STD
         中轨 = MA
         下轨 = MA - 2 * STD
@@ -251,22 +251,22 @@ class TechnicalIndicators:
                 signal=SignalType.NEUTRAL,
                 description="数据不足"
             )
-        
+
         ma = self.df['close'].rolling(window=period).mean()
         std = self.df['close'].rolling(window=period).std()
-        
+
         upper = ma + std_dev * std
         lower = ma - std_dev * std
-        
+
         current_price = self.df['close'].iloc[-1]
         current_upper = upper.iloc[-1]
         current_lower = lower.iloc[-1]
         current_ma = ma.iloc[-1]
-        
+
         # 计算带宽和%b
         bandwidth = (current_upper - current_lower) / current_ma * 100
         percent_b = (current_price - current_lower) / (current_upper - current_lower) if current_upper != current_lower else 0.5
-        
+
         # 信号判断
         if current_price > current_upper:
             sig = SignalType.OVERBOUGHT
@@ -283,7 +283,7 @@ class TechnicalIndicators:
         else:
             sig = SignalType.HOLD
             desc = f"价格在中轨附近，%B={percent_b:.2f}"
-        
+
         return IndicatorResult(
             name="BOLL",
             value={
@@ -297,11 +297,11 @@ class TechnicalIndicators:
             description=desc,
             raw_data={"period": period, "std_dev": std_dev}
         )
-    
+
     def kdj(self, n: int = 9, m1: int = 3, m2: int = 3) -> IndicatorResult:
         """
         计算KDJ指标
-        
+
         RSV = (Close - LLV(Low, N)) / (HHV(High, N) - LLV(Low, N)) * 100
         K = SMA(RSV, M1, 1)
         D = SMA(K, M2, 1)
@@ -314,21 +314,21 @@ class TechnicalIndicators:
                 signal=SignalType.NEUTRAL,
                 description="数据不足"
             )
-        
+
         low_list = self.df['low'].rolling(window=n, min_periods=n).min()
         high_list = self.df['high'].rolling(window=n, min_periods=n).max()
         rsv = (self.df['close'] - low_list) / (high_list - low_list) * 100
-        
+
         k = rsv.ewm(com=m1-1, adjust=False).mean()
         d = k.ewm(com=m2-1, adjust=False).mean()
         j = 3 * k - 2 * d
-        
+
         current_k = k.iloc[-1]
         current_d = d.iloc[-1]
         current_j = j.iloc[-1]
         prev_k = k.iloc[-2] if len(k) > 1 else current_k
         prev_d = d.iloc[-2] if len(d) > 1 else current_d
-        
+
         # 信号判断
         if current_j > 100:
             sig = SignalType.OVERBOUGHT
@@ -345,7 +345,7 @@ class TechnicalIndicators:
         else:
             sig = SignalType.HOLD
             desc = f"KDJ震荡，K={current_k:.1f}, D={current_d:.1f}, J={current_j:.1f}"
-        
+
         return IndicatorResult(
             name="KDJ",
             value={
@@ -357,7 +357,7 @@ class TechnicalIndicators:
             description=desc,
             raw_data={"n": n, "m1": m1, "m2": m2}
         )
-    
+
     def volume_analysis(self) -> IndicatorResult:
         """成交量分析"""
         if not self._check_data(20):
@@ -367,13 +367,13 @@ class TechnicalIndicators:
                 signal=SignalType.NEUTRAL,
                 description="数据不足"
             )
-        
+
         current_vol = self.df['volume'].iloc[-1]
         avg_vol_5 = self.df['volume'].tail(5).mean()
         avg_vol_20 = self.df['volume'].tail(20).mean()
-        
+
         vol_ratio = current_vol / avg_vol_20 if avg_vol_20 > 0 else 1
-        
+
         if vol_ratio > 2:
             sig = SignalType.BUY if self.df['close'].iloc[-1] > self.df['close'].iloc[-2] else SignalType.SELL
             desc = f"成交量放大{vol_ratio:.1f}倍，{'放量上涨' if sig == SignalType.BUY else '放量下跌'}"
@@ -386,7 +386,7 @@ class TechnicalIndicators:
         else:
             sig = SignalType.HOLD
             desc = f"成交量正常，{vol_ratio:.1f}倍均量"
-        
+
         return IndicatorResult(
             name="VOL",
             value={
@@ -398,19 +398,19 @@ class TechnicalIndicators:
             signal=sig,
             description=desc
         )
-    
+
     def analyze_all(self, indicators: List[str] = None) -> Dict[str, Any]:
         """
         批量计算多个指标
-        
+
         Args:
             indicators: 指标列表，如 ['MA', 'RSI', 'MACD', 'BOLL', 'KDJ', 'VOL']
         """
         if indicators is None:
             indicators = ['MA', 'RSI', 'MACD', 'BOLL', 'KDJ', 'VOL']
-        
+
         results = {}
-        
+
         indicator_map = {
             'MA': lambda: self.ma(),
             'EMA': lambda: self.ema(),
@@ -420,7 +420,7 @@ class TechnicalIndicators:
             'KDJ': lambda: self.kdj(),
             'VOL': lambda: self.volume_analysis()
         }
-        
+
         for ind in indicators:
             ind_upper = ind.upper()
             if ind_upper in indicator_map:
@@ -433,18 +433,18 @@ class TechnicalIndicators:
                         signal=SignalType.NEUTRAL,
                         description=f"计算错误: {str(e)}"
                     )
-        
+
         # 综合评分
         buy_signals = sum(1 for r in results.values() if r.signal == SignalType.BUY)
         sell_signals = sum(1 for r in results.values() if r.signal == SignalType.SELL)
-        
+
         if buy_signals > sell_signals + 1:
             overall = SignalType.BUY
         elif sell_signals > buy_signals + 1:
             overall = SignalType.SELL
         else:
             overall = SignalType.HOLD
-        
+
         return {
             "success": True,
             "indicators": {
@@ -466,11 +466,11 @@ class TechnicalIndicators:
 def analyze_stock_technical(data: List[Dict], indicators: List[str] = None) -> Dict[str, Any]:
     """
     便捷函数: 分析股票技术指标
-    
+
     Args:
         data: K线数据
         indicators: 要计算的指标列表
-    
+
     Returns:
         分析结果字典
     """
@@ -479,7 +479,7 @@ def analyze_stock_technical(data: List[Dict], indicators: List[str] = None) -> D
             "success": False,
             "error": "需要安装pandas和numpy: pip install pandas numpy"
         }
-    
+
     calculator = TechnicalIndicators(data)
     return calculator.analyze_all(indicators)
 
@@ -489,7 +489,7 @@ if __name__ == "__main__":
     print("=" * 60)
     print("技术指标计算模块测试")
     print("=" * 60)
-    
+
     # 模拟数据
     test_data = [
         {"date": "2024-01-01", "open": 100, "high": 105, "low": 98, "close": 102, "volume": 10000},
@@ -503,7 +503,7 @@ if __name__ == "__main__":
         {"date": "2024-01-09", "open": 120, "high": 121, "low": 115, "close": 116, "volume": 30000},
         {"date": "2024-01-10", "open": 116, "high": 118, "low": 112, "close": 114, "volume": 26000},
     ]
-    
+
     # 补充更多数据以满足计算需求
     for i in range(20):
         import random
@@ -521,24 +521,24 @@ if __name__ == "__main__":
             "close": round(close, 2),
             "volume": int(random.uniform(10000, 50000))
         })
-    
+
     calculator = TechnicalIndicators(test_data)
-    
+
     print("\n--- RSI ---")
     result = calculator.rsi()
     print(f"Value: {result.value}, Signal: {result.signal.value}")
     print(f"Desc: {result.description}")
-    
+
     print("\n--- MACD ---")
     result = calculator.macd()
     print(f"Value: {result.value}, Signal: {result.signal.value}")
     print(f"Desc: {result.description}")
-    
+
     print("\n--- BOLL ---")
     result = calculator.bollinger()
     print(f"Value: {result.value}, Signal: {result.signal.value}")
     print(f"Desc: {result.description}")
-    
+
     print("\n--- 综合分析 ---")
     analysis = calculator.analyze_all()
     print(json.dumps(analysis, indent=2, ensure_ascii=False))

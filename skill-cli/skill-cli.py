@@ -27,13 +27,13 @@ def parse_skill_md(skill_name: str) -> Dict[str, Any]:
     skill_path = SKILLS_DIR / skill_name / "SKILL.md"
     if not skill_path.exists():
         return {}
-    
+
     content = skill_path.read_text(encoding='utf-8')
-    
+
     # 提取技能名称和描述
     name_match = re.search(r'^name:\s*(.+)$', content, re.MULTILINE)
     desc_match = re.search(r'^description:\s*(.+)$', content, re.MULTILINE)
-    
+
     # 提取使用示例中的命令
     examples = []
     example_section = re.search(r'## 使用示例.*?(?=##|$)', content, re.DOTALL)
@@ -43,7 +43,7 @@ def parse_skill_md(skill_name: str) -> Dict[str, Any]:
         for block in bash_blocks:
             lines = [l.strip() for l in block.strip().split('\n') if l.strip() and not l.strip().startswith('#')]
             examples.extend(lines)
-    
+
     return {
         "name": name_match.group(1) if name_match else skill_name,
         "description": desc_match.group(1) if desc_match else "",
@@ -53,16 +53,16 @@ def parse_skill_md(skill_name: str) -> Dict[str, Any]:
 def execute_skill_command(skill_name: str, args: List[str]) -> Dict[str, Any]:
     """执行技能命令"""
     skill_info = parse_skill_md(skill_name)
-    
+
     if not skill_info:
         return {
             "success": False,
             "error": f"技能包 '{skill_name}' 不存在或缺少SKILL.md"
         }
-    
+
     # 构建命令映射
     command_map = build_command_map(skill_name)
-    
+
     if not args:
         return {
             "success": True,
@@ -71,10 +71,10 @@ def execute_skill_command(skill_name: str, args: List[str]) -> Dict[str, Any]:
             "available_commands": list(command_map.keys()),
             "examples": skill_info.get("examples", [])
         }
-    
+
     # 解析子命令
     subcommand = args[0]
-    
+
     if subcommand in command_map:
         handler = command_map[subcommand]
         return handler(skill_name, args[1:])
@@ -84,14 +84,14 @@ def execute_skill_command(skill_name: str, args: List[str]) -> Dict[str, Any]:
 
 def build_command_map(skill_name: str) -> Dict[str, callable]:
     """为技能包构建命令映射"""
-    
+
     # 通用命令处理器
     handlers = {
         "help": handle_help,
         "info": handle_info,
         "examples": handle_examples,
     }
-    
+
     # 根据技能类型添加特定处理器
     if skill_name == "coding-pro":
         handlers.update({
@@ -121,7 +121,7 @@ def build_command_map(skill_name: str) -> Dict[str, callable]:
             "search": handle_research_search,
             "monitor": handle_research_monitor,
         })
-    
+
     return handlers
 
 # ============ 通用处理器 ============
@@ -140,7 +140,7 @@ def handle_info(skill_name: str, args: List[str]) -> Dict[str, Any]:
     """显示技能包详细信息"""
     skill_path = SKILLS_DIR / skill_name
     skill_file = skill_path / "SKILL.md"
-    
+
     info = {
         "success": True,
         "skill": skill_name,
@@ -148,12 +148,12 @@ def handle_info(skill_name: str, args: List[str]) -> Dict[str, Any]:
         "exists": skill_path.exists(),
         "has_skill_md": skill_file.exists(),
     }
-    
+
     if skill_file.exists():
         content = skill_file.read_text(encoding='utf-8')
         info["size_bytes"] = len(content)
         info["line_count"] = len(content.split('\n'))
-    
+
     return info
 
 def handle_examples(skill_name: str, args: List[str]) -> Dict[str, Any]:
@@ -205,7 +205,7 @@ def handle_coding_repo(skill_name: str, args: List[str]) -> Dict[str, Any]:
     """仓库管理"""
     if not args:
         return {"success": False, "error": "缺少子命令 (create/clone/push)"}
-    
+
     subcmd = args[0]
     if subcmd == "create":
         return {
@@ -432,10 +432,10 @@ def execute_natural_language(skill_name: str, command: str) -> Dict[str, Any]:
         # 导入自然语言执行模块
         sys.path.insert(0, str(Path(__file__).parent))
         from executor import SkillExecutor
-        
+
         executor = SkillExecutor()
         result = executor.execute_natural_language(command)
-        
+
         return {
             "success": result.status.value == "success",
             "action": "natural_language",
@@ -463,7 +463,7 @@ def execute_natural_language(skill_name: str, command: str) -> Dict[str, Any]:
 def main():
     # 手动解析参数以支持技能命令中的--参数
     args_list = sys.argv[1:]
-    
+
     # 检查是否是list命令
     if not args_list or args_list[0] in ["list", "--list", "-l"]:
         skills = get_available_skills()
@@ -482,17 +482,17 @@ def main():
                 desc = info.get("description", "")[:40]
                 print(f"  • {skill:<20} {desc}...")
         return
-    
+
     # 解析参数
     skill_name = args_list[0]
     skill_args = args_list[1:]
     use_json = "--json" in skill_args or "-j" in skill_args
     # 移除--json参数
     skill_args = [a for a in skill_args if a not in ["--json", "-j"]]
-    
+
     # 执行技能命令
     result = execute_skill_command(skill_name, skill_args)
-    
+
     if use_json:
         print(json.dumps(result, indent=2, ensure_ascii=False))
     else:

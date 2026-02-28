@@ -16,7 +16,7 @@ from typing import Dict, List, Optional, Any
 def generate_code(prompt: str, output_dir: str, language: str = "python") -> Dict[str, Any]:
     """
     代码生成 - 根据自然语言描述生成代码
-    
+
     Args:
         prompt: 代码描述
         output_dir: 输出目录
@@ -24,21 +24,21 @@ def generate_code(prompt: str, output_dir: str, language: str = "python") -> Dic
     """
     output_path = Path(output_dir)
     output_path.mkdir(parents=True, exist_ok=True)
-    
+
     # 生成项目结构
     structure = generate_project_structure(prompt, language)
-    
+
     # 创建文件
     created_files = []
     for file_info in structure.get("files", []):
         file_path = output_path / file_info["path"]
         file_path.parent.mkdir(parents=True, exist_ok=True)
-        
+
         with open(file_path, 'w', encoding='utf-8') as f:
             f.write(file_info["content"])
-        
+
         created_files.append(str(file_path))
-    
+
     # 创建README
     readme_path = output_path / "README.md"
     with open(readme_path, 'w', encoding='utf-8') as f:
@@ -47,7 +47,7 @@ def generate_code(prompt: str, output_dir: str, language: str = "python") -> Dic
         f.write(f"## 文件结构\n\n")
         for filepath in created_files:
             f.write(f"- {os.path.basename(filepath)}\n")
-    
+
     return {
         "success": True,
         "prompt": prompt,
@@ -59,10 +59,10 @@ def generate_code(prompt: str, output_dir: str, language: str = "python") -> Dic
 
 def generate_project_structure(prompt: str, language: str) -> Dict[str, Any]:
     """根据提示生成项目结构"""
-    
+
     # 根据提示关键词推断项目类型
     prompt_lower = prompt.lower()
-    
+
     if "api" in prompt_lower or "fastapi" in prompt_lower or "flask" in prompt_lower:
         return generate_api_project(prompt, language)
     elif "cli" in prompt_lower or "command" in prompt_lower:
@@ -151,15 +151,15 @@ import sys
 def main():
     parser = argparse.ArgumentParser(description="CLI Tool")
     parser.add_argument("--version", action="version", version="1.0.0")
-    
+
     subparsers = parser.add_subparsers(dest="command")
-    
+
     # 添加子命令
     cmd = subparsers.add_parser("hello", help="Say hello")
     cmd.add_argument("--name", default="World", help="Name to greet")
-    
+
     args = parser.parse_args()
-    
+
     if args.command == "hello":
         print(f"Hello, {args.name}!")
     else:
@@ -264,50 +264,50 @@ if __name__ == "__main__":
 def review_code(path: str, rules: List[str]) -> Dict[str, Any]:
     """
     代码审查
-    
+
     Args:
         path: 代码路径
         rules: 审查规则 (security/performance/style)
     """
     target_path = Path(path)
-    
+
     if not target_path.exists():
         return {
             "success": False,
             "error": f"路径不存在: {path}"
         }
-    
+
     findings = []
     files_reviewed = 0
-    
+
     # 遍历所有Python文件
     for file_path in target_path.rglob("*.py"):
         files_reviewed += 1
         content = file_path.read_text(encoding='utf-8')
-        
+
         file_findings = []
-        
+
         # 安全检查
         if "security" in rules:
             security_issues = check_security_issues(content)
             file_findings.extend(security_issues)
-        
+
         # 性能检查
         if "performance" in rules:
             perf_issues = check_performance_issues(content)
             file_findings.extend(perf_issues)
-        
+
         # 风格检查
         if "style" in rules:
             style_issues = check_style_issues(content)
             file_findings.extend(style_issues)
-        
+
         if file_findings:
             findings.append({
                 "file": str(file_path),
                 "issues": file_findings
             })
-    
+
     return {
         "success": True,
         "path": path,
@@ -320,7 +320,7 @@ def review_code(path: str, rules: List[str]) -> Dict[str, Any]:
 def check_security_issues(content: str) -> List[Dict]:
     """检查安全问题"""
     issues = []
-    
+
     # 检查硬编码密码
     if "password" in content.lower() and "=" in content:
         issues.append({
@@ -328,7 +328,7 @@ def check_security_issues(content: str) -> List[Dict]:
             "severity": "high",
             "message": "可能存在硬编码密码"
         })
-    
+
     # 检查SQL注入风险
     if "execute(" in content and "%" in content:
         issues.append({
@@ -336,13 +336,13 @@ def check_security_issues(content: str) -> List[Dict]:
             "severity": "medium",
             "message": "可能存在SQL注入风险"
         })
-    
+
     return issues
 
 def check_performance_issues(content: str) -> List[Dict]:
     """检查性能问题"""
     issues = []
-    
+
     # 检查循环中的数据库查询
     if "for" in content and "query" in content.lower():
         issues.append({
@@ -350,13 +350,13 @@ def check_performance_issues(content: str) -> List[Dict]:
             "severity": "medium",
             "message": "循环中可能存在数据库查询，考虑使用批量查询"
         })
-    
+
     return issues
 
 def check_style_issues(content: str) -> List[Dict]:
     """检查风格问题"""
     issues = []
-    
+
     lines = content.split('\n')
     for i, line in enumerate(lines, 1):
         if len(line) > 100:
@@ -366,13 +366,13 @@ def check_style_issues(content: str) -> List[Dict]:
                 "severity": "low",
                 "message": f"行长度超过100字符 ({len(line)}字符)"
             })
-    
+
     return issues
 
 def setup_cicd(template: str, provider: str) -> Dict[str, Any]:
     """
     配置CI/CD流水线
-    
+
     Args:
         template: 项目模板 (python/node/go)
         provider: CI/CD提供商 (github-actions/gitlab-ci)
@@ -389,10 +389,10 @@ def setup_cicd(template: str, provider: str) -> Dict[str, Any]:
 
 def setup_github_actions(template: str) -> Dict[str, Any]:
     """配置GitHub Actions"""
-    
+
     workflow_dir = Path(".github/workflows")
     workflow_dir.mkdir(parents=True, exist_ok=True)
-    
+
     if template == "python":
         workflow_content = '''name: Python CI
 
@@ -405,24 +405,24 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    
+
     steps:
     - uses: actions/checkout@v3
-    
+
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
         python-version: '3.11'
-    
+
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
-    
+
     - name: Run tests
       run: |
         pytest tests/ -v
-    
+
     - name: Lint with flake8
       run: |
         flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
@@ -439,25 +439,25 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    
+
     strategy:
       matrix:
         node-version: [18.x, 20.x]
-    
+
     steps:
     - uses: actions/checkout@v3
-    
+
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v3
       with:
         node-version: ${{ matrix.node-version }}
-    
+
     - name: Install dependencies
       run: npm ci
-    
+
     - name: Run tests
       run: npm test
-    
+
     - name: Build
       run: npm run build
 '''
@@ -473,18 +473,18 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    
+
     steps:
     - uses: actions/checkout@v3
-    
+
     - name: Run tests
       run: echo "Add your test commands here"
 '''
-    
+
     workflow_file = workflow_dir / "ci.yml"
     with open(workflow_file, 'w') as f:
         f.write(workflow_content)
-    
+
     return {
         "success": True,
         "provider": "github-actions",
@@ -495,7 +495,7 @@ jobs:
 
 def setup_gitlab_ci(template: str) -> Dict[str, Any]:
     """配置GitLab CI"""
-    
+
     if template == "python":
         ci_content = '''stages:
   - test
@@ -533,11 +533,11 @@ test:
     - merge_requests
     - main
 '''
-    
+
     ci_file = Path(".gitlab-ci.yml")
     with open(ci_file, 'w') as f:
         f.write(ci_content)
-    
+
     return {
         "success": True,
         "provider": "gitlab-ci",
@@ -557,28 +557,28 @@ def main():
     parser.add_argument("--template", default="python", help="项目模板")
     parser.add_argument("--provider", default="github-actions", help="CI/CD提供商")
     parser.add_argument("--json", action="store_true", help="JSON格式输出")
-    
+
     args = parser.parse_args()
-    
+
     if args.command == "generate":
         if not args.prompt:
             print("✗ 错误: --prompt 是必需的")
             sys.exit(1)
         result = generate_code(args.prompt, args.output, args.language)
-    
+
     elif args.command == "review":
         if not args.path:
             print("✗ 错误: --path 是必需的")
             sys.exit(1)
         rules = [r.strip() for r in args.rules.split(",")]
         result = review_code(args.path, rules)
-    
+
     elif args.command == "cicd":
         result = setup_cicd(args.template, args.provider)
-    
+
     else:
         result = {"success": False, "error": "未知命令"}
-    
+
     if args.json:
         print(json.dumps(result, indent=2, ensure_ascii=False))
     else:

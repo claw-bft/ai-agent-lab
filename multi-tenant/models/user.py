@@ -40,7 +40,7 @@ class User:
     last_login: Optional[datetime] = None
     profile: Dict[str, Any] = field(default_factory=dict)
     permissions: List[str] = field(default_factory=list)
-    
+
     def to_dict(self) -> Dict[str, Any]:
         """转换为字典"""
         return {
@@ -60,16 +60,16 @@ class User:
 
 class UserManager:
     """用户管理器"""
-    
+
     def __init__(self):
         self._users: Dict[str, User] = {}
         self._email_index: Dict[str, str] = {}  # email -> user_id
         self._tenant_users: Dict[str, List[str]] = {}  # tenant_id -> [user_ids]
-    
+
     def _generate_id(self) -> str:
         """生成用户ID"""
         return f"user_{uuid.uuid4().hex[:16]}"
-    
+
     def create_user(
         self,
         tenant_id: str,
@@ -80,10 +80,10 @@ class UserManager:
     ) -> User:
         """创建用户"""
         email = email.lower().strip()
-        
+
         if email in self._email_index:
             raise ValueError(f"邮箱 {email} 已被使用")
-        
+
         now = datetime.utcnow()
         user = User(
             id=self._generate_id(),
@@ -96,21 +96,21 @@ class UserManager:
             updated_at=now,
             profile=profile or {},
         )
-        
+
         self._users[user.id] = user
         self._email_index[email] = user.id
-        
+
         # 添加到租户用户列表
         if tenant_id not in self._tenant_users:
             self._tenant_users[tenant_id] = []
         self._tenant_users[tenant_id].append(user.id)
-        
+
         return user
-    
+
     def get_user(self, user_id: str) -> Optional[User]:
         """获取用户"""
         return self._users.get(user_id)
-    
+
     def get_user_by_email(self, email: str) -> Optional[User]:
         """通过邮箱获取用户"""
         email = email.lower().strip()
@@ -118,7 +118,7 @@ class UserManager:
         if user_id:
             return self._users.get(user_id)
         return None
-    
+
     def list_users(
         self,
         tenant_id: str,
@@ -128,14 +128,14 @@ class UserManager:
         """列出租户内用户"""
         user_ids = self._tenant_users.get(tenant_id, [])
         users = [self._users[uid] for uid in user_ids if uid in self._users]
-        
+
         if role:
             users = [u for u in users if u.role == role]
         if status:
             users = [u for u in users if u.status == status]
-        
+
         return users
-    
+
     def update_user(
         self,
         user_id: str,
@@ -147,41 +147,41 @@ class UserManager:
         user = self._users.get(user_id)
         if not user:
             return None
-        
+
         if role is not None:
             user.role = role
         if status is not None:
             user.status = status
         if profile is not None:
             user.profile.update(profile)
-        
+
         user.updated_at = datetime.utcnow()
         return user
-    
+
     def delete_user(self, user_id: str) -> bool:
         """删除用户"""
         user = self._users.get(user_id)
         if not user:
             return False
-        
+
         del self._users[user_id]
         del self._email_index[user.email]
-        
+
         if user.tenant_id in self._tenant_users:
             self._tenant_users[user.tenant_id].remove(user_id)
-        
+
         return True
-    
+
     def has_permission(self, user_id: str, permission: str) -> bool:
         """检查用户是否有特定权限"""
         user = self._users.get(user_id)
         if not user:
             return False
-        
+
         # 所有者拥有所有权限
         if user.role == UserRole.OWNER:
             return True
-        
+
         # 管理员拥有大部分权限
         if user.role == UserRole.ADMIN:
             admin_permissions = [
@@ -191,7 +191,7 @@ class UserManager:
                 "setting:read", "setting:write",
             ]
             return permission in admin_permissions or permission in user.permissions
-        
+
         # 普通成员
         if user.role == UserRole.MEMBER:
             member_permissions = [
@@ -201,10 +201,10 @@ class UserManager:
                 "setting:read",
             ]
             return permission in member_permissions or permission in user.permissions
-        
+
         # 只读用户
         if user.role == UserRole.VIEWER:
             viewer_permissions = ["user:read", "skill:read", "workflow:read"]
             return permission in viewer_permissions or permission in user.permissions
-        
+
         return permission in user.permissions

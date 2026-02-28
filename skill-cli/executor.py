@@ -51,17 +51,17 @@ class ParsedIntent:
 
 class SkillHandler(ABC):
     """技能处理器基类"""
-    
+
     @abstractmethod
     def can_handle(self, intent: ParsedIntent) -> bool:
         """判断是否能处理该意图"""
         pass
-    
+
     @abstractmethod
     def execute(self, intent: ParsedIntent) -> ExecutionResult:
         """执行意图"""
         pass
-    
+
     @abstractmethod
     def get_help(self) -> str:
         """获取帮助信息"""
@@ -70,7 +70,7 @@ class SkillHandler(ABC):
 
 class IntentParser:
     """自然语言意图解析器"""
-    
+
     # 技能关键词映射
     SKILL_KEYWORDS = {
         "finance-pro": [
@@ -94,7 +94,7 @@ class IntentParser:
             "trend", "industry"
         ]
     }
-    
+
     # 动作关键词映射
     ACTION_KEYWORDS = {
         "finance-pro": {
@@ -122,23 +122,23 @@ class IntentParser:
             "monitor": ["监控", "monitor", "追踪", "track", "watch"]
         }
     }
-    
+
     def parse(self, command: str) -> ParsedIntent:
         """解析自然语言命令"""
         command_lower = command.lower()
-        
+
         # 1. 识别技能
         skill_name = self._detect_skill(command_lower)
-        
+
         # 2. 识别动作
         action = self._detect_action(skill_name, command_lower)
-        
+
         # 3. 提取参数
         parameters = self._extract_parameters(command, skill_name, action)
-        
+
         # 4. 计算置信度
         confidence = self._calculate_confidence(command, skill_name, action)
-        
+
         return ParsedIntent(
             skill_name=skill_name,
             action=action,
@@ -146,35 +146,35 @@ class IntentParser:
             confidence=confidence,
             raw_command=command
         )
-    
+
     def _detect_skill(self, command: str) -> str:
         """检测技能类型"""
         scores = {}
-        
+
         for skill, keywords in self.SKILL_KEYWORDS.items():
             score = sum(1 for kw in keywords if kw.lower() in command)
             scores[skill] = score
-        
+
         # 返回得分最高的技能，如果没有匹配则返回finance-pro作为默认
         if max(scores.values()) > 0:
             return max(scores, key=scores.get)
         return "finance-pro"
-    
+
     def _detect_action(self, skill_name: str, command: str) -> str:
         """检测动作类型"""
         if skill_name not in self.ACTION_KEYWORDS:
             return "help"
-        
+
         actions = self.ACTION_KEYWORDS[skill_name]
         scores = {}
-        
+
         for action, keywords in actions.items():
             score = sum(1 for kw in keywords if kw.lower() in command)
             scores[action] = score
-        
+
         if max(scores.values()) > 0:
             return max(scores, key=scores.get)
-        
+
         # 默认动作
         defaults = {
             "finance-pro": "quote",
@@ -183,11 +183,11 @@ class IntentParser:
             "research-pro": "search"
         }
         return defaults.get(skill_name, "help")
-    
+
     def _extract_parameters(self, command: str, skill_name: str, action: str) -> Dict[str, Any]:
         """提取参数"""
         params = {}
-        
+
         # 股票代码提取 (支持多种格式: 000001.SZ, 600519, 茅台)
         if skill_name == "finance-pro":
             # 提取标准股票代码格式
@@ -196,7 +196,7 @@ class IntentParser:
                 code = stock_match.group(1)
                 suffix = stock_match.group(2) or ".SZ" if code.startswith(("0", "3")) else ".SH"
                 params["symbol"] = f"{code}{suffix}"
-            
+
             # 提取股票名称
             stock_names = ["茅台", "腾讯", "阿里", "比亚迪", "宁德时代", "招商银行"]
             for name in stock_names:
@@ -213,69 +213,69 @@ class IntentParser:
                     }
                     if name in name_to_code:
                         params["symbol"] = name_to_code[name]
-        
+
         # 提取URL/路径
         url_match = re.search(r'https?://[^\s]+', command)
         if url_match:
             params["url"] = url_match.group(0)
-        
+
         path_match = re.search(r'[\./][\w\-/]+\.\w+', command)
         if path_match:
             params["path"] = path_match.group(0)
-        
+
         # 提取主题/查询
         if "关于" in command:
             topic_match = re.search(r'关于["\']?([^"\']+)["\']?', command)
             if topic_match:
                 params["topic"] = topic_match.group(1)
-        
+
         if "生成" in command or "create" in command.lower():
             gen_match = re.search(r'生成["\']?([^"\']+)["\']?', command)
             if gen_match:
                 params["prompt"] = gen_match.group(1)
-        
+
         return params
-    
+
     def _calculate_confidence(self, command: str, skill_name: str, action: str) -> float:
         """计算解析置信度"""
         confidence = 0.5  # 基础置信度
-        
+
         # 技能匹配加分
         skill_keywords = self.SKILL_KEYWORDS.get(skill_name, [])
         if any(kw in command.lower() for kw in skill_keywords):
             confidence += 0.2
-        
+
         # 动作匹配加分
         if skill_name in self.ACTION_KEYWORDS:
             action_keywords = self.ACTION_KEYWORDS[skill_name].get(action, [])
             if any(kw in command.lower() for kw in action_keywords):
                 confidence += 0.2
-        
+
         # 参数提取加分
         if self._extract_parameters(command, skill_name, action):
             confidence += 0.1
-        
+
         return min(confidence, 1.0)
 
 
 class SkillRouter:
     """技能路由器 - 选择并执行对应的技能处理器"""
-    
+
     def __init__(self):
         self.handlers: Dict[str, SkillHandler] = {}
         self._register_handlers()
-    
+
     def _register_handlers(self):
         """注册所有技能处理器"""
         self.handlers["finance-pro"] = FinanceProHandler()
         self.handlers["coding-pro"] = CodingProHandler()
         self.handlers["product-pro"] = ProductProHandler()
         self.handlers["research-pro"] = ResearchProHandler()
-    
+
     def route(self, intent: ParsedIntent) -> Optional[SkillHandler]:
         """根据意图路由到对应的处理器"""
         return self.handlers.get(intent.skill_name)
-    
+
     def get_available_skills(self) -> List[str]:
         """获取所有可用技能"""
         return list(self.handlers.keys())
@@ -283,27 +283,27 @@ class SkillRouter:
 
 class FinanceProHandler(SkillHandler):
     """金融专业包处理器 - 使用真实数据适配器"""
-    
+
     def __init__(self):
         self._adapter = None
-    
+
     def _get_adapter(self):
         """懒加载数据适配器"""
         if self._adapter is None:
             from data_adapter import get_finance_adapter
             self._adapter = get_finance_adapter()
         return self._adapter
-    
+
     def can_handle(self, intent: ParsedIntent) -> bool:
         return intent.skill_name == "finance-pro"
-    
+
     def execute(self, intent: ParsedIntent) -> ExecutionResult:
         start_time = time.time()
-        
+
         action = intent.action
         params = intent.parameters
         adapter = self._get_adapter()
-        
+
         try:
             if action == "quote":
                 symbol = params.get("symbol", "000001.SZ")
@@ -317,7 +317,7 @@ class FinanceProHandler(SkillHandler):
                     duration_ms=result.latency_ms or int((time.time() - start_time) * 1000),
                     metadata={"source": result.source}
                 )
-            
+
             elif action == "analyze":
                 symbol = params.get("symbol", "000001.SZ")
                 indicators = params.get("indicators", "MA,RSI").split(",")
@@ -331,7 +331,7 @@ class FinanceProHandler(SkillHandler):
                     duration_ms=result.latency_ms or int((time.time() - start_time) * 1000),
                     metadata={"source": result.source}
                 )
-            
+
             elif action == "financial":
                 symbol = params.get("symbol", "000001.SZ")
                 result = adapter.get_financial_report(symbol)
@@ -344,7 +344,7 @@ class FinanceProHandler(SkillHandler):
                     duration_ms=result.latency_ms or int((time.time() - start_time) * 1000),
                     metadata={"source": result.source}
                 )
-            
+
             elif action == "history":
                 symbol = params.get("symbol", "000001.SZ")
                 period = params.get("period", "1mo")
@@ -358,7 +358,7 @@ class FinanceProHandler(SkillHandler):
                     duration_ms=result.latency_ms or int((time.time() - start_time) * 1000),
                     metadata={"source": result.source}
                 )
-            
+
             else:
                 return ExecutionResult(
                     status=ExecutionStatus.FAILED,
@@ -367,7 +367,7 @@ class FinanceProHandler(SkillHandler):
                     error=f"未知动作: {action}",
                     duration_ms=int((time.time() - start_time) * 1000)
                 )
-                
+
         except Exception as e:
             return ExecutionResult(
                 status=ExecutionStatus.FAILED,
@@ -376,7 +376,7 @@ class FinanceProHandler(SkillHandler):
                 error=str(e),
                 duration_ms=int((time.time() - start_time) * 1000)
             )
-    
+
     def get_help(self) -> str:
         return """
 finance-pro 支持的动作:
@@ -394,16 +394,16 @@ finance-pro 支持的动作:
 
 class CodingProHandler(SkillHandler):
     """编程专业包处理器"""
-    
+
     def can_handle(self, intent: ParsedIntent) -> bool:
         return intent.skill_name == "coding-pro"
-    
+
     def execute(self, intent: ParsedIntent) -> ExecutionResult:
         start_time = time.time()
-        
+
         action = intent.action
         params = intent.parameters
-        
+
         if action == "generate":
             prompt = params.get("prompt", "生成一个Python函数")
             return ExecutionResult(
@@ -418,7 +418,7 @@ class CodingProHandler(SkillHandler):
                 },
                 duration_ms=int((time.time() - start_time) * 1000)
             )
-        
+
         elif action == "review":
             path = params.get("path", "./")
             return ExecutionResult(
@@ -432,7 +432,7 @@ class CodingProHandler(SkillHandler):
                 },
                 duration_ms=int((time.time() - start_time) * 1000)
             )
-        
+
         elif action == "repo":
             return ExecutionResult(
                 status=ExecutionStatus.SUCCESS,
@@ -444,7 +444,7 @@ class CodingProHandler(SkillHandler):
                 },
                 duration_ms=int((time.time() - start_time) * 1000)
             )
-        
+
         elif action == "cicd":
             return ExecutionResult(
                 status=ExecutionStatus.SUCCESS,
@@ -456,7 +456,7 @@ class CodingProHandler(SkillHandler):
                 },
                 duration_ms=int((time.time() - start_time) * 1000)
             )
-        
+
         return ExecutionResult(
             status=ExecutionStatus.FAILED,
             skill_name="coding-pro",
@@ -464,7 +464,7 @@ class CodingProHandler(SkillHandler):
             error=f"未知动作: {action}",
             duration_ms=int((time.time() - start_time) * 1000)
         )
-    
+
     def get_help(self) -> str:
         return """
 coding-pro 支持的动作:
@@ -482,16 +482,16 @@ coding-pro 支持的动作:
 
 class ProductProHandler(SkillHandler):
     """产品专业包处理器"""
-    
+
     def can_handle(self, intent: ParsedIntent) -> bool:
         return intent.skill_name == "product-pro"
-    
+
     def execute(self, intent: ParsedIntent) -> ExecutionResult:
         start_time = time.time()
-        
+
         action = intent.action
         params = intent.parameters
-        
+
         if action == "competitor":
             product = params.get("product", "AI助手")
             return ExecutionResult(
@@ -505,7 +505,7 @@ class ProductProHandler(SkillHandler):
                 },
                 duration_ms=int((time.time() - start_time) * 1000)
             )
-        
+
         elif action == "prd":
             feature = params.get("feature", "新功能")
             return ExecutionResult(
@@ -519,7 +519,7 @@ class ProductProHandler(SkillHandler):
                 },
                 duration_ms=int((time.time() - start_time) * 1000)
             )
-        
+
         elif action == "ppt":
             topic = params.get("topic", "产品介绍")
             return ExecutionResult(
@@ -533,7 +533,7 @@ class ProductProHandler(SkillHandler):
                 },
                 duration_ms=int((time.time() - start_time) * 1000)
             )
-        
+
         elif action == "research":
             return ExecutionResult(
                 status=ExecutionStatus.SUCCESS,
@@ -545,7 +545,7 @@ class ProductProHandler(SkillHandler):
                 },
                 duration_ms=int((time.time() - start_time) * 1000)
             )
-        
+
         return ExecutionResult(
             status=ExecutionStatus.FAILED,
             skill_name="product-pro",
@@ -553,7 +553,7 @@ class ProductProHandler(SkillHandler):
             error=f"未知动作: {action}",
             duration_ms=int((time.time() - start_time) * 1000)
         )
-    
+
     def get_help(self) -> str:
         return """
 product-pro 支持的动作:
@@ -571,27 +571,27 @@ product-pro 支持的动作:
 
 class ResearchProHandler(SkillHandler):
     """研究专业包处理器 - 使用数据适配器"""
-    
+
     def __init__(self):
         self._adapter = None
-    
+
     def _get_adapter(self):
         """懒加载数据适配器"""
         if self._adapter is None:
             from data_adapter import get_research_adapter
             self._adapter = get_research_adapter()
         return self._adapter
-    
+
     def can_handle(self, intent: ParsedIntent) -> bool:
         return intent.skill_name == "research-pro"
-    
+
     def execute(self, intent: ParsedIntent) -> ExecutionResult:
         start_time = time.time()
-        
+
         action = intent.action
         params = intent.parameters
         adapter = self._get_adapter()
-        
+
         try:
             if action == "deep":
                 topic = params.get("topic", "AI发展趋势")
@@ -606,7 +606,7 @@ class ResearchProHandler(SkillHandler):
                     duration_ms=result.latency_ms or int((time.time() - start_time) * 1000),
                     metadata={"source": result.source}
                 )
-            
+
             elif action == "search":
                 query = params.get("query", params.get("topic", "最新AI新闻"))
                 sources = params.get("sources", ["news", "blog"])
@@ -620,7 +620,7 @@ class ResearchProHandler(SkillHandler):
                     duration_ms=result.latency_ms or int((time.time() - start_time) * 1000),
                     metadata={"source": result.source}
                 )
-            
+
             elif action == "analyze":
                 file_path = params.get("file", "data.csv")
                 return ExecutionResult(
@@ -635,7 +635,7 @@ class ResearchProHandler(SkillHandler):
                     },
                     duration_ms=int((time.time() - start_time) * 1000)
                 )
-            
+
             elif action == "monitor":
                 competitors = params.get("competitors", ["竞争对手"])
                 return ExecutionResult(
@@ -649,7 +649,7 @@ class ResearchProHandler(SkillHandler):
                     },
                     duration_ms=int((time.time() - start_time) * 1000)
                 )
-            
+
             else:
                 return ExecutionResult(
                     status=ExecutionStatus.FAILED,
@@ -658,7 +658,7 @@ class ResearchProHandler(SkillHandler):
                     error=f"未知动作: {action}",
                     duration_ms=int((time.time() - start_time) * 1000)
                 )
-                
+
         except Exception as e:
             return ExecutionResult(
                 status=ExecutionStatus.FAILED,
@@ -667,7 +667,7 @@ class ResearchProHandler(SkillHandler):
                 error=str(e),
                 duration_ms=int((time.time() - start_time) * 1000)
             )
-    
+
     def get_help(self) -> str:
         return """
 research-pro 支持的动作:
@@ -686,18 +686,18 @@ research-pro 支持的动作:
 
 class ContextManager:
     """执行上下文管理器"""
-    
+
     def __init__(self):
         self.context: Dict[str, Any] = {
             "session_id": None,
             "history": [],
             "variables": {}
         }
-    
+
     def set_session(self, session_id: str):
         """设置会话ID"""
         self.context["session_id"] = session_id
-    
+
     def add_history(self, command: str, result: ExecutionResult):
         """添加执行历史"""
         self.context["history"].append({
@@ -707,15 +707,15 @@ class ContextManager:
         })
         # 只保留最近10条
         self.context["history"] = self.context["history"][-10:]
-    
+
     def get_variable(self, name: str) -> Any:
         """获取变量"""
         return self.context["variables"].get(name)
-    
+
     def set_variable(self, name: str, value: Any):
         """设置变量"""
         self.context["variables"][name] = value
-    
+
     def get_context(self) -> Dict[str, Any]:
         """获取完整上下文"""
         return self.context.copy()
@@ -723,20 +723,20 @@ class ContextManager:
 
 class SkillExecutor:
     """技能执行器 - 主入口"""
-    
+
     def __init__(self):
         self.intent_parser = IntentParser()
         self.skill_router = SkillRouter()
         self.context_manager = ContextManager()
-    
+
     def execute_natural_language(self, command: str) -> ExecutionResult:
         """执行自然语言命令"""
         # 1. 解析意图
         intent = self.intent_parser.parse(command)
-        
+
         # 2. 路由到处理器
         handler = self.skill_router.route(intent)
-        
+
         if not handler:
             return ExecutionResult(
                 status=ExecutionStatus.FAILED,
@@ -744,7 +744,7 @@ class SkillExecutor:
                 command=command,
                 error=f"未找到技能处理器: {intent.skill_name}"
             )
-        
+
         # 3. 执行
         if handler.can_handle(intent):
             result = handler.execute(intent)
@@ -757,7 +757,7 @@ class SkillExecutor:
                 command=command,
                 error="处理器无法处理该意图"
             )
-    
+
     def execute_direct(self, skill_name: str, action: str, params: Dict[str, Any]) -> ExecutionResult:
         """直接执行指定技能动作"""
         intent = ParsedIntent(
@@ -767,18 +767,18 @@ class SkillExecutor:
             confidence=1.0,
             raw_command=f"{skill_name} {action} {json.dumps(params)}"
         )
-        
+
         handler = self.skill_router.route(intent)
         if handler and handler.can_handle(intent):
             return handler.execute(intent)
-        
+
         return ExecutionResult(
             status=ExecutionStatus.FAILED,
             skill_name=skill_name,
             command=intent.raw_command,
             error=f"无法执行: {skill_name}.{action}"
         )
-    
+
     def get_skill_help(self, skill_name: Optional[str] = None) -> str:
         """获取技能帮助"""
         if skill_name:
@@ -786,7 +786,7 @@ class SkillExecutor:
             if handler:
                 return handler.get_help()
             return f"未找到技能: {skill_name}"
-        
+
         help_text = "可用技能:\n"
         for name, handler in self.skill_router.handlers.items():
             help_text += f"\n{name}:\n{handler.get_help()}\n"
@@ -797,22 +797,22 @@ class SkillExecutor:
 def main():
     """命令行入口"""
     import argparse
-    
+
     parser = argparse.ArgumentParser(description="AI Skill Executor")
     parser.add_argument("command", nargs="?", help="自然语言命令")
     parser.add_argument("--skill", help="指定技能")
     parser.add_argument("--action", help="指定动作")
     parser.add_argument("--params", help="JSON格式参数")
     parser.add_argument("--help-skill", help="显示技能帮助")
-    
+
     args = parser.parse_args()
-    
+
     executor = SkillExecutor()
-    
+
     if args.help_skill:
         print(executor.get_skill_help(args.help_skill))
         return
-    
+
     if args.skill and args.action:
         # 直接执行模式
         params = json.loads(args.params) if args.params else {}
@@ -823,7 +823,7 @@ def main():
     else:
         print(executor.get_skill_help())
         return
-    
+
     # 输出结果
     print(json.dumps({
         "status": result.status.value,

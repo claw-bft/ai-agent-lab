@@ -160,23 +160,23 @@ def handle_list_skills(query_params: dict) -> tuple:
     tag_filter = query_params.get("tag", [None])[0]
     search_query = query_params.get("q", [None])[0]
     sort_by = query_params.get("sort", ["downloads"])[0]
-    
+
     skills = list(SKILLS_REGISTRY.values())
-    
+
     # 标签过滤
     if tag_filter:
         skills = [s for s in skills if tag_filter in s.get("tags", [])]
-    
+
     # 搜索过滤
     if search_query:
         search_lower = search_query.lower()
         skills = [
-            s for s in skills 
-            if (search_lower in s.get("name", "").lower() or 
+            s for s in skills
+            if (search_lower in s.get("name", "").lower() or
                 search_lower in s.get("description", "").lower() or
                 any(search_lower in tag.lower() for tag in s.get("tags", [])))
         ]
-    
+
     # 排序
     if sort_by == "downloads":
         skills.sort(key=lambda x: x.get("downloads", 0), reverse=True)
@@ -184,7 +184,7 @@ def handle_list_skills(query_params: dict) -> tuple:
         skills.sort(key=lambda x: x.get("rating", 0), reverse=True)
     elif sort_by == "updated":
         skills.sort(key=lambda x: x.get("updated_at", ""), reverse=True)
-    
+
     return json_response({
         "skills": skills,
         "total": len(skills),
@@ -204,10 +204,10 @@ def handle_get_skill(skill_name: str) -> tuple:
             "error": "Skill not found",
             "skill": skill_name
         }, 404)
-    
+
     # 增加下载计数（模拟）
     skill["downloads"] = skill.get("downloads", 0) + 1
-    
+
     return json_response({
         "skill": skill,
         "install_command": f"claw install {skill_name}"
@@ -225,7 +225,7 @@ def handle_stats() -> tuple:
     """获取注册表统计信息"""
     total_downloads = sum(s.get("downloads", 0) for s in SKILLS_REGISTRY.values())
     avg_rating = sum(s.get("rating", 0) for s in SKILLS_REGISTRY.values()) / len(SKILLS_REGISTRY) if SKILLS_REGISTRY else 0
-    
+
     return json_response({
         "total_skills": len(SKILLS_REGISTRY),
         "total_downloads": total_downloads,
@@ -245,10 +245,10 @@ def handle_publish(body: dict) -> tuple:
     skill_name = body.get("name")
     if not skill_name:
         return json_response({"error": "Skill name is required"}, 400)
-    
+
     if skill_name in SKILLS_REGISTRY:
         return json_response({"error": "Skill already exists"}, 409)
-    
+
     skill_data = {
         "name": skill_name,
         "version": body.get("version", "1.0.0"),
@@ -261,9 +261,9 @@ def handle_publish(body: dict) -> tuple:
         "repository": body.get("repository", ""),
         "install_url": body.get("install_url", "")
     }
-    
+
     SKILLS_REGISTRY[skill_name] = skill_data
-    
+
     return json_response({
         "message": "Skill published successfully",
         "skill": skill_data
@@ -272,20 +272,20 @@ def handle_publish(body: dict) -> tuple:
 
 class handler(BaseHTTPRequestHandler):
     """Vercel Serverless Handler"""
-    
+
     def do_OPTIONS(self):
         """处理CORS预检请求"""
         self.send_response(200)
         for key, value in cors_headers().items():
             self.send_header(key, value)
         self.end_headers()
-    
+
     def do_GET(self):
         """处理GET请求"""
         parsed_path = urlparse(self.path)
         path = parsed_path.path
         query_params = parse_qs(parsed_path.query)
-        
+
         # 路由分发
         if path == "/api/health" or path == "/health":
             status, body = handle_health()
@@ -313,27 +313,27 @@ class handler(BaseHTTPRequestHandler):
                     "GET /stats"
                 ]
             }, 404)
-        
+
         self.send_response(status)
         for key, value in cors_headers().items():
             self.send_header(key, value)
         self.end_headers()
         self.wfile.write(body.encode())
-    
+
     def do_POST(self):
         """处理POST请求"""
         parsed_path = urlparse(self.path)
         path = parsed_path.path
-        
+
         # 读取请求体
         content_length = int(self.headers.get('Content-Length', 0))
         body = self.rfile.read(content_length) if content_length > 0 else b'{}'
-        
+
         try:
             body_json = json.loads(body.decode())
         except json.JSONDecodeError:
             body_json = {}
-        
+
         if path == "/api/skills" or path == "/skills":
             status, response_body = handle_publish(body_json)
         else:
@@ -341,7 +341,7 @@ class handler(BaseHTTPRequestHandler):
                 "error": "Not found",
                 "path": path
             }, 404)
-        
+
         self.send_response(status)
         for key, value in cors_headers().items():
             self.send_header(key, value)

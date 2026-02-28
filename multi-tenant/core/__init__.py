@@ -14,6 +14,6 @@ from .isolation import ResourceIsolator
 
 __all__ = [
     "TenantManager",
-    "TenantContext", 
+    "TenantContext",
     "ResourceIsolator",
 ]

@@ -43,7 +43,7 @@ class CompetitorInfo:
     pricing: str
     market_share: str = "未知"
     key_features: List[str] = None
-    
+
     def __post_init__(self):
         if self.key_features is None:
             self.key_features = []
@@ -54,27 +54,27 @@ class PRDSection:
     title: str
     content: str
     subsections: List[Dict] = None
-    
+
     def __post_init__(self):
         if self.subsections is None:
             self.subsections = []
 
 class CompetitorAnalyzer:
     """竞品分析引擎"""
-    
+
     def __init__(self):
         self.analysis_framework = {
             "swot": ["优势", "劣势", "机会", "威胁"],
             "4p": ["产品", "价格", "渠道", "推广"],
             "user_journey": ["认知", "考虑", "购买", "使用", "忠诚"]
         }
-    
+
     def analyze(self, product_name: str, competitors: List[str] = None) -> Dict[str, Any]:
         """执行竞品分析"""
-        
+
         if competitors is None:
             competitors = self._infer_competitors(product_name)
-        
+
         analysis = {
             "success": True,
             "product": product_name,
@@ -84,26 +84,26 @@ class CompetitorAnalyzer:
             "comparison_matrix": {},
             "insights": []
         }
-        
+
         # 分析每个竞品
         for comp_name in competitors:
             comp_info = self._analyze_competitor(comp_name, product_name)
             analysis["competitors"].append(asdict(comp_info))
-        
+
         # 生成对比矩阵
         analysis["comparison_matrix"] = self._generate_comparison_matrix(
             product_name, analysis["competitors"]
         )
-        
+
         # 生成洞察
         analysis["insights"] = self._generate_insights(analysis["competitors"])
-        
+
         return analysis
-    
+
     def _infer_competitors(self, product_name: str) -> List[str]:
         """根据产品名称推断竞品"""
         product_lower = product_name.lower()
-        
+
         competitor_map = {
             "ai代码": ["GitHub Copilot", "Cursor", "Codeium", "Tabnine"],
             "代码助手": ["GitHub Copilot", "Cursor", "Codeium", "Tabnine"],
@@ -114,19 +114,19 @@ class CompetitorAnalyzer:
             "项目管理": ["Jira", "Trello", "Asana", "Monday.com"],
             "文档": ["Google Docs", "Microsoft Word", "Notion", "Confluence"],
         }
-        
+
         for key, comps in competitor_map.items():
             if key in product_lower:
                 return comps
-        
+
         # 默认返回通用竞品
         return ["市场领导者A", "创新者B", "价格竞争者C"]
-    
+
     def _analyze_competitor(self, name: str, target_product: str) -> CompetitorInfo:
         """分析单个竞品"""
         # 这里可以接入真实搜索API获取数据
         # 目前使用模拟数据框架
-        
+
         return CompetitorInfo(
             name=name,
             positioning=f"{name}在{target_product}领域的定位",
@@ -145,7 +145,7 @@ class CompetitorAnalyzer:
             market_share="25-30%",
             key_features=["核心功能A", "核心功能B", "核心功能C"]
         )
-    
+
     def _generate_market_overview(self, product_name: str) -> Dict:
         """生成市场概览"""
         return {
@@ -163,31 +163,31 @@ class CompetitorAnalyzer:
                 "数据安全合规"
             ]
         }
-    
+
     def _generate_comparison_matrix(self, product_name: str, competitors: List[Dict]) -> Dict:
         """生成对比矩阵"""
         dimensions = ["功能完整度", "易用性", "价格", "性能", "支持服务"]
-        
+
         matrix = {
             "dimensions": dimensions,
             "products": []
         }
-        
+
         # 添加自身产品
         matrix["products"].append({
             "name": product_name,
             "scores": {d: "待评估" for d in dimensions}
         })
-        
+
         # 添加竞品
         for comp in competitors:
             matrix["products"].append({
                 "name": comp["name"],
                 "scores": {d: "待评估" for d in dimensions}
             })
-        
+
         return matrix
-    
+
     def _generate_insights(self, competitors: List[Dict]) -> List[str]:
         """生成洞察建议"""
         return [
@@ -199,27 +199,27 @@ class CompetitorAnalyzer:
 
 class PRDGenerator:
     """PRD文档生成器"""
-    
+
     def __init__(self):
         self.templates = {
             "standard": self._standard_template,
             "lean": self._lean_template,
             "detailed": self._detailed_template
         }
-    
-    def generate(self, feature_name: str, template: str = "standard", 
+
+    def generate(self, feature_name: str, template: str = "standard",
                  context: Dict = None) -> Dict[str, Any]:
         """生成PRD文档"""
-        
+
         if template not in self.templates:
             return {
                 "success": False,
                 "error": f"未知模板: {template}"
             }
-        
+
         template_func = self.templates[template]
         sections = template_func(feature_name, context or {})
-        
+
         return {
             "success": True,
             "feature": feature_name,
@@ -228,7 +228,7 @@ class PRDGenerator:
             "sections": [asdict(s) for s in sections],
             "markdown": self._to_markdown(feature_name, sections)
         }
-    
+
     def _standard_template(self, feature_name: str, context: Dict) -> List[PRDSection]:
         """标准PRD模板"""
         return [
@@ -277,7 +277,7 @@ class PRDGenerator:
                 content=f"""### 3.1 功能清单
 
 #### 3.1.1 {feature_name} - 核心功能
-**需求描述**: 
+**需求描述**:
 [详细描述功能需求]
 
 **验收标准**:
@@ -370,7 +370,7 @@ class PRDGenerator:
 """
             )
         ]
-    
+
     def _lean_template(self, feature_name: str, context: Dict) -> List[PRDSection]:
         """精简PRD模板"""
         return [
@@ -412,12 +412,12 @@ class PRDGenerator:
 """
             )
         ]
-    
+
     def _detailed_template(self, feature_name: str, context: Dict) -> List[PRDSection]:
         """详细PRD模板"""
         # 在标准模板基础上增加更多细节
         sections = self._standard_template(feature_name, context)
-        
+
         # 增加技术实现章节
         sections.insert(4, PRDSection(
             title="4. 技术方案",
@@ -446,24 +446,24 @@ class PRDGenerator:
 - [依赖2]: 用途
 """
         ))
-        
+
         return sections
-    
+
     def _to_markdown(self, feature_name: str, sections: List[PRDSection]) -> str:
         """转换为Markdown格式"""
         md = f"# {feature_name} - 产品需求文档\n\n"
         md += f"> 生成时间: {datetime.now().strftime('%Y-%m-%d %H:%M')}\n\n"
         md += "---\n\n"
-        
+
         for section in sections:
             md += f"\n{section.content}\n\n"
             md += "---\n"
-        
+
         return md
 
 class PPTGenerator:
     """PPT生成器"""
-    
+
     def __init__(self):
         self.slide_layouts = {
             "title": self._create_title_slide,
@@ -472,32 +472,32 @@ class PPTGenerator:
             "two_column": self._create_two_column_slide,
             "image": self._create_image_slide
         }
-    
-    def generate(self, topic: str, slides_count: int = 10, 
+
+    def generate(self, topic: str, slides_count: int = 10,
                  outline: List[Dict] = None) -> Dict[str, Any]:
         """生成PPT"""
-        
+
         if not PPTX_AVAILABLE:
             return {
                 "success": False,
                 "error": "python-pptx未安装，请运行: pip install python-pptx"
             }
-        
+
         if outline is None:
             outline = self._generate_default_outline(topic, slides_count)
-        
+
         try:
             prs = Presentation()
-            
+
             for slide_info in outline:
                 layout_type = slide_info.get("type", "content")
                 if layout_type in self.slide_layouts:
                     self.slide_layouts[layout_type](prs, slide_info)
-            
+
             # 保存文件
             output_path = f"{topic.replace(' ', '_')}_{datetime.now().strftime('%Y%m%d')}.pptx"
             prs.save(output_path)
-            
+
             return {
                 "success": True,
                 "topic": topic,
@@ -505,13 +505,13 @@ class PPTGenerator:
                 "output_path": output_path,
                 "outline": outline
             }
-        
+
         except Exception as e:
             return {
                 "success": False,
                 "error": f"生成PPT失败: {str(e)}"
             }
-    
+
     def _generate_default_outline(self, topic: str, count: int) -> List[Dict]:
         """生成默认大纲"""
         outline = [
@@ -594,60 +594,60 @@ class PPTGenerator:
                 "subtitle": "Questions?"
             }
         ]
-        
+
         return outline[:count]
-    
+
     def _create_title_slide(self, prs: Presentation, info: Dict):
         """创建标题页"""
         slide_layout = prs.slide_layouts[0]  # Title Slide
         slide = prs.slides.add_slide(slide_layout)
-        
+
         title = slide.shapes.title
         subtitle = slide.placeholders[1]
-        
+
         title.text = info.get("title", "")
         subtitle.text = info.get("subtitle", "")
-    
+
     def _create_content_slide(self, prs: Presentation, info: Dict):
         """创建内容页"""
         slide_layout = prs.slide_layouts[1]  # Title and Content
         slide = prs.slides.add_slide(slide_layout)
-        
+
         title = slide.shapes.title
         content = slide.placeholders[1]
-        
+
         title.text = info.get("title", "")
         content.text = info.get("content", "")
-    
+
     def _create_bullet_slide(self, prs: Presentation, info: Dict):
         """创建列表页"""
         slide_layout = prs.slide_layouts[1]
         slide = prs.slides.add_slide(slide_layout)
-        
+
         title = slide.shapes.title
         body = slide.placeholders[1]
-        
+
         title.text = info.get("title", "")
-        
+
         tf = body.text_frame
         tf.text = info.get("items", [""])[0] if info.get("items") else ""
-        
+
         for item in info.get("items", [])[1:]:
             p = tf.add_paragraph()
             p.text = item
             p.level = 0
-    
+
     def _create_two_column_slide(self, prs: Presentation, info: Dict):
         """创建双栏页"""
         slide_layout = prs.slide_layouts[5]  # Blank
         slide = prs.slides.add_slide(slide_layout)
-        
+
         # 添加标题
         title_shape = slide.shapes.add_textbox(
             Inches(0.5), Inches(0.5), Inches(9), Inches(1)
         )
         title_shape.text_frame.text = info.get("title", "")
-        
+
         # 左栏
         left = info.get("left", {})
         left_box = slide.shapes.add_textbox(
@@ -655,12 +655,12 @@ class PPTGenerator:
         )
         tf = left_box.text_frame
         tf.text = left.get("title", "")
-        
+
         for item in left.get("items", []):
             p = tf.add_paragraph()
             p.text = f"• {item}"
             p.level = 1
-        
+
         # 右栏
         right = info.get("right", {})
         right_box = slide.shapes.add_textbox(
@@ -668,22 +668,22 @@ class PPTGenerator:
         )
         tf = right_box.text_frame
         tf.text = right.get("title", "")
-        
+
         for item in right.get("items", []):
             p = tf.add_paragraph()
             p.text = f"• {item}"
             p.level = 1
-    
+
     def _create_image_slide(self, prs: Presentation, info: Dict):
         """创建图片页"""
         slide_layout = prs.slide_layouts[5]
         slide = prs.slides.add_slide(slide_layout)
-        
+
         title = slide.shapes.add_textbox(
             Inches(0.5), Inches(0.5), Inches(9), Inches(1)
         )
         title.text_frame.text = info.get("title", "")
-        
+
         # 图片占位
         content = slide.shapes.add_textbox(
             Inches(0.5), Inches(1.5), Inches(9), Inches(5)
@@ -692,26 +692,26 @@ class PPTGenerator:
 
 class MarketResearcher:
     """市场研究模块"""
-    
+
     def conduct_research(self, topic: str, method: str = "secondary",
                         target: str = None, sample_size: int = 0) -> Dict[str, Any]:
         """执行市场研究"""
-        
+
         methods = {
             "secondary": self._secondary_research,
             "interview": self._interview_research,
             "survey": self._survey_research,
             "competitive": self._competitive_research
         }
-        
+
         if method not in methods:
             return {
                 "success": False,
                 "error": f"未知研究方法: {method}"
             }
-        
+
         return methods[method](topic, target, sample_size)
-    
+
     def _secondary_research(self, topic: str, target: str, sample_size: int) -> Dict:
         """二手资料研究"""
         return {
@@ -737,7 +737,7 @@ class MarketResearcher:
                 "建立行业专家访谈名单"
             ]
         }
-    
+
     def _interview_research(self, topic: str, target: str, sample_size: int) -> Dict:
         """用户访谈研究"""
         return {
@@ -775,7 +775,7 @@ class MarketResearcher:
 -
 """
         }
-    
+
     def _survey_research(self, topic: str, target: str, sample_size: int) -> Dict:
         """问卷调查"""
         return {
@@ -807,7 +807,7 @@ class MarketResearcher:
             },
             "target_responses": sample_size or 100
         }
-    
+
     def _competitive_research(self, topic: str, target: str, sample_size: int) -> Dict:
         """竞品研究"""
         analyzer = CompetitorAnalyzer()
@@ -816,7 +816,7 @@ class MarketResearcher:
 def main():
     parser = argparse.ArgumentParser(description="Product Pro - 产品经理专业技能包")
     subparsers = parser.add_subparsers(dest="command", help="可用命令")
-    
+
     # 竞品分析命令
     competitor_parser = subparsers.add_parser("competitor", help="竞品分析")
     competitor_parser.add_argument("action", choices=["analyze"])
@@ -824,17 +824,17 @@ def main():
     competitor_parser.add_argument("--competitors", help="竞品列表 (逗号分隔)")
     competitor_parser.add_argument("--output", help="输出文件路径")
     competitor_parser.add_argument("--json", action="store_true", help="JSON格式输出")
-    
+
     # PRD生成命令
     prd_parser = subparsers.add_parser("prd", help="PRD文档生成")
     prd_parser.add_argument("action", choices=["create"])
     prd_parser.add_argument("--feature", required=True, help="功能名称")
-    prd_parser.add_argument("--template", default="standard", 
+    prd_parser.add_argument("--template", default="standard",
                            choices=["standard", "lean", "detailed"],
                            help="PRD模板类型")
     prd_parser.add_argument("--output", help="输出文件路径")
     prd_parser.add_argument("--json", action="store_true", help="JSON格式输出")
-    
+
     # PPT生成命令
     ppt_parser = subparsers.add_parser("ppt", help="PPT生成")
     ppt_parser.add_argument("action", choices=["create"])
@@ -842,7 +842,7 @@ def main():
     ppt_parser.add_argument("--slides", type=int, default=10, help="幻灯片数量")
     ppt_parser.add_argument("--output", help="输出文件路径")
     ppt_parser.add_argument("--json", action="store_true", help="JSON格式输出")
-    
+
     # 市场研究命令
     research_parser = subparsers.add_parser("research", help="市场研究")
     research_parser.add_argument("action", choices=["conduct"])
@@ -853,43 +853,43 @@ def main():
     research_parser.add_argument("--target", help="目标用户群体")
     research_parser.add_argument("--n", type=int, default=0, help="样本数量")
     research_parser.add_argument("--json", action="store_true", help="JSON格式输出")
-    
+
     args = parser.parse_args()
-    
+
     if not args.command:
         parser.print_help()
         sys.exit(1)
-    
+
     result = None
-    
+
     if args.command == "competitor":
         analyzer = CompetitorAnalyzer()
         competitors = None
         if args.competitors:
             competitors = [c.strip() for c in args.competitors.split(",")]
         result = analyzer.analyze(args.product, competitors)
-    
+
     elif args.command == "prd":
         generator = PRDGenerator()
         result = generator.generate(args.feature, args.template)
-        
+
         # 保存Markdown文件
         if result.get("success") and not args.json:
             output_path = args.output or f"PRD_{args.feature.replace(' ', '_')}.md"
             with open(output_path, 'w', encoding='utf-8') as f:
                 f.write(result.get("markdown", ""))
             result["saved_to"] = output_path
-    
+
     elif args.command == "ppt":
         generator = PPTGenerator()
         result = generator.generate(args.topic, args.slides)
-    
+
     elif args.command == "research":
         researcher = MarketResearcher()
         result = researcher.conduct_research(
             args.topic, args.method, args.target, args.n
         )
-    
+
     # 输出结果
     if args.json or (result and not result.get("success")):
         print(json.dumps(result, indent=2, ensure_ascii=False))

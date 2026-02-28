@@ -16,13 +16,13 @@ def create_test_suite():
     """创建测试套件"""
     loader = unittest.TestLoader()
     suite = unittest.TestSuite()
-    
+
     # 添加测试类
     suite.addTests(loader.loadTestsFromTestCase(TestTenantManager))
     suite.addTests(loader.loadTestsFromTestCase(TestTenantContext))
     suite.addTests(loader.loadTestsFromTestCase(TestResourceIsolator))
     suite.addTests(loader.loadTestsFromTestCase(TestAuthManager))
-    
+
     return suite
 
 

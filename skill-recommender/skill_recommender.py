@@ -25,7 +25,7 @@ class Skill:
     version: str = "1.0.0"
     author: str = ""
     updated_at: str = ""
-    
+
     def to_dict(self) -> Dict:
         return {
             "name": self.name,
@@ -50,7 +50,7 @@ class UserInteraction:
     action: str  # 'view', 'download', 'rate', 'install'
     timestamp: datetime
     rating: Optional[int] = None  # 1-5评分
-    
+
     def to_dict(self) -> Dict:
         return {
             "user_id": self.user_id,
@@ -64,18 +64,18 @@ class UserInteraction:
 class SkillRecommender:
     """
     技能推荐引擎
-    
+
     支持多种推荐策略:
     - 协同过滤 (Collaborative Filtering)
     - 基于内容的推荐 (Content-Based)
     - 热门推荐 (Popularity-Based)
     - 混合推荐 (Hybrid)
     """
-    
+
     def __init__(self, skills_data: Optional[List[Dict]] = None):
         """
         初始化推荐器
-        
+
         Args:
             skills_data: 技能包数据列表，如果为None则使用默认数据
         """
@@ -84,16 +84,16 @@ class SkillRecommender:
         self.user_skill_matrix: Dict[str, Dict[str, float]] = defaultdict(dict)
         self.skill_vectors: Dict[str, Dict[str, float]] = {}
         self.idf_scores: Dict[str, float] = {}
-        
+
         # 加载技能数据
         if skills_data:
             self._load_skills(skills_data)
         else:
             self._load_default_skills()
-        
+
         # 构建特征向量
         self._build_skill_vectors()
-    
+
     def _load_skills(self, skills_data: List[Dict]):
         """加载技能数据"""
         for data in skills_data:
@@ -111,7 +111,7 @@ class SkillRecommender:
                 updated_at=data.get("updated_at", "")
             )
             self.skills[skill.name] = skill
-    
+
     def _load_default_skills(self):
         """加载默认技能数据"""
         default_skills = [
@@ -267,65 +267,65 @@ class SkillRecommender:
             }
         ]
         self._load_skills(default_skills)
-    
+
     def _build_skill_vectors(self):
         """构建技能的TF-IDF特征向量"""
         # 收集所有词汇
         all_terms = set()
         term_freq = defaultdict(lambda: defaultdict(int))
-        
+
         for skill_name, skill in self.skills.items():
             # 从描述和标签中提取词汇
             text = skill.description.lower() + " " + " ".join(skill.tags).lower()
             terms = self._tokenize(text)
-            
+
             for term in terms:
                 term_freq[skill_name][term] += 1
                 all_terms.add(term)
-        
+
         # 计算IDF
         n_skills = len(self.skills)
         for term in all_terms:
             doc_count = sum(1 for skill_name in term_freq if term_freq[skill_name][term] > 0)
             self.idf_scores[term] = math.log(n_skills / (doc_count + 1)) + 1
-        
+
         # 构建TF-IDF向量
         for skill_name, skill in self.skills.items():
             vector = {}
             terms = self._tokenize(skill.description.lower() + " " + " ".join(skill.tags).lower())
             term_count = len(terms)
-            
+
             for term in set(terms):
                 tf = term_freq[skill_name][term] / term_count if term_count > 0 else 0
                 idf = self.idf_scores.get(term, 1.0)
                 vector[term] = tf * idf
-            
+
             self.skill_vectors[skill_name] = vector
-    
+
     def _tokenize(self, text: str) -> List[str]:
         """简单分词"""
         # 移除非字母数字字符，分词
         import re
         return re.findall(r'\b[a-zA-Z]+\b', text.lower())
-    
+
     def _cosine_similarity(self, vec1: Dict[str, float], vec2: Dict[str, float]) -> float:
         """计算两个向量的余弦相似度"""
         all_keys = set(vec1.keys()) | set(vec2.keys())
-        
+
         dot_product = sum(vec1.get(k, 0) * vec2.get(k, 0) for k in all_keys)
         norm1 = math.sqrt(sum(v ** 2 for v in vec1.values()))
         norm2 = math.sqrt(sum(v ** 2 for v in vec2.values()))
-        
+
         if norm1 == 0 or norm2 == 0:
             return 0.0
-        
+
         return dot_product / (norm1 * norm2)
-    
+
     def record_interaction(self, user_id: str, skill_name: str,
                            action: str, rating: Optional[int] = None):
         """
         记录用户交互
-        
+
         Args:
             user_id: 用户ID
             skill_name: 技能名称
@@ -340,14 +340,14 @@ class SkillRecommender:
             rating=rating
         )
         self.user_interactions.append(interaction)
-        
+
         # 更新用户-技能矩阵
         weight = self._get_action_weight(action, rating)
         if skill_name in self.user_skill_matrix[user_id]:
             self.user_skill_matrix[user_id][skill_name] += weight
         else:
             self.user_skill_matrix[user_id][skill_name] = weight
-    
+
     def _get_action_weight(self, action: str, rating: Optional[int] = None) -> float:
         """获取交互类型的权重"""
         weights = {
@@ -357,30 +357,30 @@ class SkillRecommender:
             'rate': 1.0
         }
         base_weight = weights.get(action, 0.5)
-        
+
         if action == 'rate' and rating:
             # 评分权重：高分表示更喜欢
             base_weight *= (rating / 3.0)
-        
+
         return base_weight
-    
+
     def get_similar_skills(self, skill_name: str, n_similar: int = 5) -> List[Tuple[str, float]]:
         """
         获取与指定技能相似的技能
-        
+
         Args:
             skill_name: 参考技能名称
             n_similar: 返回的相似技能数量
-            
+
         Returns:
             列表，每项为(技能名称, 相似度分数)
         """
         if skill_name not in self.skills:
             return []
-        
+
         target_vector = self.skill_vectors.get(skill_name, {})
         similarities = []
-        
+
         for name, vector in self.skill_vectors.items():
             if name != skill_name:
                 sim = self._cosine_similarity(target_vector, vector)
@@ -388,28 +388,28 @@ class SkillRecommender:
                 if self.skills[name].category == self.skills[skill_name].category:
                     sim += 0.1
                 similarities.append((name, sim))
-        
+
         # 按相似度排序
         similarities.sort(key=lambda x: x[1], reverse=True)
         return similarities[:n_similar]
-    
+
     def recommend_collaborative(self, user_id: str, n_recommendations: int = 5) -> List[Tuple[str, float]]:
         """
         基于协同过滤的推荐
-        
+
         Args:
             user_id: 用户ID
             n_recommendations: 推荐数量
-            
+
         Returns:
             列表，每项为(技能名称, 推荐分数)
         """
         user_skills = self.user_skill_matrix.get(user_id, {})
-        
+
         if not user_skills:
             # 新用户，返回热门推荐
             return self.recommend_popular(n_recommendations)
-        
+
         # 找到相似用户
         user_similarities = []
         for other_user_id, other_skills in self.user_skill_matrix.items():
@@ -417,100 +417,100 @@ class SkillRecommender:
                 sim = self._user_similarity(user_skills, other_skills)
                 if sim > 0:
                     user_similarities.append((other_user_id, sim))
-        
+
         user_similarities.sort(key=lambda x: x[1], reverse=True)
         top_similar_users = user_similarities[:10]  # 取前10个相似用户
-        
+
         # 基于相似用户的偏好推荐
         skill_scores = defaultdict(float)
-        
+
         for other_user_id, similarity in top_similar_users:
             for skill_name, weight in self.user_skill_matrix[other_user_id].items():
                 if skill_name not in user_skills:  # 只推荐用户未交互过的
                     skill_scores[skill_name] += similarity * weight
-        
+
         # 排序并返回
         recommendations = sorted(skill_scores.items(), key=lambda x: x[1], reverse=True)
         return recommendations[:n_recommendations]
-    
+
     def _user_similarity(self, user1_skills: Dict[str, float],
                          user2_skills: Dict[str, float]) -> float:
         """计算两个用户的相似度（基于共同喜欢的技能）"""
         common_skills = set(user1_skills.keys()) & set(user2_skills.keys())
-        
+
         if not common_skills:
             return 0.0
-        
+
         # 使用余弦相似度
         all_skills = set(user1_skills.keys()) | set(user2_skills.keys())
         vec1 = [user1_skills.get(s, 0) for s in all_skills]
         vec2 = [user2_skills.get(s, 0) for s in all_skills]
-        
+
         dot_product = sum(a * b for a, b in zip(vec1, vec2))
         norm1 = math.sqrt(sum(a ** 2 for a in vec1))
         norm2 = math.sqrt(sum(b ** 2 for b in vec2))
-        
+
         if norm1 == 0 or norm2 == 0:
             return 0.0
-        
+
         return dot_product / (norm1 * norm2)
-    
+
     def recommend_content_based(self, user_id: str, n_recommendations: int = 5) -> List[Tuple[str, float]]:
         """
         基于内容的推荐
-        
+
         Args:
             user_id: 用户ID
             n_recommendations: 推荐数量
-            
+
         Returns:
             列表，每项为(技能名称, 推荐分数)
         """
         user_skills = self.user_skill_matrix.get(user_id, {})
-        
+
         if not user_skills:
             return self.recommend_popular(n_recommendations)
-        
+
         # 构建用户偏好向量（基于已交互技能的加权平均）
         user_vector = defaultdict(float)
         total_weight = 0
-        
+
         for skill_name, weight in user_skills.items():
             if skill_name in self.skill_vectors:
                 for term, value in self.skill_vectors[skill_name].items():
                     user_vector[term] += value * weight
                 total_weight += weight
-        
+
         if total_weight > 0:
             for term in user_vector:
                 user_vector[term] /= total_weight
-        
+
         # 计算与所有未交互技能的相似度
         skill_scores = []
         for skill_name, skill_vector in self.skill_vectors.items():
             if skill_name not in user_skills:
                 sim = self._cosine_similarity(dict(user_vector), skill_vector)
                 skill_scores.append((skill_name, sim))
-        
+
         skill_scores.sort(key=lambda x: x[1], reverse=True)
         return skill_scores[:n_recommendations]
-    
+
     def recommend_popular(self, n_recommendations: int = 5,
                           exclude_user: Optional[str] = None) -> List[Tuple[str, float]]:
         """
         基于热门程度的推荐
-        
+
         Args:
             n_recommendations: 推荐数量
             exclude_user: 排除该用户已交互的技能
-            
+
         Returns:
             列表，每项为(技能名称, 推荐分数)
         """
         exclude_skills = set()
         if exclude_user and exclude_user in self.user_skill_matrix:
             exclude_skills = set(self.user_skill_matrix[exclude_user].keys())
-        
+
         # 综合下载量和评分计算热门分数
         popularity_scores = []
         for skill_name, skill in self.skills.items():
@@ -522,20 +522,20 @@ class SkillRecommender:
                 # 综合分数
                 score = download_score * 0.6 + rating_score * 0.4
                 popularity_scores.append((skill_name, score))
-        
+
         popularity_scores.sort(key=lambda x: x[1], reverse=True)
         return popularity_scores[:n_recommendations]
-    
+
     def recommend_for_user(self, user_id: str, n_recommendations: int = 5,
                            strategy: str = "hybrid") -> List[Dict]:
         """
         为用户生成推荐
-        
+
         Args:
             user_id: 用户ID
             n_recommendations: 推荐数量
             strategy: 推荐策略 ('hybrid', 'collaborative', 'content', 'popular')
-            
+
         Returns:
             推荐技能列表，每项包含完整技能信息和推荐分数
         """
@@ -547,7 +547,7 @@ class SkillRecommender:
             recommendations = self.recommend_popular(n_recommendations, user_id)
         else:  # hybrid
             recommendations = self._hybrid_recommend(user_id, n_recommendations)
-        
+
         # 转换为完整技能信息
         result = []
         for skill_name, score in recommendations:
@@ -556,35 +556,35 @@ class SkillRecommender:
                 skill_info["recommend_score"] = round(score, 3)
                 skill_info["recommend_reason"] = self._get_recommend_reason(user_id, skill_name)
                 result.append(skill_info)
-        
+
         return result
-    
+
     def _hybrid_recommend(self, user_id: str, n_recommendations: int) -> List[Tuple[str, float]]:
         """混合推荐策略"""
         # 获取各种策略的推荐
         collaborative = self.recommend_collaborative(user_id, n_recommendations * 2)
         content_based = self.recommend_content_based(user_id, n_recommendations * 2)
         popular = self.recommend_popular(n_recommendations * 2, user_id)
-        
+
         # 加权融合
         skill_scores = defaultdict(float)
-        
+
         # 协同过滤权重 0.4
         for skill_name, score in collaborative:
             skill_scores[skill_name] += score * 0.4
-        
+
         # 内容推荐权重 0.35
         for skill_name, score in content_based:
             skill_scores[skill_name] += score * 0.35
-        
+
         # 热门推荐权重 0.25
         for skill_name, score in popular:
             skill_scores[skill_name] += score * 0.25
-        
+
         # 排序
         recommendations = sorted(skill_scores.items(), key=lambda x: x[1], reverse=True)
         return recommendations[:n_recommendations]
-    
+
     def _get_recommend_reason(self, user_id: str, skill_name: str) -> str:
         """生成推荐理由"""
         user_skills = self.user_skill_matrix.get(user_id, {})
@@ -640,50 +640,50 @@ class SkillRecommender:
             return f"高评分技能 ({skill.rating}⭐)"
 
         return "为您推荐"
-    
+
     def get_trending_skills(self, days: int = 7, n_skills: int = 5) -> List[Dict]:
         """
         获取近期热门技能
-        
+
         Args:
             days: 统计天数
             n_skills: 返回数量
-            
+
         Returns:
             热门技能列表
         """
         cutoff_date = datetime.now() - timedelta(days=days)
-        
+
         # 统计近期交互
         recent_interactions = defaultdict(int)
         for interaction in self.user_interactions:
             if interaction.timestamp >= cutoff_date:
                 recent_interactions[interaction.skill_name] += 1
-        
+
         # 排序
         trending = sorted(recent_interactions.items(), key=lambda x: x[1], reverse=True)
-        
+
         result = []
         for skill_name, count in trending[:n_skills]:
             if skill_name in self.skills:
                 skill_info = self.skills[skill_name].to_dict()
                 skill_info["recent_downloads"] = count
                 result.append(skill_info)
-        
+
         return result
-    
+
     def get_user_profile(self, user_id: str) -> Dict:
         """
         获取用户画像
-        
+
         Args:
             user_id: 用户ID
-            
+
         Returns:
             用户画像信息
         """
         user_skills = self.user_skill_matrix.get(user_id, {})
-        
+
         if not user_skills:
             return {
                 "user_id": user_id,
@@ -692,11 +692,11 @@ class SkillRecommender:
                 "top_skills": [],
                 "activity_level": "new"
             }
-        
+
         # 统计类别偏好
         category_counts = defaultdict(float)
         top_skills = []
-        
+
         for skill_name, weight in sorted(user_skills.items(), key=lambda x: x[1], reverse=True):
             if skill_name in self.skills:
                 skill = self.skills[skill_name]
@@ -706,9 +706,9 @@ class SkillRecommender:
                     "display_name": skill.display_name,
                     "weight": weight
                 })
-        
+
         favorite_category = max(category_counts.items(), key=lambda x: x[1])[0] if category_counts else None
-        
+
         # 活跃度分级
         total_weight = sum(user_skills.values())
         if total_weight > 20:
@@ -719,7 +719,7 @@ class SkillRecommender:
             activity_level = "moderate"
         else:
             activity_level = "casual"
-        
+
         return {
             "user_id": user_id,
             "total_interactions": len(user_skills),
@@ -728,7 +728,7 @@ class SkillRecommender:
             "activity_level": activity_level,
             "category_preferences": dict(category_counts)
         }
-    
+
     def export_model(self) -> Dict:
         """导出推荐模型数据"""
         return {
@@ -739,12 +739,12 @@ class SkillRecommender:
             "idf_scores": self.idf_scores,
             "export_time": datetime.now().isoformat()
         }
-    
+
     def import_model(self, data: Dict):
         """导入推荐模型数据"""
         if "skills" in data:
             self._load_skills(list(data["skills"].values()))
-        
+
         if "user_interactions" in data:
             self.user_interactions = [
                 UserInteraction(
@@ -756,13 +756,13 @@ class SkillRecommender:
                 )
                 for i in data["user_interactions"]
             ]
-        
+
         if "user_skill_matrix" in data:
             self.user_skill_matrix = defaultdict(dict, data["user_skill_matrix"])
-        
+
         if "skill_vectors" in data:
             self.skill_vectors = data["skill_vectors"]
-        
+
         if "idf_scores" in data:
             self.idf_scores = data["idf_scores"]
 
@@ -784,36 +784,36 @@ if __name__ == "__main__":
     print("=" * 60)
     print("AI技能推荐系统演示")
     print("=" * 60)
-    
+
     recommender = SkillRecommender()
-    
+
     # 模拟用户行为
     print("\n1. 模拟用户行为...")
     recommender.record_interaction("user_001", "finance-pro", "download")
     recommender.record_interaction("user_001", "stock-portfolio-analyzer", "download")
     recommender.record_interaction("user_001", "finance-pro", "rate", 5)
-    
+
     recommender.record_interaction("user_002", "coding-pro", "download")
     recommender.record_interaction("user_002", "skill-cli", "download")
     recommender.record_interaction("user_002", "finance-pro", "download")
-    
+
     # 为用户001生成推荐
     print("\n2. 为用户 user_001 生成推荐...")
     recommendations = recommender.recommend_for_user("user_001", n_recommendations=5)
-    
+
     print("\n推荐结果:")
     for i, rec in enumerate(recommendations, 1):
         print(f"  {i}. {rec['display_name']} ({rec['name']})")
         print(f"     分数: {rec['recommend_score']}")
         print(f"     原因: {rec['recommend_reason']}")
-    
+
     # 获取相似技能
     print("\n3. 与 'finance-pro' 相似的技能:")
     similar = recommender.get_similar_skills("finance-pro", n_similar=3)
     for skill_name, score in similar:
         skill = recommender.skills[skill_name]
         print(f"  - {skill.display_name}: {score:.3f}")
-    
+
     # 用户画像
     print("\n4. 用户画像:")
     profile = recommender.get_user_profile("user_001")
@@ -821,7 +821,7 @@ if __name__ == "__main__":
     print(f"  交互次数: {profile['total_interactions']}")
     print(f"  偏好类别: {profile['favorite_category']}")
     print(f"  活跃程度: {profile['activity_level']}")
-    
+
     print("\n" + "=" * 60)
     print("演示完成!")
     print("=" * 60)

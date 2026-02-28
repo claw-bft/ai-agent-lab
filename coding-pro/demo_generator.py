@@ -18,13 +18,13 @@ def demo_template_generation():
     print("=" * 60)
     print("🚀 Coding-Pro AI代码生成器演示")
     print("=" * 60)
-    
+
     generator = AICodeGenerator()
-    
+
     # 示例1: FastAPI用户认证服务
     print("\n📦 示例1: FastAPI用户认证服务")
     print("-" * 40)
-    
+
     request1 = CodeGenerationRequest(
         prompt="创建一个FastAPI用户认证服务，包含注册、登录、JWT token验证",
         language="python",
@@ -33,16 +33,16 @@ def demo_template_generation():
         include_tests=True,
         include_docs=True
     )
-    
+
     # 使用模板生成（无需API）
     result1 = generator.generate(request1)
-    
+
     if result1.success:
         print(f"✅ 生成成功！")
         print(f"   生成文件数: {len(result1.files)}")
         print(f"   依赖项: {', '.join(result1.dependencies[:5])}...")
         print(f"   输出目录: {request1.output_dir}")
-        
+
         # 写入文件
         for file in result1.files:
             filepath = os.path.join(request1.output_dir, file.path)
@@ -52,11 +52,11 @@ def demo_template_generation():
         print(f"   文件已写入: {request1.output_dir}")
     else:
         print(f"❌ 生成失败: {result1.error}")
-    
+
     # 示例2: React组件
     print("\n📦 示例2: React待办事项组件")
     print("-" * 40)
-    
+
     request2 = CodeGenerationRequest(
         prompt="创建一个React待办事项组件，支持添加、删除、标记完成",
         language="typescript",
@@ -65,15 +65,15 @@ def demo_template_generation():
         include_tests=True,
         include_docs=True
     )
-    
+
     result2 = generator.generate(request2)
-    
+
     if result2.success:
         print(f"✅ 生成成功！")
         print(f"   生成文件数: {len(result2.files)}")
         print(f"   依赖项: {', '.join(result2.dependencies[:5])}...")
         print(f"   输出目录: {request2.output_dir}")
-        
+
         for file in result2.files:
             filepath = os.path.join(request2.output_dir, file.path)
             os.makedirs(os.path.dirname(filepath), exist_ok=True)
@@ -82,11 +82,11 @@ def demo_template_generation():
         print(f"   文件已写入: {request2.output_dir}")
     else:
         print(f"❌ 生成失败: {result2.error}")
-    
+
     # 示例3: CLI工具
     print("\n📦 示例3: Python CLI文件处理工具")
     print("-" * 40)
-    
+
     request3 = CodeGenerationRequest(
         prompt="创建一个命令行文件批量重命名工具，支持正则表达式",
         language="python",
@@ -95,14 +95,14 @@ def demo_template_generation():
         include_tests=True,
         include_docs=True
     )
-    
+
     result3 = generator.generate(request3)
-    
+
     if result3.success:
         print(f"✅ 生成成功！")
         print(f"   生成文件数: {len(result3.files)}")
         print(f"   输出目录: {request3.output_dir}")
-        
+
         for file in result3.files:
             filepath = os.path.join(request3.output_dir, file.path)
             os.makedirs(os.path.dirname(filepath), exist_ok=True)
@@ -111,7 +111,7 @@ def demo_template_generation():
         print(f"   文件已写入: {request3.output_dir}")
     else:
         print(f"❌ 生成失败: {result3.error}")
-    
+
     print("\n" + "=" * 60)
     print("✨ 演示完成！")
     print("=" * 60)

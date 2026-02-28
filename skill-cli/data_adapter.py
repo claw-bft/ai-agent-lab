@@ -38,22 +38,22 @@ class FinanceDataAdapter:
     Finance Pro 数据适配器
     将真实 finance_pro.py 功能集成到 skill-cli
     """
-    
+
     def __init__(self):
         self.module = None
         self.status = DataSourceStatus.UNAVAILABLE
         self._load_module()
-    
+
     def _load_module(self):
         """加载 finance_pro 模块"""
         try:
             import importlib.util
             finance_pro_path = SKILLS_DIR / 'finance-pro' / 'finance_pro.py'
-            
+
             if not finance_pro_path.exists():
                 # 尝试其他路径
                 finance_pro_path = SKILLS_DIR / 'finance-pro' / 'finance-pro.py'
-            
+
             if finance_pro_path.exists():
                 spec = importlib.util.spec_from_file_location('finance_pro_real', str(finance_pro_path))
                 self.module = importlib.util.module_from_spec(spec)
@@ -64,23 +64,23 @@ class FinanceDataAdapter:
         except Exception as e:
             print(f"[FinanceAdapter] 加载真实模块失败: {e}", file=sys.stderr)
             self.status = DataSourceStatus.MOCK_MODE
-    
+
     def get_stock_quote(self, symbol: str) -> DataAdapterResult:
         """获取股票实时行情"""
         import time
         start = time.time()
-        
+
         if self.status == DataSourceStatus.AVAILABLE and self.module:
             try:
                 result = self.module.get_stock_quote_a_share(symbol)
                 latency = int((time.time() - start) * 1000)
-                
+
                 # 如果真实数据源返回失败，降级到mock
                 if not result.get("success", False):
                     mock_result = self._mock_quote(symbol)
                     mock_result.error = f"真实数据源失败: {result.get('error')}, 已降级到mock"
                     return mock_result
-                
+
                 return DataAdapterResult(
                     success=True,
                     data=result,
@@ -93,26 +93,26 @@ class FinanceDataAdapter:
                 mock_result = self._mock_quote(symbol)
                 mock_result.error = f"真实数据源异常: {str(e)}, 已降级到mock"
                 return mock_result
-        
+
         # Fallback to mock
         return self._mock_quote(symbol)
-    
+
     def get_stock_history(self, symbol: str, period: str = "1mo") -> DataAdapterResult:
         """获取股票历史数据"""
         import time
         start = time.time()
-        
+
         if self.status == DataSourceStatus.AVAILABLE and self.module:
             try:
                 result = self.module.get_stock_history(symbol, period)
                 latency = int((time.time() - start) * 1000)
-                
+
                 # 如果真实数据源返回失败，降级到mock
                 if not result.get("success", False):
                     mock_result = self._mock_history(symbol)
                     mock_result.error = f"真实数据源失败: {result.get('error')}, 已降级到mock"
                     return mock_result
-                
+
                 return DataAdapterResult(
                     success=True,
                     data=result,
@@ -125,25 +125,25 @@ class FinanceDataAdapter:
                 mock_result = self._mock_history(symbol)
                 mock_result.error = f"真实数据源异常: {str(e)}, 已降级到mock"
                 return mock_result
-        
+
         return self._mock_history(symbol)
-    
+
     def technical_analysis(self, symbol: str, indicators: List[str]) -> DataAdapterResult:
         """技术分析"""
         import time
         start = time.time()
-        
+
         if self.status == DataSourceStatus.AVAILABLE and self.module:
             try:
                 result = self.module.technical_analysis(symbol, indicators)
                 latency = int((time.time() - start) * 1000)
-                
+
                 # 如果真实数据源返回失败，降级到mock
                 if not result.get("success", False):
                     mock_result = self._mock_analysis(symbol, indicators)
                     mock_result.error = f"真实数据源失败: {result.get('error')}, 已降级到mock"
                     return mock_result
-                
+
                 return DataAdapterResult(
                     success=True,
                     data=result,
@@ -156,25 +156,25 @@ class FinanceDataAdapter:
                 mock_result = self._mock_analysis(symbol, indicators)
                 mock_result.error = f"真实数据源异常: {str(e)}, 已降级到mock"
                 return mock_result
-        
+
         return self._mock_analysis(symbol, indicators)
-    
+
     def get_financial_report(self, symbol: str, quarter: str = "latest") -> DataAdapterResult:
         """获取财务报表"""
         import time
         start = time.time()
-        
+
         if self.status == DataSourceStatus.AVAILABLE and self.module:
             try:
                 result = self.module.get_financial_report(symbol, quarter)
                 latency = int((time.time() - start) * 1000)
-                
+
                 # 如果真实数据源返回失败，降级到mock
                 if not result.get("success", False):
                     mock_result = self._mock_financial(symbol)
                     mock_result.error = f"真实数据源失败: {result.get('error')}, 已降级到mock"
                     return mock_result
-                
+
                 return DataAdapterResult(
                     success=True,
                     data=result,
@@ -187,15 +187,15 @@ class FinanceDataAdapter:
                 mock_result = self._mock_financial(symbol)
                 mock_result.error = f"真实数据源异常: {str(e)}, 已降级到mock"
                 return mock_result
-        
+
         return self._mock_financial(symbol)
-    
+
     def _mock_quote(self, symbol: str) -> DataAdapterResult:
         """Mock行情数据"""
         import random
         base_price = random.uniform(10, 200)
         change = random.uniform(-5, 5)
-        
+
         return DataAdapterResult(
             success=True,
             data={
@@ -214,12 +214,12 @@ class FinanceDataAdapter:
             },
             source="mock"
         )
-    
+
     def _mock_history(self, symbol: str) -> DataAdapterResult:
         """Mock历史数据"""
         import random
         from datetime import datetime, timedelta
-        
+
         data = []
         base_price = random.uniform(50, 150)
         for i in range(30):
@@ -234,7 +234,7 @@ class FinanceDataAdapter:
                 "low": round(base_price * 0.98, 2),
                 "volume": random.randint(1000000, 5000000)
             })
-        
+
         return DataAdapterResult(
             success=True,
             data={
@@ -246,11 +246,11 @@ class FinanceDataAdapter:
             },
             source="mock"
         )
-    
+
     def _mock_analysis(self, symbol: str, indicators: List[str]) -> DataAdapterResult:
         """Mock技术分析"""
         import random
-        
+
         results = {}
         for ind in indicators:
             ind = ind.upper()
@@ -275,7 +275,7 @@ class FinanceDataAdapter:
                 }
             else:
                 results[ind] = {"success": False, "error": f"暂未实现指标: {ind}"}
-        
+
         return DataAdapterResult(
             success=True,
             data={
@@ -285,11 +285,11 @@ class FinanceDataAdapter:
             },
             source="mock"
         )
-    
+
     def _mock_financial(self, symbol: str) -> DataAdapterResult:
         """Mock财务数据"""
         import random
-        
+
         return DataAdapterResult(
             success=True,
             data={
@@ -309,10 +309,10 @@ class ResearchDataAdapter:
     Research Pro 数据适配器
     集成搜索和分析功能
     """
-    
+
     def __init__(self):
         self.status = DataSourceStatus.MOCK_MODE
-    
+
     def deep_research(self, topic: str, depth: str = "comprehensive") -> DataAdapterResult:
         """深度研究"""
         # 目前使用mock，后续可接入真实搜索API
@@ -332,7 +332,7 @@ class ResearchDataAdapter:
             },
             source="mock"
         )
-    
+
     def realtime_search(self, query: str, sources: List[str] = None) -> DataAdapterResult:
         """实时搜索"""
         return DataAdapterResult(
@@ -375,7 +375,7 @@ def get_adapter_status() -> Dict[str, Any]:
     """获取所有适配器状态"""
     finance = get_finance_adapter()
     research = get_research_adapter()
-    
+
     return {
         "finance-pro": {
             "status": finance.status.value,
@@ -392,11 +392,11 @@ if __name__ == "__main__":
     # 测试适配器
     print("测试 Finance Data Adapter")
     print("-" * 40)
-    
+
     adapter = get_finance_adapter()
     print(f"适配器状态: {adapter.status.value}")
     print()
-    
+
     # 测试行情获取
     result = adapter.get_stock_quote("000001.SZ")
     print(f"行情查询结果:")
@@ -406,7 +406,7 @@ if __name__ == "__main__":
     if result.data:
         print(f"  数据: {json.dumps(result.data, indent=2, ensure_ascii=False)[:200]}...")
     print()
-    
+
     # 测试技术分析
     result = adapter.technical_analysis("000001.SZ", ["MA", "RSI"])
     print(f"技术分析结果:")

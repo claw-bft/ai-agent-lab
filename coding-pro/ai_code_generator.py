@@ -63,7 +63,7 @@ class APIError(Exception):
 
 class AICodeGenerator:
     """AI代码生成器 - 支持真实AI模型API"""
-    
+
     # 语言模板映射
     LANGUAGE_TEMPLATES = {
         "python": {
@@ -102,7 +102,7 @@ class AICodeGenerator:
             "test_framework": "cargo test"
         }
     }
-    
+
     # 框架模板
     FRAMEWORK_TEMPLATES = {
         "fastapi": {
@@ -126,11 +126,11 @@ class AICodeGenerator:
             "structure": ["src/", "public/", "components/", "hooks/", "utils/"]
         }
     }
-    
+
     def __init__(self, api_provider: str = "claude"):
         """
         初始化代码生成器
-        
+
         Args:
             api_provider: AI模型提供商 (claude, openai, kimi)
         """
@@ -138,7 +138,7 @@ class AICodeGenerator:
         self.api_key = self._get_api_key()
         self.api_client = None
         self._init_api_client()
-    
+
     def _get_api_key(self) -> Optional[str]:
         """获取API密钥"""
         env_vars = {
@@ -146,13 +146,13 @@ class AICodeGenerator:
             "openai": ["OPENAI_API_KEY"],
             "kimi": ["KIMI_API_KEY", "MOONSHOT_API_KEY"]
         }
-        
+
         for var in env_vars.get(self.api_provider, []):
             key = os.getenv(var)
             if key:
                 return key
         return None
-    
+
     def _init_api_client(self):
         """初始化API客户端"""
         if self.api_provider == "claude":
@@ -179,25 +179,25 @@ class AICodeGenerator:
                     )
             except ImportError:
                 pass
-    
+
     def _call_ai_api(self, prompt: str, max_retries: int = 3, request: Optional[CodeGenerationRequest] = None) -> Optional[str]:
         """
         调用AI API生成代码
-        
+
         Args:
             prompt: 生成提示
             max_retries: 最大重试次数
             request: 代码生成请求（用于获取temperature等参数）
-            
+
         Returns:
             生成的代码内容，失败返回None
         """
         if not self.api_client:
             return None
-        
+
         max_tokens = request.max_tokens if request else 4096
         temperature = request.temperature if request else 0.2
-        
+
         system_prompt = """You are an expert software engineer. Generate clean, production-ready code based on the user's requirements.
 
 Rules:
@@ -223,7 +223,7 @@ When generating multiple files, use this format:
                         messages=[{"role": "user", "content": prompt}]
                     )
                     return response.content[0].text
-                    
+
                 elif self.api_provider in ["openai", "kimi"]:
                     model = "gpt-4" if self.api_provider == "openai" else "moonshot-v1-128k"
                     response = self.api_client.chat.completions.create(
@@ -236,7 +236,7 @@ When generating multiple files, use this format:
                         temperature=temperature
                     )
                     return response.choices[0].message.content
-                    
+
             except Exception as e:
                 if attempt < max_retries - 1:
                     wait_time = 2 ** attempt  # 指数退避
@@ -244,30 +244,30 @@ When generating multiple files, use this format:
                     continue
                 print(f"API call failed after {max_retries} attempts: {e}")
                 return None
-        
+
         return None
-    
+
     def generate(self, request: CodeGenerationRequest) -> CodeGenerationResult:
         """
         根据请求生成代码
-        
+
         优先使用AI API，失败时回退到模板生成
         """
         try:
             # 分析需求
             architecture = self._analyze_requirements(request)
-            
+
             # 尝试使用AI API生成
             if self.api_client and self.api_key:
                 ai_result = self._generate_with_ai(request, architecture)
                 if ai_result:
                     return ai_result
-            
+
             # 回退到模板生成
             files = self._generate_files(request, architecture)
             dependencies = self._generate_dependencies(request, architecture)
             setup_instructions = self._generate_setup_instructions(request, architecture)
-            
+
             return CodeGenerationResult(
                 success=True,
                 request=request,
@@ -277,7 +277,7 @@ When generating multiple files, use this format:
                 setup_instructions=setup_instructions,
                 generation_method="template"
             )
-            
+
         except Exception as e:
             return CodeGenerationResult(
                 success=False,
@@ -289,10 +289,10 @@ When generating multiple files, use this format:
                 generation_method="failed",
                 error=str(e)
             )
-    
+
     def _generate_with_ai(self, request: CodeGenerationRequest, architecture: Dict[str, Any]) -> Optional[CodeGenerationResult]:
         """使用AI API生成代码"""
-        
+
         prompt = f"""Generate a complete {request.language} project for the following requirement:
 
 {request.prompt}
@@ -313,22 +313,22 @@ Use the === filename.ext === format for each file."""
         ai_response = self._call_ai_api(prompt, request=request)
         if not ai_response:
             return None
-        
+
         # 解析AI响应，提取文件
         files = self._parse_ai_response(ai_response, request)
-        
+
         # 如果没有解析到文件，回退到模板
         if not files:
             return None
-        
+
         # 确保有基本配置文件
         existing_paths = {f.path for f in files}
         if ".gitignore" not in existing_paths:
             files.extend(self._generate_config_files(request, architecture))
-        
+
         dependencies = self._extract_dependencies_from_files(files, request.language)
         setup_instructions = self._generate_setup_instructions(request, architecture)
-        
+
         return CodeGenerationResult(
             success=True,
             request=request,
@@ -339,28 +339,28 @@ Use the === filename.ext === format for each file."""
             generation_method="ai",
             api_provider=self.api_provider
         )
-    
+
     def _parse_ai_response(self, response: str, request: CodeGenerationRequest) -> List[GeneratedFile]:
         """解析AI响应，提取文件内容"""
         files = []
-        
+
         # 匹配 === filename.ext === 格式
         pattern = r'===\s*(.+?)\s*===\n(.*?)===\s*end\s*==='
         matches = re.findall(pattern, response, re.DOTALL)
-        
+
         for filename, content in matches:
             files.append(GeneratedFile(
                 path=filename.strip(),
                 content=content.strip(),
                 description=f"Generated {filename.strip()}"
             ))
-        
+
         # 如果没有匹配到格式，尝试其他解析方式
         if not files:
             # 尝试匹配代码块
             code_block_pattern = r'```(\w*)\n(.*?)```'
             code_blocks = re.findall(code_block_pattern, response, re.DOTALL)
-            
+
             if code_blocks:
                 ext = self.LANGUAGE_TEMPLATES.get(request.language, {}).get("extension", ".py")
                 files.append(GeneratedFile(
@@ -368,13 +368,13 @@ Use the === filename.ext === format for each file."""
                     content=code_blocks[0][1].strip(),
                     description="Generated main file"
                 ))
-        
+
         return files
-    
+
     def _extract_dependencies_from_files(self, files: List[GeneratedFile], language: str) -> List[str]:
         """从生成的文件中提取依赖"""
         deps = []
-        
+
         for file in files:
             if file.path == "requirements.txt":
                 deps.extend([line.strip() for line in file.content.split('\n') if line.strip() and not line.startswith('#')])
@@ -384,13 +384,13 @@ Use the === filename.ext === format for each file."""
                     deps.extend([f"{k}@{v}" for k, v in pkg.get('dependencies', {}).items()])
                 except:
                     pass
-        
+
         return deps
-    
+
     def _analyze_requirements(self, request: CodeGenerationRequest) -> Dict[str, Any]:
         """分析需求并确定架构"""
         prompt_lower = request.prompt.lower()
-        
+
         # 推断项目类型（注意：更具体的类型优先匹配）
         if any(kw in prompt_lower for kw in ["api", "rest", "endpoint", "service"]):
             project_type = "api"
@@ -402,7 +402,7 @@ Use the === filename.ext === format for each file."""
             project_type = "web"
         else:
             project_type = "generic"
-        
+
         # 推断框架
         framework = request.framework
         if not framework:
@@ -420,7 +420,7 @@ Use the === filename.ext === format for each file."""
                     framework = "express"
                 elif "react" in prompt_lower:
                     framework = "react"
-        
+
         return {
             "project_type": project_type,
             "framework": framework,
@@ -428,7 +428,7 @@ Use the === filename.ext === format for each file."""
             "features": self._extract_features(prompt_lower),
             "complexity": self._estimate_complexity(request.prompt)
         }
-    
+
     def _extract_features(self, prompt: str) -> List[str]:
         """从提示中提取功能特征"""
         features = []
@@ -444,31 +444,31 @@ Use the === filename.ext === format for each file."""
             "websocket": ["websocket", "socket", "realtime", "live"],
             "testing": ["test", "pytest", "unittest", "jest"]
         }
-        
+
         for feature, keywords in feature_keywords.items():
             if any(kw in prompt for kw in keywords):
                 features.append(feature)
-        
+
         return features
-    
+
     def _estimate_complexity(self, prompt: str) -> str:
         """估计项目复杂度"""
         word_count = len(prompt.split())
         feature_count = len(self._extract_features(prompt.lower()))
-        
+
         if word_count > 50 or feature_count > 5:
             return "high"
         elif word_count > 20 or feature_count > 2:
             return "medium"
         return "low"
-    
+
     def _generate_files(self, request: CodeGenerationRequest, architecture: Dict[str, Any]) -> List[GeneratedFile]:
         """生成项目文件 (模板方式)"""
         files = []
         lang = request.language
         framework = architecture.get("framework")
         project_type = architecture.get("project_type")
-        
+
         if project_type == "api":
             files.extend(self._generate_api_files(request, architecture))
         elif project_type == "cli":
@@ -477,23 +477,23 @@ Use the === filename.ext === format for each file."""
             files.extend(self._generate_web_files(request, architecture))
         else:
             files.extend(self._generate_generic_files(request, architecture))
-        
+
         files.extend(self._generate_config_files(request, architecture))
-        
+
         if request.include_tests:
             files.extend(self._generate_test_files(request, architecture))
-        
+
         if request.include_docs:
             files.extend(self._generate_doc_files(request, architecture))
-        
+
         return files
-    
+
     def _generate_api_files(self, request: CodeGenerationRequest, architecture: Dict[str, Any]) -> List[GeneratedFile]:
         """生成API项目文件"""
         files = []
         lang = request.language
         framework = architecture.get("framework")
-        
+
         if lang == "python" and framework == "fastapi":
             files.append(GeneratedFile(
                 path="main.py",
@@ -520,7 +520,7 @@ if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
 '''
             ))
-            
+
             files.append(GeneratedFile(
                 path="requirements.txt",
                 description="Python依赖",
@@ -529,14 +529,14 @@ uvicorn[standard]>=0.24.0
 pydantic>=2.5.0
 '''
             ))
-        
+
         return files
-    
+
     def _generate_cli_files(self, request: CodeGenerationRequest, architecture: Dict[str, Any]) -> List[GeneratedFile]:
         """生成CLI项目文件"""
         files = []
         lang = request.language
-        
+
         if lang == "python":
             files.append(GeneratedFile(
                 path="cli.py",
@@ -556,13 +556,13 @@ if __name__ == "__main__":
     main()
 '''
             ))
-        
+
         return files
-    
+
     def _generate_web_files(self, request: CodeGenerationRequest, architecture: Dict[str, Any]) -> List[GeneratedFile]:
         """生成Web项目文件"""
         files = []
-        
+
         files.append(GeneratedFile(
             path="index.html",
             description="HTML入口",
@@ -582,9 +582,9 @@ if __name__ == "__main__":
 </html>
 '''
         ))
-        
+
         return files
-    
+
     def _generate_generic_files(self, request: CodeGenerationRequest, architecture: Dict[str, Any]) -> List[GeneratedFile]:
         """生成通用项目文件"""
         files = []
@@ -592,7 +592,7 @@ if __name__ == "__main__":
         lang_config = self.LANGUAGE_TEMPLATES.get(lang, {})
         ext = lang_config.get("extension", ".py")
         shebang = lang_config.get("shebang", "")
-        
+
         if lang == "python":
             content = f'''{shebang}
 """Generated Module - AI Code Generator"""
@@ -605,20 +605,20 @@ if __name__ == "__main__":
 '''
         else:
             content = f"// Generated {lang} module\n\nconsole.log('Hello, World!');\n"
-        
+
         files.append(GeneratedFile(
             path=f"main{ext}",
             description="主程序文件",
             content=content
         ))
-        
+
         return files
-    
+
     def _generate_config_files(self, request: CodeGenerationRequest, architecture: Dict[str, Any]) -> List[GeneratedFile]:
         """生成配置文件"""
         files = []
         lang = request.language
-        
+
         # .gitignore
         files.append(GeneratedFile(
             path=".gitignore",
@@ -646,7 +646,7 @@ ENV/
 .DS_Store
 '''
         ))
-        
+
         # .env.example
         files.append(GeneratedFile(
             path=".env.example",
@@ -658,14 +658,14 @@ DEBUG=true
 LOG_LEVEL=info
 '''
         ))
-        
+
         return files
-    
+
     def _generate_test_files(self, request: CodeGenerationRequest, architecture: Dict[str, Any]) -> List[GeneratedFile]:
         """生成测试文件"""
         files = []
         lang = request.language
-        
+
         if lang == "python":
             files.append(GeneratedFile(
                 path="tests/test_main.py",
@@ -682,13 +682,13 @@ if __name__ == "__main__":
     pytest.main([__file__])
 '''
             ))
-        
+
         return files
-    
+
     def _generate_doc_files(self, request: CodeGenerationRequest, architecture: Dict[str, Any]) -> List[GeneratedFile]:
         """生成文档文件"""
         files = []
-        
+
         files.append(GeneratedFile(
             path="README.md",
             description="项目文档",
@@ -709,25 +709,25 @@ See setup instructions below.
 MIT
 '''
         ))
-        
+
         return files
-    
+
     def _generate_dependencies(self, request: CodeGenerationRequest, architecture: Dict[str, Any]) -> List[str]:
         """生成依赖列表"""
         deps = []
         framework = architecture.get("framework")
-        
+
         if framework and framework in self.FRAMEWORK_TEMPLATES:
             deps.extend(self.FRAMEWORK_TEMPLATES[framework]["dependencies"])
-        
+
         return deps
-    
+
     def _generate_setup_instructions(self, request: CodeGenerationRequest, architecture: Dict[str, Any]) -> List[str]:
         """生成设置说明"""
         instructions = []
         lang = request.language
         framework = architecture.get("framework")
-        
+
         if lang == "python":
             instructions.extend([
                 "pip install -r requirements.txt",
@@ -738,9 +738,9 @@ MIT
                 "npm install",
                 "npm start"
             ])
-        
+
         return instructions
-    
+
     def _get_install_command(self, language: str) -> str:
         """获取安装命令"""
         if language == "python":
@@ -752,7 +752,7 @@ MIT
         elif language == "rust":
             return "cargo build"
         return ""
-    
+
     def _get_run_command(self, language: str, architecture: Dict[str, Any]) -> str:
         """获取运行命令"""
         if language == "python":
@@ -764,37 +764,37 @@ MIT
         elif language == "rust":
             return "cargo run"
         return ""
-    
+
     def save_files(self, result: CodeGenerationResult, output_dir: Optional[str] = None) -> List[str]:
         """
         保存生成的文件到磁盘
-        
+
         Args:
             result: 代码生成结果
             output_dir: 输出目录（默认使用request中的output_dir）
-            
+
         Returns:
             保存的文件路径列表
         """
         output_dir = output_dir or result.request.output_dir
         output_path = Path(output_dir)
         output_path.mkdir(parents=True, exist_ok=True)
-        
+
         saved_files = []
-        
+
         for file in result.files:
             file_path = output_path / file.path
             file_path.parent.mkdir(parents=True, exist_ok=True)
             file_path.write_text(file.content, encoding='utf-8')
             saved_files.append(str(file_path))
-        
+
         return saved_files
 
 
 def main():
     """命令行入口"""
     import argparse
-    
+
     parser = argparse.ArgumentParser(description="AI Code Generator")
     parser.add_argument("prompt", help="Code generation prompt")
     parser.add_argument("--language", default="python", help="Target language")
@@ -803,11 +803,11 @@ def main():
     parser.add_argument("--provider", default="claude", help="AI provider (claude/openai/kimi)")
     parser.add_argument("--no-tests", action="store_true", help="Skip test generation")
     parser.add_argument("--no-docs", action="store_true", help="Skip documentation")
-    
+
     args = parser.parse_args()
-    
+
     generator = AICodeGenerator(api_provider=args.provider)
-    
+
     request = CodeGenerationRequest(
         prompt=args.prompt,
         language=args.language,
@@ -816,15 +816,15 @@ def main():
         include_tests=not args.no_tests,
         include_docs=not args.no_docs
     )
-    
+
     result = generator.generate(request)
-    
+
     if result.success:
         print(f"✓ Generated {len(result.files)} files")
         print(f"  Method: {result.generation_method}")
         if result.api_provider:
             print(f"  Provider: {result.api_provider}")
-        
+
         saved = generator.save_files(result)
         print(f"✓ Saved to: {args.output}")
         for f in saved:
@@ -832,7 +832,7 @@ def main():
     else:
         print(f"✗ Generation failed: {result.error}")
         return 1
-    
+
     return 0
 
 
