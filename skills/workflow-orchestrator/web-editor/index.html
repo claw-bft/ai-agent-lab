@@ -773,6 +773,9 @@
                 <button class="toolbar-btn" onclick="app.showTemplates()">
                     <span>📋</span> 模板
                 </button>
+                <button class="toolbar-btn" onclick="app.openNaturalLanguage()">
+                    <span>🎯</span> 自然语言
+                </button>
                 <button class="toolbar-btn" onclick="app.undo()" id="undoBtn" disabled>
                     <span>↩️</span> 撤销
                 </button>
@@ -1875,10 +1878,38 @@
                 this.executionLogs.appendChild(entry);
                 this.executionLogs.scrollTop = this.executionLogs.scrollHeight;
             }
+            // 打开自然语言编排器
+            openNaturalLanguage() {
+                window.open('natural-language.html', '_blank');
+            }
+
+            // 检查并导入自然语言生成的工作流
+            checkNaturalLanguageImport() {
+                const urlParams = new URLSearchParams(window.location.search);
+                if (urlParams.get('import') === 'nl_workflow') {
+                    const saved = localStorage.getItem('nl_workflow_export');
+                    if (saved) {
+                        try {
+                            const workflow = JSON.parse(saved);
+                            this.loadWorkflowData(workflow);
+                            this.log('已从自然语言编排器导入工作流', 'success');
+                            // 清除导入标记
+                            localStorage.removeItem('nl_workflow_export');
+                            // 清除URL参数
+                            window.history.replaceState({}, document.title, window.location.pathname);
+                        } catch (e) {
+                            this.log('导入自然语言工作流失败', 'error');
+                        }
+                    }
+                }
+            }
         }
 
         // 初始化应用
         const app = new WorkflowEditor();
+        
+        // 检查自然语言导入
+        app.checkNaturalLanguageImport();
     </script>
 </body>
 </html>
