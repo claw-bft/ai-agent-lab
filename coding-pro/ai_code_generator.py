@@ -391,15 +391,15 @@ Use the === filename.ext === format for each file."""
         """分析需求并确定架构"""
         prompt_lower = request.prompt.lower()
         
-        # 推断项目类型
+        # 推断项目类型（注意：更具体的类型优先匹配）
         if any(kw in prompt_lower for kw in ["api", "rest", "endpoint", "service"]):
             project_type = "api"
         elif any(kw in prompt_lower for kw in ["cli", "command", "tool", "script"]):
             project_type = "cli"
-        elif any(kw in prompt_lower for kw in ["web", "website", "frontend", "ui"]):
-            project_type = "web"
         elif any(kw in prompt_lower for kw in ["bot", "automation", "scraper", "crawler"]):
             project_type = "automation"
+        elif any(kw in prompt_lower for kw in ["web", "website", "frontend", "ui"]):
+            project_type = "web"
         else:
             project_type = "generic"
         
