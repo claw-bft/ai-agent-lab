@@ -14,7 +14,7 @@ from pathlib import Path
 from typing import Optional
 
 # 默认注册表URL
-DEFAULT_REGISTRY_URL = os.environ.get("CLAWHUB_REGISTRY", "https://clawhub-registry.vercel.app")
+DEFAULT_REGISTRY_URL = os.environ.get("CLAWHUB_REGISTRY", "https://claw-bft.github.io/ai-agent-lab/registry/api")
 
 # 本地技能安装目录
 SKILLS_DIR = Path(os.environ.get("CLAWHUB_SKILLS_DIR", os.path.expanduser("~/.clawhub/skills")))
@@ -30,15 +30,21 @@ class ClawHubClient:
     def _check_connectivity(self):
         """检查注册表连接状态"""
         try:
-            health_url = f"{self.registry_url}/health"
+            # GitHub Pages 没有专门的health端点，检查主skills端点
+            health_url = f"{self.registry_url}/skills.json"
             req = urllib.request.Request(health_url, method="GET")
             req.add_header("Accept", "application/json")
             
             with urllib.request.urlopen(req, timeout=5) as response:
                 if response.status == 200:
-                    data = json.loads(response.read().decode())
                     self.connected = True
-                    self.registry_info = data
+                    self.registry_info = {
+                        "service": "ClawHub Registry",
+                        "version": "1.0.0",
+                        "skills_count": "N/A",
+                        "categories_count": "N/A",
+                        "timestamp": "2026-02-28T00:00:00Z"
+                    }
                 else:
                     self.connected = False
                     self.registry_info = None
@@ -49,17 +55,7 @@ class ClawHubClient:
     
     def list_skills(self, tag: Optional[str] = None, search: Optional[str] = None, sort: str = "downloads"):
         """列出可用技能包"""
-        url = f"{self.registry_url}/skills"
-        params = []
-        if tag:
-            params.append(f"tag={tag}")
-        if search:
-            params.append(f"q={search}")
-        if sort:
-            params.append(f"sort={sort}")
-        
-        if params:
-            url += "?" + "&".join(params)
+        url = f"{self.registry_url}/skills.json"
         
         req = urllib.request.Request(url, method="GET")
         req.add_header("Accept", "application/json")
@@ -69,17 +65,22 @@ class ClawHubClient:
     
     def get_skill(self, name: str):
         """获取技能包详情"""
-        url = f"{self.registry_url}/skills/{name}"
+        url = f"{self.registry_url}/skills.json"
         
         req = urllib.request.Request(url, method="GET")
         req.add_header("Accept", "application/json")
         
         with urllib.request.urlopen(req, timeout=10) as response:
-            return json.loads(response.read().decode())
+            data = json.loads(response.read().decode())
+            skills = data.get("skills", [])
+            for skill in skills:
+                if skill.get("name") == name:
+                    return {"skill": skill}
+            raise urllib.error.HTTPError(url, 404, "Not Found", None, None)
     
     def get_categories(self):
         """获取技能分类"""
-        url = f"{self.registry_url}/categories"
+        url = f"{self.registry_url}/categories.json"
         
         req = urllib.request.Request(url, method="GET")
         req.add_header("Accept", "application/json")
@@ -89,13 +90,27 @@ class ClawHubClient:
     
     def get_stats(self):
         """获取注册表统计"""
-        url = f"{self.registry_url}/stats"
+        url = f"{self.registry_url}/skills.json"
         
         req = urllib.request.Request(url, method="GET")
         req.add_header("Accept", "application/json")
         
         with urllib.request.urlopen(req, timeout=10) as response:
-            return json.loads(response.read().decode())
+            data = json.loads(response.read().decode())
+            skills = data.get("skills", [])
+            total_downloads = sum(s.get("downloads", 0) for s in skills)
+            avg_rating = sum(s.get("rating", 0) for s in skills) / len(skills) if skills else 0
+            
+            # 排序获取热门技能
+            top_skills = sorted(skills, key=lambda x: x.get("downloads", 0), reverse=True)[:5]
+            
+            return {
+                "total_skills": len(skills),
+                "total_downloads": total_downloads,
+                "average_rating": round(avg_rating, 1),
+                "total_categories": 0,  # 静态文件不包含分类数量
+                "top_skills": top_skills
+            }
 
 
 def format_skill_row(skill: dict, index: int) -> str:
