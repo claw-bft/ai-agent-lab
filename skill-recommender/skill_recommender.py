@@ -5,9 +5,8 @@ AI驱动的技能推荐系统
 
 import json
 import math
-import random
 from collections import defaultdict
-from typing import Dict, List, Tuple, Optional, Set
+from typing import Dict, List, Tuple, Optional
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 
@@ -322,8 +321,8 @@ class SkillRecommender:
         
         return dot_product / (norm1 * norm2)
     
-    def record_interaction(self, user_id: str, skill_name: str, 
-                          action: str, rating: Optional[int] = None):
+    def record_interaction(self, user_id: str, skill_name: str,
+                           action: str, rating: Optional[int] = None):
         """
         记录用户交互
         
@@ -434,8 +433,8 @@ class SkillRecommender:
         recommendations = sorted(skill_scores.items(), key=lambda x: x[1], reverse=True)
         return recommendations[:n_recommendations]
     
-    def _user_similarity(self, user1_skills: Dict[str, float], 
-                        user2_skills: Dict[str, float]) -> float:
+    def _user_similarity(self, user1_skills: Dict[str, float],
+                         user2_skills: Dict[str, float]) -> float:
         """计算两个用户的相似度（基于共同喜欢的技能）"""
         common_skills = set(user1_skills.keys()) & set(user2_skills.keys())
         
@@ -496,8 +495,8 @@ class SkillRecommender:
         skill_scores.sort(key=lambda x: x[1], reverse=True)
         return skill_scores[:n_recommendations]
     
-    def recommend_popular(self, n_recommendations: int = 5, 
-                         exclude_user: Optional[str] = None) -> List[Tuple[str, float]]:
+    def recommend_popular(self, n_recommendations: int = 5,
+                          exclude_user: Optional[str] = None) -> List[Tuple[str, float]]:
         """
         基于热门程度的推荐
         
@@ -528,7 +527,7 @@ class SkillRecommender:
         return popularity_scores[:n_recommendations]
     
     def recommend_for_user(self, user_id: str, n_recommendations: int = 5,
-                          strategy: str = "hybrid") -> List[Dict]:
+                           strategy: str = "hybrid") -> List[Dict]:
         """
         为用户生成推荐
         
@@ -590,33 +589,56 @@ class SkillRecommender:
         """生成推荐理由"""
         user_skills = self.user_skill_matrix.get(user_id, {})
         skill = self.skills.get(skill_name)
-        
+
         if not skill:
             return "热门推荐"
-        
+
         # 检查是否有相似用户喜欢
-        if user_skills:
-            for other_user, other_skills in self.user_skill_matrix.items():
-                if other_user != user_id and skill_name in other_skills:
-                    common = set(user_skills.keys()) & set(other_skills.keys())
-                    if common:
-                        return f"与您使用过的 {len(common)} 个技能相似的用户也喜欢"
-        
+        reason = self._get_collaborative_reason(user_id, skill_name, user_skills)
+        if reason:
+            return reason
+
         # 检查内容相似性
-        if user_skills:
-            for user_skill_name in user_skills:
-                if user_skill_name in self.skills:
-                    user_skill = self.skills[user_skill_name]
-                    if user_skill.category == skill.category:
-                        return f"基于您对 {user_skill.display_name} 的喜好推荐"
-        
-        # 基于热门程度
+        reason = self._get_content_reason(user_skills, skill)
+        if reason:
+            return reason
+
+        # 基于热门程度或评分
+        return self._get_popularity_reason(skill)
+
+    def _get_collaborative_reason(self, user_id: str, skill_name: str,
+                                  user_skills: Dict[str, float]) -> Optional[str]:
+        """基于协同过滤生成推荐理由"""
+        if not user_skills:
+            return None
+
+        for other_user, other_skills in self.user_skill_matrix.items():
+            if other_user != user_id and skill_name in other_skills:
+                common = set(user_skills.keys()) & set(other_skills.keys())
+                if common:
+                    return f"与您使用过的 {len(common)} 个技能相似的用户也喜欢"
+        return None
+
+    def _get_content_reason(self, user_skills: Dict[str, float], skill) -> Optional[str]:
+        """基于内容相似性生成推荐理由"""
+        if not user_skills:
+            return None
+
+        for user_skill_name in user_skills:
+            if user_skill_name in self.skills:
+                user_skill = self.skills[user_skill_name]
+                if user_skill.category == skill.category:
+                    return f"基于您对 {user_skill.display_name} 的喜好推荐"
+        return None
+
+    def _get_popularity_reason(self, skill) -> str:
+        """基于热门程度生成推荐理由"""
         if skill.downloads > 300:
             return f"{skill.downloads}+ 次下载的热门技能"
-        
+
         if skill.rating >= 4.5:
             return f"高评分技能 ({skill.rating}⭐)"
-        
+
         return "为您推荐"
     
     def get_trending_skills(self, days: int = 7, n_skills: int = 5) -> List[Dict]:
