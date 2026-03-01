@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-03-01T17:17:00+08:00",
+  "timestamp": "2026-03-01T17:47:00+08:00",
   "news": [
     {
       "id": "news_001",
@@ -16,7 +16,7 @@
       "keywords": ["伊朗", "哈梅内伊", "美以", "军事打击", "中东局势"],
       "category": "国际政治",
       "sentiment": "negative",
-      "url": "https://www.news.cn/world/20260301/..."
+      "url": "https://www.news.cn/world/20260301/"
     },
     {
       "id": "news_002",
@@ -33,78 +33,27 @@
       "keywords": ["OpenAI", "Anthropic", "五角大楼", "AI", "军方"],
       "category": "科技",
       "sentiment": "negative",
-      "url": "https://finance.sina.com.cn/..."
+      "url": "https://finance.sina.com.cn/"
     },
     {
       "id": "news_003",
-      "title": "春节AI应用DAU创新高 豆包达1.45亿",
-      "summary": "QuestMobile数据显示，春节期间三大AI应用创DAU新高：豆包除夕当日DAU达1.45亿，千问7352万，元宝4054万。科技巨头超80亿元红包营销拉动用户使用频次大幅增长。",
-      "source": "新浪科技",
-      "heat": 82.1,
+      "title": "算力需求攀升、智能体价值兑现 2026年AI产业全面提速",
+      "summary": "某人工智能公司智算中心副总经理蒋钦表示，今年春节期间整个行业大模型发布迎来新高峰，对于AI基础设施的需求保持持续高速上涨状态。大装置算力需求持续攀升。",
+      "source": "中国新闻网",
+      "heat": 85.2,
       "impact": {
-        "social": 7.5,
-        "economic": 8.0,
-        "political": 4.0,
-        "tech": 9.0
+        "social": 7.0,
+        "economic": 8.5,
+        "political": 5.0,
+        "tech": 9.5
       },
-      "keywords": ["AI", "豆包", "千问", "元宝", "DAU", "春节"],
+      "keywords": ["AI", "算力", "智能体", "大模型", "智算中心"],
       "category": "科技",
       "sentiment": "positive",
-      "url": "https://k.sina.com.cn/..."
+      "url": "https://www.chinanews.com.cn/cj/2026/03-01/10578574.shtml"
     },
     {
       "id": "news_004",
-      "title": "华为发布U6GHz系列5G-A产品 支持向6G平滑过渡",
-      "summary": "华为在MWC26期间发布覆盖全场景的U6GHz系列化5G-A产品，旨在提升网络性能并支持向6G平滑过渡，为移动AI应用提供大容量、高体验和低时延的网络基础支撑。",
-      "source": "IT之家",
-      "heat": 76.8,
-      "impact": {
-        "social": 5.0,
-        "economic": 7.5,
-        "political": 6.0,
-        "tech": 9.5
-      },
-      "keywords": ["华为", "5G-A", "6G", "MWC", "移动AI"],
-      "category": "科技",
-      "sentiment": "positive",
-      "url": "https://k.sina.com.cn/..."
-    },
-    {
-      "id": "news_005",
-      "title": "中国研发经费3.9万亿 投入强度首超OECD平均水平",
-      "summary": "国家统计局公布2025年数据，中国研发经费总量39262亿元稳居世界第二，投入强度2.8%首次超越OECD国家平均水平，展现从科技大国迈向科技强国的坚实底气。",
-      "source": "新华社",
-      "heat": 74.5,
-      "impact": {
-        "social": 6.0,
-        "economic": 8.0,
-        "political": 7.5,
-        "tech": 9.0
-      },
-      "keywords": ["研发经费", "科技创新", "OECD", "科技强国"],
-      "category": "科技",
-      "sentiment": "positive",
-      "url": "https://k.sina.com.cn/..."
-    },
-    {
-      "id": "news_006",
-      "title": "杭州影院推出烂片退钱模式 20分钟内可退40%",
-      "summary": "杭州西田城时代联合影城试行观影体验保障服务，观众在影片放映20分钟内觉得体验不佳，可申请退还40%票价。此举打破电影消费长期以来的小遗憾，引发行业关注。",
-      "source": "新浪财经",
-      "heat": 71.2,
-      "impact": {
-        "social": 8.0,
-        "economic": 6.5,
-        "political": 3.0,
-        "tech": 2.0
-      },
-      "keywords": ["电影院", "退票", "消费者权益", "杭州"],
-      "category": "社会",
-      "sentiment": "positive",
-      "url": "https://finance.sina.com.cn/..."
-    },
-    {
-      "id": "news_007",
       "title": "美伊冲突升级 霍尔木兹海峡关闭油价或冲150美元",
       "summary": "伊朗宣布禁止任何船只通过霍尔木兹海峡，该海峡承载全球20%原油运输。分析指出若全面封锁，国际油价或飙升至150美元/桶以上，引发全球能源危机。",
       "source": "证券时报/国际金融报",
@@ -118,48 +67,99 @@
       "keywords": ["霍尔木兹海峡", "油价", "能源危机", "美伊冲突"],
       "category": "财经",
       "sentiment": "negative",
-      "url": "https://www.stcn.com/..."
+      "url": "https://www.stcn.com/"
+    },
+    {
+      "id": "news_005",
+      "title": "中国研发经费3.9万亿 投入强度首超OECD平均水平",
+      "summary": "国家统计局公布2025年数据，中国研发经费总量39262亿元稳居世界第二，投入强度2.8%首次超越OECD国家平均水平，展现从科技大国迈向科技强国的坚实底气。",
+      "source": "新华社",
+      "heat": 82.5,
+      "impact": {
+        "social": 6.0,
+        "economic": 8.0,
+        "political": 7.5,
+        "tech": 9.0
+      },
+      "keywords": ["研发经费", "科技创新", "OECD", "科技强国"],
+      "category": "科技",
+      "sentiment": "positive",
+      "url": "https://k.sina.com.cn/"
+    },
+    {
+      "id": "news_006",
+      "title": "第四届北京人工智能产业创新发展大会开幕",
+      "summary": "第四届北京人工智能产业创新发展大会正式开幕，聚焦大模型受追捧加速AI应用端商业化。京西人工智能与机器人场景融合创新中心举行发起仪式，推动物理AI与机器人融合发展。",
+      "source": "新浪科技",
+      "heat": 78.6,
+      "impact": {
+        "social": 6.0,
+        "economic": 7.5,
+        "political": 5.5,
+        "tech": 9.0
+      },
+      "keywords": ["北京", "人工智能", "大模型", "机器人", "物理AI"],
+      "category": "科技",
+      "sentiment": "positive",
+      "url": "https://k.sina.com.cn/article_7857201856_1d45362c001902qzii.html"
+    },
+    {
+      "id": "news_007",
+      "title": "华为发布U6GHz系列5G-A产品 支持向6G平滑过渡",
+      "summary": "华为在MWC26期间发布覆盖全场景的U6GHz系列化5G-A产品，旨在提升网络性能并支持向6G平滑过渡，为移动AI应用提供大容量、高体验和低时延的网络基础支撑。",
+      "source": "IT之家",
+      "heat": 76.8,
+      "impact": {
+        "social": 5.0,
+        "economic": 7.5,
+        "political": 6.0,
+        "tech": 9.5
+      },
+      "keywords": ["华为", "5G-A", "6G", "MWC", "移动AI"],
+      "category": "科技",
+      "sentiment": "positive",
+      "url": "https://k.sina.com.cn/"
     },
     {
       "id": "news_008",
-      "title": "蔚来联合中科大斩获中国AI最高奖吴文俊奖",
-      "summary": "蔚来主导、联合中科大完成的《从视觉理解到世界模型的时空认知关键技术及产业应用》项目荣获2025年度吴文俊人工智能科学技术奖科技进步一等奖。",
-      "source": "CNMO",
-      "heat": 68.5,
+      "title": "全球数字经济崛起"北京标杆" 排名全球第二",
+      "summary": "北京市举行全球数字经济标杆城市建设新闻发布会，市经济和信息化局副局长李辉透露，北京在2025全球数字经济标杆城市指数评价中排名全球第二，展现中国数字经济实力。",
+      "source": "北京市政府",
+      "heat": 75.3,
       "impact": {
         "social": 5.5,
-        "economic": 6.5,
-        "political": 4.0,
+        "economic": 8.5,
+        "political": 6.0,
         "tech": 8.5
       },
-      "keywords": ["蔚来", "中科大", "吴文俊奖", "AI", "世界模型"],
-      "category": "科技",
+      "keywords": ["数字经济", "北京", "全球排名", "标杆城市"],
+      "category": "财经",
       "sentiment": "positive",
-      "url": "https://k.sina.com.cn/..."
+      "url": "https://www.beijing.gov.cn/ywdt/gzdt/202603/t20260301_4546122.html"
     },
     {
       "id": "news_009",
-      "title": "539项国家标准今起实施 涵盖AI算子接口等领域",
-      "summary": "3月1日起，539项国家标准正式实施，包括《人工智能算子接口》系列标准，将提升软件与不同AI处理器适配性，促进人工智能软硬件生态健康发展。",
-      "source": "新京报",
-      "heat": 65.3,
+      "title": "春节AI应用DAU创新高 豆包达1.45亿",
+      "summary": "QuestMobile数据显示，春节期间三大AI应用创DAU新高：豆包除夕当日DAU达1.45亿，千问7352万，元宝4054万。科技巨头超80亿元红包营销拉动用户使用频次大幅增长。",
+      "source": "新浪科技",
+      "heat": 82.1,
       "impact": {
-        "social": 6.0,
-        "economic": 6.5,
-        "political": 7.0,
-        "tech": 8.0
+        "social": 7.5,
+        "economic": 8.0,
+        "political": 4.0,
+        "tech": 9.0
       },
-      "keywords": ["国家标准", "AI", "算子接口", "食品安全"],
-      "category": "政策",
+      "keywords": ["AI", "豆包", "千问", "元宝", "DAU", "春节"],
+      "category": "科技",
       "sentiment": "positive",
-      "url": "https://finance.sina.com.cn/..."
+      "url": "https://k.sina.com.cn/"
     },
     {
       "id": "news_010",
       "title": "中国网络零售连续13年全球第一 规模超23.8万亿",
       "summary": "商务部数据显示，十四五以来中国数字消费整体规模超23.8万亿元，连续13年位居全球最大网络零售市场。2025年网上零售额15.97万亿元，同比增长8.6%。",
       "source": "人民日报",
-      "heat": 72.8,
+      "heat": 79.8,
       "impact": {
         "social": 7.0,
         "economic": 8.5,
@@ -169,48 +169,31 @@
       "keywords": ["网络零售", "电商", "数字消费", "直播带货"],
       "category": "财经",
       "sentiment": "positive",
-      "url": "https://finance.sina.com.cn/..."
+      "url": "https://finance.sina.com.cn/"
     },
     {
       "id": "news_011",
-      "title": "第四届链博会将首设人工智能专区",
-      "summary": "中国贸促会表示，第四届链博会招展工作接近尾声，已有500多家中外企业签约参展。本届将首次设立人工智能专区，系统呈现从数据、算力到应用的全链条生态。",
-      "source": "新京报",
-      "heat": 63.2,
+      "title": "全国政协十四届四次会议3月4日召开",
+      "summary": "中国人民政治协商会议第十四届全国委员会第四次会议于2026年3月4日在北京召开。全国政协十四届四次会议新闻发布会定于3月3日15:00在人民大会堂举行。",
+      "source": "科技日报",
+      "heat": 88.4,
       "impact": {
-        "social": 5.5,
-        "economic": 7.5,
-        "political": 6.0,
-        "tech": 8.5
+        "social": 7.5,
+        "economic": 7.0,
+        "political": 9.5,
+        "tech": 4.0
       },
-      "keywords": ["链博会", "人工智能", "具身智能", "低空经济"],
-      "category": "财经",
-      "sentiment": "positive",
-      "url": "https://news.sina.com.cn/..."
+      "keywords": ["两会", "政协", "全国人大", "政策", "2026"],
+      "category": "政策",
+      "sentiment": "neutral",
+      "url": "https://www.stdaily.com/web/gdxw/2026-03/01/content_478476.html"
     },
     {
       "id": "news_012",
-      "title": "马斯克回怼维基百科创始人 Grokipedia叫板事件升级",
-      "summary": "维基百科创始人Jimmy Wales称马斯克的Grokipedia是滑稽模仿品、注定失败。马斯克在X平台回击称著名的临终遗言，双方围绕中立性和平台定位展开口水战。",
-      "source": "IT之家",
-      "heat": 69.4,
-      "impact": {
-        "social": 6.5,
-        "economic": 4.5,
-        "political": 5.0,
-        "tech": 7.5
-      },
-      "keywords": ["马斯克", "维基百科", "Grokipedia", "X平台"],
-      "category": "科技",
-      "sentiment": "neutral",
-      "url": "https://k.sina.com.cn/..."
-    },
-    {
-      "id": "news_013",
       "title": "AI算力需求引爆光纤行业 价格创七年新高",
       "summary": "国内主流G.652.D单模光纤价格在1月上涨超75%，2月部分报价达60多元/芯公里，创近七年新高。北美科技巨头疯狂扩张AI数据中心，带动全球光纤市场量价齐升。",
       "source": "财闻",
-      "heat": 66.7,
+      "heat": 74.2,
       "impact": {
         "social": 4.5,
         "economic": 7.5,
@@ -220,14 +203,65 @@
       "keywords": ["AI算力", "光纤", "数据中心", "中天科技"],
       "category": "财经",
       "sentiment": "positive",
-      "url": "https://finance.sina.com.cn/..."
+      "url": "https://finance.sina.com.cn/"
+    },
+    {
+      "id": "news_013",
+      "title": "539项国家标准今起实施 涵盖AI算子接口等领域",
+      "summary": "3月1日起，539项国家标准正式实施，包括《人工智能算子接口》系列标准，将提升软件与不同AI处理器适配性，促进人工智能软硬件生态健康发展。",
+      "source": "新京报",
+      "heat": 71.5,
+      "impact": {
+        "social": 6.0,
+        "economic": 6.5,
+        "political": 7.0,
+        "tech": 8.0
+      },
+      "keywords": ["国家标准", "AI", "算子接口", "食品安全"],
+      "category": "政策",
+      "sentiment": "positive",
+      "url": "https://finance.sina.com.cn/"
     },
     {
       "id": "news_014",
+      "title": "第四届链博会将首设人工智能专区",
+      "summary": "中国贸促会表示，第四届链博会招展工作接近尾声，已有500多家中外企业签约参展。本届将首次设立人工智能专区，系统呈现从数据、算力到应用的全链条生态。",
+      "source": "新京报",
+      "heat": 68.3,
+      "impact": {
+        "social": 5.5,
+        "economic": 7.5,
+        "political": 6.0,
+        "tech": 8.5
+      },
+      "keywords": ["链博会", "人工智能", "具身智能", "低空经济"],
+      "category": "财经",
+      "sentiment": "positive",
+      "url": "https://news.sina.com.cn/"
+    },
+    {
+      "id": "news_015",
+      "title": "蔚来联合中科大斩获中国AI最高奖吴文俊奖",
+      "summary": "蔚来主导、联合中科大完成的《从视觉理解到世界模型的时空认知关键技术及产业应用》项目荣获2025年度吴文俊人工智能科学技术奖科技进步一等奖。",
+      "source": "CNMO",
+      "heat": 69.5,
+      "impact": {
+        "social": 5.5,
+        "economic": 6.5,
+        "political": 4.0,
+        "tech": 8.5
+      },
+      "keywords": ["蔚来", "中科大", "吴文俊奖", "AI", "世界模型"],
+      "category": "科技",
+      "sentiment": "positive",
+      "url": "https://k.sina.com.cn/"
+    },
+    {
+      "id": "news_016",
       "title": "特斯拉FSD监督版在阿布扎比启动道路测试",
       "summary": "特斯拉在阿布扎比交通局监管下启动首次FSD监督版道路测试，这是阿联酋首个针对特斯拉FSD的正式测试框架，得到智能与自主系统委员会支持。",
       "source": "IT之家",
-      "heat": 64.8,
+      "heat": 67.8,
       "impact": {
         "social": 5.0,
         "economic": 6.0,
@@ -237,14 +271,14 @@
       "keywords": ["特斯拉", "FSD", "自动驾驶", "阿布扎比"],
       "category": "科技",
       "sentiment": "positive",
-      "url": "https://finance.sina.com.cn/..."
+      "url": "https://finance.sina.com.cn/"
     },
     {
-      "id": "news_015",
+      "id": "news_017",
       "title": "2026年春运95亿人次流动 自驾占比八成",
       "summary": "2026年春运40天全社会跨区域人员流动量预计达95亿人次，其中自驾出行占比高达80%。铁路预计发送5.4亿人次，民航9500万人次，反向过年成新潮流。",
       "source": "中国网",
-      "heat": 70.5,
+      "heat": 72.5,
       "impact": {
         "social": 8.5,
         "economic": 7.0,
@@ -254,43 +288,67 @@
       "keywords": ["春运", "出行", "自驾", "反向过年", "交通"],
       "category": "社会",
       "sentiment": "positive",
-      "url": "http://www.china.com.cn/..."
+      "url": "http://www.china.com.cn/"
+    },
+    {
+      "id": "news_018",
+      "title": "从国产机械臂到虚拟预演解锁春节档影片背后的硬科技",
+      "summary": "一些影视创作者称之为电影制作的"数字化彩排"，这项技术在2026年春节档的多部影片中应用，为影片的拍摄制作降本增效，把更好的效果呈现给观众。",
+      "source": "中国新闻网",
+      "heat": 66.4,
+      "impact": {
+        "social": 6.5,
+        "economic": 5.5,
+        "political": 3.5,
+        "tech": 7.5
+      },
+      "keywords": ["春节档", "虚拟预演", "国产机械臂", "硬科技"],
+      "category": "科技",
+      "sentiment": "positive",
+      "url": "https://www.chinanews.com.cn/cul/2026/03-01/10578741.shtml"
     }
   ],
   "relations": [
-    {"source": "news_001", "target": "news_007", "type": "causal", "strength": 0.95},
+    {"source": "news_001", "target": "news_004", "type": "causal", "strength": 0.95},
     {"source": "news_001", "target": "news_002", "type": "similar", "strength": 0.65},
-    {"source": "news_002", "target": "news_003", "type": "similar", "strength": 0.78},
-    {"source": "news_002", "target": "news_012", "type": "similar", "strength": 0.58},
-    {"source": "news_003", "target": "news_004", "type": "similar", "strength": 0.72},
-    {"source": "news_003", "target": "news_008", "type": "similar", "strength": 0.75},
-    {"source": "news_004", "target": "news_013", "type": "similar", "strength": 0.68},
-    {"source": "news_005", "target": "news_009", "type": "similar", "strength": 0.70},
-    {"source": "news_005", "target": "news_011", "type": "similar", "strength": 0.62},
-    {"source": "news_008", "target": "news_014", "type": "similar", "strength": 0.55},
-    {"source": "news_010", "target": "news_015", "type": "sequential", "strength": 0.60},
-    {"source": "news_003", "target": "news_012", "type": "similar", "strength": 0.52},
-    {"source": "news_004", "target": "news_014", "type": "similar", "strength": 0.65},
-    {"source": "news_007", "target": "news_010", "type": "causal", "strength": 0.58},
-    {"source": "news_009", "target": "news_011", "type": "similar", "strength": 0.68}
+    {"source": "news_002", "target": "news_003", "type": "similar", "strength": 0.82},
+    {"source": "news_002", "target": "news_006", "type": "similar", "strength": 0.75},
+    {"source": "news_003", "target": "news_006", "type": "similar", "strength": 0.88},
+    {"source": "news_003", "target": "news_007", "type": "similar", "strength": 0.72},
+    {"source": "news_003", "target": "news_012", "type": "causal", "strength": 0.85},
+    {"source": "news_004", "target": "news_010", "type": "causal", "strength": 0.68},
+    {"source": "news_005", "target": "news_008", "type": "similar", "strength": 0.78},
+    {"source": "news_005", "target": "news_013", "type": "similar", "strength": 0.72},
+    {"source": "news_006", "target": "news_014", "type": "similar", "strength": 0.80},
+    {"source": "news_006", "target": "news_015", "type": "similar", "strength": 0.65},
+    {"source": "news_007", "target": "news_016", "type": "similar", "strength": 0.70},
+    {"source": "news_009", "target": "news_003", "type": "similar", "strength": 0.85},
+    {"source": "news_009", "target": "news_015", "type": "similar", "strength": 0.68},
+    {"source": "news_011", "target": "news_013", "type": "similar", "strength": 0.75},
+    {"source": "news_011", "target": "news_005", "type": "similar", "strength": 0.62},
+    {"source": "news_012", "target": "news_003", "type": "causal", "strength": 0.88},
+    {"source": "news_014", "target": "news_006", "type": "similar", "strength": 0.82},
+    {"source": "news_015", "target": "news_016", "type": "similar", "strength": 0.72},
+    {"source": "news_017", "target": "news_018", "type": "sequential", "strength": 0.60},
+    {"source": "news_008", "target": "news_010", "type": "similar", "strength": 0.70}
   ],
   "stats": {
-    "total": 15,
-    "highImpact": 5,
+    "total": 18,
+    "highImpact": 6,
     "categories": {
-      "科技": 7,
+      "科技": 9,
       "国际政治": 1,
-      "财经": 3,
-      "社会": 2,
-      "政策": 1,
+      "财经": 4,
+      "社会": 1,
+      "政策": 2,
       "其他": 1
     },
     "sentiment": {
-      "positive": 10,
+      "positive": 14,
       "neutral": 1,
-      "negative": 4
+      "negative": 3
     },
-    "avgHeat": 74.2,
-    "topKeywords": ["AI", "伊朗", "科技", "美国", "中国"]
+    "avgHeat": 77.8,
+    "topKeywords": ["AI", "人工智能", "科技", "中国", "算力"]
   }
 }
