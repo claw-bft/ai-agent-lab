@@ -1,9 +1,8 @@
 {
   "name": "news-intelligence-hub",
   "version": "1.0.0",
-  "description": "热点新闻抓取、关联分析与可视化系统",
+  "description": "新闻情报抓取与可视化仪表板",
   "scripts": {
-    "start": "npx serve .",
-    "deploy": "surge . news-intelligence-hub.surge.sh"
+    "start": "npx serve ."
   }
 }

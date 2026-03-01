@@ -1,66 +1,47 @@
-# News Intelligence Hub
+# 新闻情报仪表板 (News Intelligence Hub)
 
-热点新闻抓取、关联分析与可视化系统
+实时热点新闻抓取、关联分析与可视化仪表板。
 
 ## 功能特性
 
-- **多源新闻抓取**: 支持微博、知乎、今日头条、36氪等热点源
-- **智能关联分析**: 基于语义相似度分析新闻之间的关联关系
-- **影响评估**: 多维度评估新闻的社会、经济、政治、科技影响
-- **可视化仪表板**: 交互式网络图、时间线、热力图等
+- ✅ 实时热点新闻抓取（每30分钟更新）
+- ✅ 新闻关联网络图（D3.js力导向图）
+- ✅ 影响维度雷达图（社会/经济/政治/科技）
+- ✅ 分类分布与情绪分析
+- ✅ 热度时间线与关键词云
+- ✅ 移动端响应式设计
 
-## 安装依赖
+## 部署
+
+### Vercel部署
 
 ```bash
-pip install aiohttp numpy scikit-learn networkx
+# 安装Vercel CLI
+npm i -g vercel
+
+# 登录
+vercel login
+
+# 部署
+vercel --prod
 ```
 
-## 使用方法
+### 本地预览
 
-```python
-from engine import NewsIntelligenceEngine
-import asyncio
-
-engine = NewsIntelligenceEngine()
-
-# 抓取新闻
-news_items = asyncio.run(engine.fetch_news())
-
-# 分析关联
-relations = engine.analyze_correlations(news_items)
-
-# 评估影响
-for item in news_items:
-    impact = engine.assess_impact(item)
-    print(f"{item.title}: 影响评分 {impact.overall_score}")
+```bash
+npx serve .
 ```
 
-## 配置文件
+## 数据来源
 
-编辑 `config.json` 自定义数据源和分析参数：
+- 新浪财经
+- 央视网
+- 中国新闻网
+- 其他公开新闻API
 
-```json
-{
-  "sources": [...],
-  "analysis": {
-    "correlation": {"threshold": 0.75},
-    "impact": {"dimensions": ["social", "economic", "political", "tech"]}
-  }
-}
-```
+## 技术栈
 
-## 可视化仪表板
-
-打开 `dashboard.html` 查看实时热点新闻可视化。
-
-## 定时任务
-
-默认每30分钟自动抓取和分析：
-
-```cron
-*/30 * * * * python engine.py
-```
-
-## License
-
-MIT
+- HTML5 + Tailwind CSS
+- D3.js（网络图）
+- Chart.js（图表）
+- 纯前端静态部署

@@ -1,354 +1,286 @@
 {
-  "timestamp": "2026-03-01T17:47:00+08:00",
+  "timestamp": "2026-03-01T18:47:00+08:00",
   "news": [
     {
       "id": "news_001",
-      "title": "伊朗最高领袖哈梅内伊在美以联合袭击中身亡",
-      "summary": "伊朗多家媒体证实，伊朗最高领袖哈梅内伊在美国和以色列对伊朗的联合军事打击中身亡。伊朗政府宣布进行为期40天的全国哀悼。特朗普称美以轰炸仍将继续，伊朗誓言无限制报复。",
-      "source": "新华社/中新网",
+      "title": "美以联合袭击伊朗，全球金融市场震荡",
+      "summary": "当地时间2月28日，美国和以色列对伊朗发动联合军事打击，目标包括总统府等。伊朗迅速反击，袭击美国在中东军事基地和以色列多地。此冲突导致金融市场剧烈波动，黄金、原油价格上涨，比特币等加密货币暴跌，超15万人爆仓。",
+      "source": "新浪财经",
       "heat": 98.5,
-      "impact": {
-        "social": 9.5,
-        "economic": 8.5,
-        "political": 10.0,
-        "tech": 3.0
-      },
-      "keywords": ["伊朗", "哈梅内伊", "美以", "军事打击", "中东局势"],
+      "impact": {"social": 8.5, "economic": 9.5, "political": 10.0, "tech": 5.0},
+      "keywords": ["伊朗", "美国", "以色列", "中东局势", "原油", "黄金", "地缘政治"],
       "category": "国际政治",
       "sentiment": "negative",
-      "url": "https://www.news.cn/world/20260301/"
+      "url": "https://finance.sina.com.cn/headline/2026-03-01/doc-inhpmqry9406217.shtml"
     },
     {
       "id": "news_002",
-      "title": "特朗普封杀Anthropic OpenAI背刺盟友签下军方大单",
-      "summary": "特朗普政府将Anthropic列为供应链风险，禁止国防部与其合作。OpenAI一边声援Anthropic一边高调签下五角大楼协议，引发业界争议。硅谷AI公司围绕军方合约上演三国杀。",
-      "source": "IT之家/字母榜",
-      "heat": 87.3,
-      "impact": {
-        "social": 6.5,
-        "economic": 7.0,
-        "political": 8.5,
-        "tech": 9.5
-      },
-      "keywords": ["OpenAI", "Anthropic", "五角大楼", "AI", "军方"],
-      "category": "科技",
+      "title": "霍尔木兹停摆，欧佩克+能否稳住油价？",
+      "summary": "伊朗遇袭后霍尔木兹海峡航运因安全风险实质性中断，全球约20%原油海运受阻，船运保费飙升。欧佩克+将于3月1日召开关键会议，消息称其可能激进增产以应对供应紧缩风险。",
+      "source": "新浪财经",
+      "heat": 95.0,
+      "impact": {"social": 7.0, "economic": 9.8, "political": 8.5, "tech": 4.0},
+      "keywords": ["霍尔木兹海峡", "原油", "欧佩克", "油价", "能源"],
+      "category": "财经",
       "sentiment": "negative",
-      "url": "https://finance.sina.com.cn/"
+      "url": "https://news.sina.com.cn/zx/ds/2026-03-01/doc-inhpnscn8995336.shtml"
     },
     {
       "id": "news_003",
-      "title": "算力需求攀升、智能体价值兑现 2026年AI产业全面提速",
-      "summary": "某人工智能公司智算中心副总经理蒋钦表示，今年春节期间整个行业大模型发布迎来新高峰，对于AI基础设施的需求保持持续高速上涨状态。大装置算力需求持续攀升。",
-      "source": "中国新闻网",
-      "heat": 85.2,
-      "impact": {
-        "social": 7.0,
-        "economic": 8.5,
-        "political": 5.0,
-        "tech": 9.5
-      },
-      "keywords": ["AI", "算力", "智能体", "大模型", "智算中心"],
+      "title": "OpenAI狂揽7500亿元，英伟达、亚马逊、软银抢投",
+      "summary": "OpenAI于2026年初宣布获得1100亿美元（约合人民币7544亿元）巨额融资，创下全球AI领域单笔融资规模之最。亚马逊、英伟达和软银为主要投资方，其中亚马逊承诺投资500亿美元。",
+      "source": "新浪财经",
+      "heat": 92.0,
+      "impact": {"social": 6.0, "economic": 8.5, "political": 5.0, "tech": 10.0},
+      "keywords": ["OpenAI", "AI", "融资", "英伟达", "亚马逊", "软银"],
       "category": "科技",
       "sentiment": "positive",
-      "url": "https://www.chinanews.com.cn/cj/2026/03-01/10578574.shtml"
+      "url": "https://news.sina.com.cn/zx/ds/2026-03-01/doc-inhpnscq6100593.shtml"
     },
     {
       "id": "news_004",
-      "title": "美伊冲突升级 霍尔木兹海峡关闭油价或冲150美元",
-      "summary": "伊朗宣布禁止任何船只通过霍尔木兹海峡，该海峡承载全球20%原油运输。分析指出若全面封锁，国际油价或飙升至150美元/桶以上，引发全球能源危机。",
-      "source": "证券时报/国际金融报",
-      "heat": 89.7,
-      "impact": {
-        "social": 7.0,
-        "economic": 9.5,
-        "political": 9.0,
-        "tech": 2.0
-      },
-      "keywords": ["霍尔木兹海峡", "油价", "能源危机", "美伊冲突"],
-      "category": "财经",
+      "title": "特朗普封杀Anthropic，OpenAI先声援后背刺",
+      "summary": "美国国防部推行新合约条款，要求AI公司允许技术用于任何合法用途。Anthropic因坚守禁止大规模监控和自主武器两条红线而拒绝，被DoW终止合作并列入供应链风险名单。OpenAI创始人奥特曼起初公开声援，但数日后却宣布与DoW达成合作。",
+      "source": "新浪财经",
+      "heat": 88.5,
+      "impact": {"social": 7.5, "economic": 6.0, "political": 9.0, "tech": 9.5},
+      "keywords": ["Anthropic", "OpenAI", "AI伦理", "五角大楼", "特朗普"],
+      "category": "科技",
       "sentiment": "negative",
-      "url": "https://www.stcn.com/"
+      "url": "https://news.sina.com.cn/zx/ds/2026-03-01/doc-inhpnscq6100593.shtml"
     },
     {
       "id": "news_005",
-      "title": "中国研发经费3.9万亿 投入强度首超OECD平均水平",
-      "summary": "国家统计局公布2025年数据，中国研发经费总量39262亿元稳居世界第二，投入强度2.8%首次超越OECD国家平均水平，展现从科技大国迈向科技强国的坚实底气。",
-      "source": "新华社",
-      "heat": 82.5,
-      "impact": {
-        "social": 6.0,
-        "economic": 8.0,
-        "political": 7.5,
-        "tech": 9.0
-      },
-      "keywords": ["研发经费", "科技创新", "OECD", "科技强国"],
+      "title": "Claude被特朗普封杀24小时登顶App Store",
+      "summary": "因拒绝五角大楼无限制访问及自主武器开发要求，Anthropic公司旗下AI应用Claude遭特朗普政府全面封杀。此举引发公众强烈反弹，全网掀起抵制OpenAI并转投Claude的浪潮，助推Claude迅速登顶App Store榜首。",
+      "source": "新浪财经",
+      "heat": 87.0,
+      "impact": {"social": 8.0, "economic": 5.5, "political": 8.5, "tech": 9.0},
+      "keywords": ["Claude", "Anthropic", "AI", "App Store", "特朗普"],
       "category": "科技",
-      "sentiment": "positive",
-      "url": "https://k.sina.com.cn/"
+      "sentiment": "neutral",
+      "url": "https://news.sina.com.cn/zx/ds/2026-03-01/doc-inhpnscq6100593.shtml"
     },
     {
       "id": "news_006",
-      "title": "第四届北京人工智能产业创新发展大会开幕",
-      "summary": "第四届北京人工智能产业创新发展大会正式开幕，聚焦大模型受追捧加速AI应用端商业化。京西人工智能与机器人场景融合创新中心举行发起仪式，推动物理AI与机器人融合发展。",
-      "source": "新浪科技",
-      "heat": 78.6,
-      "impact": {
-        "social": 6.0,
-        "economic": 7.5,
-        "political": 5.5,
-        "tech": 9.0
-      },
-      "keywords": ["北京", "人工智能", "大模型", "机器人", "物理AI"],
-      "category": "科技",
+      "title": "人民币汇率三日急涨，央行下调外汇风险准备金率",
+      "summary": "马年春节假期后，人民币汇率三连涨，离岸人民币一度大涨超600基点。2月27日央行宣布，3月2日起将远期售汇外汇风险准备金率从20%降至0，以稳定汇率、降低企业成本。",
+      "source": "新浪财经",
+      "heat": 85.0,
+      "impact": {"social": 6.0, "economic": 9.0, "political": 7.0, "tech": 3.0},
+      "keywords": ["人民币", "汇率", "央行", "外汇", "金融政策"],
+      "category": "财经",
       "sentiment": "positive",
-      "url": "https://k.sina.com.cn/article_7857201856_1d45362c001902qzii.html"
+      "url": "https://finance.sina.com.cn/headline/2026-03-01/doc-inhpmqry9406217.shtml"
     },
     {
       "id": "news_007",
-      "title": "华为发布U6GHz系列5G-A产品 支持向6G平滑过渡",
-      "summary": "华为在MWC26期间发布覆盖全场景的U6GHz系列化5G-A产品，旨在提升网络性能并支持向6G平滑过渡，为移动AI应用提供大容量、高体验和低时延的网络基础支撑。",
-      "source": "IT之家",
-      "heat": 76.8,
-      "impact": {
-        "social": 5.0,
-        "economic": 7.5,
-        "political": 6.0,
-        "tech": 9.5
-      },
-      "keywords": ["华为", "5G-A", "6G", "MWC", "移动AI"],
+      "title": "SpaceX或3月递交IPO申请，估值超1.75万亿美元",
+      "summary": "外媒2月27日报道，SpaceX正推进IPO计划，最快3月保密递交申请，6月正式上市。部分知情人士预计其IPO估值超1.75万亿美元，拟募资500亿美元。该公司通过火箭业务和卫星互联网服务持续增长。",
+      "source": "新浪财经",
+      "heat": 84.0,
+      "impact": {"social": 5.5, "economic": 8.0, "political": 5.0, "tech": 9.5},
+      "keywords": ["SpaceX", "IPO", "马斯克", "航天", "星链"],
       "category": "科技",
       "sentiment": "positive",
-      "url": "https://k.sina.com.cn/"
+      "url": "https://finance.sina.com.cn/headline/2026-03-01/doc-inhpmqry9406217.shtml"
     },
     {
       "id": "news_008",
-      "title": "全球数字经济崛起"北京标杆" 排名全球第二",
-      "summary": "北京市举行全球数字经济标杆城市建设新闻发布会，市经济和信息化局副局长李辉透露，北京在2025全球数字经济标杆城市指数评价中排名全球第二，展现中国数字经济实力。",
-      "source": "北京市政府",
-      "heat": 75.3,
-      "impact": {
-        "social": 5.5,
-        "economic": 8.5,
-        "political": 6.0,
-        "tech": 8.5
-      },
-      "keywords": ["数字经济", "北京", "全球排名", "标杆城市"],
+      "title": "巴菲特最后一季业绩披露，利润同比下降",
+      "summary": "2月28日，伯克希尔·哈撒韦披露2025年第四季度业绩。全年净利润669.68亿美元，低于上年。第四季度营业利润102亿美元，同比降30%，净利润192亿美元，同比降2.5%。",
+      "source": "新浪财经",
+      "heat": 82.0,
+      "impact": {"social": 5.0, "economic": 8.5, "political": 4.0, "tech": 3.0},
+      "keywords": ["巴菲特", "伯克希尔", "财报", "投资"],
       "category": "财经",
-      "sentiment": "positive",
-      "url": "https://www.beijing.gov.cn/ywdt/gzdt/202603/t20260301_4546122.html"
+      "sentiment": "negative",
+      "url": "https://finance.sina.com.cn/headline/2026-03-01/doc-inhpmqry9406217.shtml"
     },
     {
       "id": "news_009",
-      "title": "春节AI应用DAU创新高 豆包达1.45亿",
-      "summary": "QuestMobile数据显示，春节期间三大AI应用创DAU新高：豆包除夕当日DAU达1.45亿，千问7352万，元宝4054万。科技巨头超80亿元红包营销拉动用户使用频次大幅增长。",
-      "source": "新浪科技",
-      "heat": 82.1,
-      "impact": {
-        "social": 7.5,
-        "economic": 8.0,
-        "political": 4.0,
-        "tech": 9.0
-      },
-      "keywords": ["AI", "豆包", "千问", "元宝", "DAU", "春节"],
-      "category": "科技",
-      "sentiment": "positive",
-      "url": "https://k.sina.com.cn/"
+      "title": "AI利空突袭，美科技股集体重挫",
+      "summary": "受人工智能泡沫担忧和美国通胀数据超预期影响，2月27日美股三大指数全线大跌，道指跌超520点，纳指盘中一度大跌近1.5%。大型科技股多数下跌，英伟达再度大跌超4%。",
+      "source": "新浪财经",
+      "heat": 81.0,
+      "impact": {"social": 6.0, "economic": 8.0, "political": 5.0, "tech": 9.0},
+      "keywords": ["AI", "科技股", "美股", "英伟达", "纳指"],
+      "category": "财经",
+      "sentiment": "negative",
+      "url": "https://finance.sina.com.cn/headline/2026-03-01/doc-inhpmqry9406217.shtml"
     },
     {
       "id": "news_010",
-      "title": "中国网络零售连续13年全球第一 规模超23.8万亿",
-      "summary": "商务部数据显示，十四五以来中国数字消费整体规模超23.8万亿元，连续13年位居全球最大网络零售市场。2025年网上零售额15.97万亿元，同比增长8.6%。",
-      "source": "人民日报",
-      "heat": 79.8,
-      "impact": {
-        "social": 7.0,
-        "economic": 8.5,
-        "political": 5.0,
-        "tech": 6.5
-      },
-      "keywords": ["网络零售", "电商", "数字消费", "直播带货"],
+      "title": "2025年GDP增长5%，经济向新向优发展",
+      "summary": "2月28日国家统计局发布公报，2025年国内生产总值1401879亿元，增长5.0%。各产业稳步发展，新质生产力成长，绿色低碳转型成效突出。全年全国居民人均可支配收入43377元，增长5.0%。",
+      "source": "新浪财经",
+      "heat": 80.0,
+      "impact": {"social": 7.5, "economic": 9.0, "political": 8.0, "tech": 6.0},
+      "keywords": ["GDP", "经济增长", "国家统计局", "新质生产力"],
       "category": "财经",
       "sentiment": "positive",
-      "url": "https://finance.sina.com.cn/"
+      "url": "https://finance.sina.com.cn/headline/2026-03-01/doc-inhpmqry9406217.shtml"
     },
     {
       "id": "news_011",
-      "title": "全国政协十四届四次会议3月4日召开",
-      "summary": "中国人民政治协商会议第十四届全国委员会第四次会议于2026年3月4日在北京召开。全国政协十四届四次会议新闻发布会定于3月3日15:00在人民大会堂举行。",
-      "source": "科技日报",
-      "heat": 88.4,
-      "impact": {
-        "social": 7.5,
-        "economic": 7.0,
-        "political": 9.5,
-        "tech": 4.0
-      },
-      "keywords": ["两会", "政协", "全国人大", "政策", "2026"],
-      "category": "政策",
-      "sentiment": "neutral",
-      "url": "https://www.stdaily.com/web/gdxw/2026-03/01/content_478476.html"
+      "title": "华为MWC26展示Atlas 950 SuperPoD超节点产品",
+      "summary": "在MWC26巴塞罗那，华为首次海外展示Atlas 950 SuperPoD等超节点产品。通过创新的灵衢互联协议，华为解决了大规模集群算力利用率低等问题，为AI训练与推理提供高性能算力底座。",
+      "source": "新浪财经",
+      "heat": 78.0,
+      "impact": {"social": 5.0, "economic": 7.0, "political": 6.0, "tech": 9.5},
+      "keywords": ["华为", "MWC", "AI算力", "Atlas", "芯片"],
+      "category": "科技",
+      "sentiment": "positive",
+      "url": "https://news.sina.com.cn/zx/ds/2026-03-01/doc-inhpnscq6100593.shtml"
     },
     {
       "id": "news_012",
-      "title": "AI算力需求引爆光纤行业 价格创七年新高",
-      "summary": "国内主流G.652.D单模光纤价格在1月上涨超75%，2月部分报价达60多元/芯公里，创近七年新高。北美科技巨头疯狂扩张AI数据中心，带动全球光纤市场量价齐升。",
-      "source": "财闻",
-      "heat": 74.2,
-      "impact": {
-        "social": 4.5,
-        "economic": 7.5,
-        "political": 4.0,
-        "tech": 8.0
-      },
-      "keywords": ["AI算力", "光纤", "数据中心", "中天科技"],
-      "category": "财经",
-      "sentiment": "positive",
-      "url": "https://finance.sina.com.cn/"
+      "title": "153家药企上失信榜，特别严重失信激增4倍",
+      "summary": "国家医保局公示第16期医药价格和招采信用评价结果，截至2026年初，全国共有153家医药企业被列入失信名单，其中特别严重失信企业达62家，较上期激增超4倍。",
+      "source": "新浪财经",
+      "heat": 76.0,
+      "impact": {"social": 8.0, "economic": 7.0, "political": 7.5, "tech": 4.0},
+      "keywords": ["医药", "医保", "失信", "监管", "上市公司"],
+      "category": "社会",
+      "sentiment": "negative",
+      "url": "https://news.sina.com.cn/zx/ds/2026-03-01/doc-inhpnscn8995336.shtml"
     },
     {
       "id": "news_013",
-      "title": "539项国家标准今起实施 涵盖AI算子接口等领域",
-      "summary": "3月1日起，539项国家标准正式实施，包括《人工智能算子接口》系列标准，将提升软件与不同AI处理器适配性，促进人工智能软硬件生态健康发展。",
-      "source": "新京报",
-      "heat": 71.5,
-      "impact": {
-        "social": 6.0,
-        "economic": 6.5,
-        "political": 7.0,
-        "tech": 8.0
-      },
-      "keywords": ["国家标准", "AI", "算子接口", "食品安全"],
-      "category": "政策",
-      "sentiment": "positive",
-      "url": "https://finance.sina.com.cn/"
+      "title": "超150家半导体公司业绩揭晓，涨价潮为2026再添变量",
+      "summary": "截至2026年2月底，超150家半导体公司披露2025年业绩。行业营收普遍增长，但利润分化显著。当前，受原材料成本攀升及AI需求爆发驱动，涨价潮已从存储芯片蔓延至功率、模拟等多领域。",
+      "source": "新浪财经",
+      "heat": 75.0,
+      "impact": {"social": 5.0, "economic": 8.0, "political": 5.0, "tech": 9.0},
+      "keywords": ["半导体", "芯片", "AI", "业绩", "涨价"],
+      "category": "科技",
+      "sentiment": "neutral",
+      "url": "https://news.sina.com.cn/zx/ds/2026-03-01/doc-inhpnscn8995336.shtml"
     },
     {
       "id": "news_014",
-      "title": "第四届链博会将首设人工智能专区",
-      "summary": "中国贸促会表示，第四届链博会招展工作接近尾声，已有500多家中外企业签约参展。本届将首次设立人工智能专区，系统呈现从数据、算力到应用的全链条生态。",
-      "source": "新京报",
-      "heat": 68.3,
-      "impact": {
-        "social": 5.5,
-        "economic": 7.5,
-        "political": 6.0,
-        "tech": 8.5
-      },
-      "keywords": ["链博会", "人工智能", "具身智能", "低空经济"],
-      "category": "财经",
+      "title": "中国大模型调用量首超美国",
+      "summary": "2月9日—2月15日这周，中国人工智能大模型以4.12万亿Token的调用量，首次超过同期美国模型的2.94万亿Token。这标志着中国AI应用落地进入新阶段。",
+      "source": "新浪财经",
+      "heat": 74.0,
+      "impact": {"social": 6.0, "economic": 7.5, "political": 6.5, "tech": 9.5},
+      "keywords": ["大模型", "AI", "Token", "中美竞争", "人工智能"],
+      "category": "科技",
       "sentiment": "positive",
-      "url": "https://news.sina.com.cn/"
+      "url": "https://k.sina.com.cn/article_7857201856_1d45362c001902qlx4.html"
     },
     {
       "id": "news_015",
-      "title": "蔚来联合中科大斩获中国AI最高奖吴文俊奖",
-      "summary": "蔚来主导、联合中科大完成的《从视觉理解到世界模型的时空认知关键技术及产业应用》项目荣获2025年度吴文俊人工智能科学技术奖科技进步一等奖。",
-      "source": "CNMO",
-      "heat": 69.5,
-      "impact": {
-        "social": 5.5,
-        "economic": 6.5,
-        "political": 4.0,
-        "tech": 8.5
-      },
-      "keywords": ["蔚来", "中科大", "吴文俊奖", "AI", "世界模型"],
+      "title": "算力需求攀升、智能体价值兑现，2026年AI产业全面提速",
+      "summary": "从算力到大模型，再到智能体，AI企业全力冲刺一季度开门红。位于上海临港的一个大型人工智能计算中心，算力集群已经在马年开启海量运算，为各类大模型训练和AI应用提供高效稳定的算力支持。",
+      "source": "央视网",
+      "heat": 73.0,
+      "impact": {"social": 5.5, "economic": 7.0, "political": 5.0, "tech": 9.5},
+      "keywords": ["算力", "AI", "智能体", "大模型", "智算中心"],
       "category": "科技",
       "sentiment": "positive",
-      "url": "https://k.sina.com.cn/"
+      "url": "https://news.cctv.cn/2026/03/01/ARTIOjYPeka8KWcSaXp3oHcM260301.shtml"
     },
     {
       "id": "news_016",
-      "title": "特斯拉FSD监督版在阿布扎比启动道路测试",
-      "summary": "特斯拉在阿布扎比交通局监管下启动首次FSD监督版道路测试，这是阿联酋首个针对特斯拉FSD的正式测试框架，得到智能与自主系统委员会支持。",
-      "source": "IT之家",
-      "heat": 67.8,
-      "impact": {
-        "social": 5.0,
-        "economic": 6.0,
-        "political": 5.5,
-        "tech": 8.5
-      },
-      "keywords": ["特斯拉", "FSD", "自动驾驶", "阿布扎比"],
-      "category": "科技",
+      "title": "A股二月收官，沪指月线三连阳",
+      "summary": "截至2月27日收盘，上证指数报4162.88点，涨0.39%，月线三连阳，全月累计上涨1.09%。涨价主线如有色金属、化工等板块大幅领跑，北向资金今年以来累计流入逼近3000亿元。",
+      "source": "上海证券报",
+      "heat": 72.0,
+      "impact": {"social": 5.0, "economic": 8.0, "political": 5.0, "tech": 4.0},
+      "keywords": ["A股", "沪指", "股市", "北向资金", "有色金属"],
+      "category": "财经",
       "sentiment": "positive",
-      "url": "https://finance.sina.com.cn/"
+      "url": "https://news.sina.com.cn/zx/ds/2026-03-01/doc-inhpnscn8995336.shtml"
     },
     {
       "id": "news_017",
-      "title": "2026年春运95亿人次流动 自驾占比八成",
-      "summary": "2026年春运40天全社会跨区域人员流动量预计达95亿人次，其中自驾出行占比高达80%。铁路预计发送5.4亿人次，民航9500万人次，反向过年成新潮流。",
-      "source": "中国网",
-      "heat": 72.5,
-      "impact": {
-        "social": 8.5,
-        "economic": 7.0,
-        "political": 4.5,
-        "tech": 3.5
-      },
-      "keywords": ["春运", "出行", "自驾", "反向过年", "交通"],
-      "category": "社会",
-      "sentiment": "positive",
-      "url": "http://www.china.com.cn/"
+      "title": "2026年全国两会即将召开",
+      "summary": "全国政协十四届四次会议和十四届全国人大四次会议分别将于2026年3月4日和3月5日在北京召开。市场关注十五五规划、经济政策、新质生产力等议题。",
+      "source": "中国新闻网",
+      "heat": 70.0,
+      "impact": {"social": 7.0, "economic": 8.5, "political": 9.5, "tech": 6.0},
+      "keywords": ["两会", "十五五", "政策", "经济", "新质生产力"],
+      "category": "政治",
+      "sentiment": "neutral",
+      "url": "https://www.chinanews.com.cn/gn/2026/03-01/10578689.shtml"
     },
     {
       "id": "news_018",
-      "title": "从国产机械臂到虚拟预演解锁春节档影片背后的硬科技",
-      "summary": "一些影视创作者称之为电影制作的"数字化彩排"，这项技术在2026年春节档的多部影片中应用，为影片的拍摄制作降本增效，把更好的效果呈现给观众。",
-      "source": "中国新闻网",
-      "heat": 66.4,
-      "impact": {
-        "social": 6.5,
-        "economic": 5.5,
-        "political": 3.5,
-        "tech": 7.5
-      },
-      "keywords": ["春节档", "虚拟预演", "国产机械臂", "硬科技"],
+      "title": "伊朗确认武装部队总参谋长、防长等高级将领遇袭身亡",
+      "summary": "伊朗官方确认，其武装部队总参谋长、革命卫队总司令、国防委员会秘书及国防部长等多位高级将领，于2月28日在美国和以色列发动的袭击中身亡。",
+      "source": "新浪军事",
+      "heat": 96.0,
+      "impact": {"social": 7.5, "economic": 7.0, "political": 10.0, "tech": 4.0},
+      "keywords": ["伊朗", "军事", "战争", "中东", "将领"],
+      "category": "国际政治",
+      "sentiment": "negative",
+      "url": "https://news.sina.com.cn/zx/ds/2026-03-01/doc-inhpnscn8997707.shtml"
+    },
+    {
+      "id": "news_019",
+      "title": "DeepRare罕见病诊断系统登上《自然》期刊",
+      "summary": "上海交通大学推出的DeepRare从一串代码、一篇论文，走向临床应用。这一全球首个可溯源智能体式罕见病诊断系统将开启大规模真实世界应用研究，预计覆盖超20000例真实病例。",
+      "source": "文汇报",
+      "heat": 68.0,
+      "impact": {"social": 8.0, "economic": 6.0, "political": 5.0, "tech": 9.0},
+      "keywords": ["AI医疗", "罕见病", "DeepRare", "上海交通大学", "《自然》"],
       "category": "科技",
       "sentiment": "positive",
-      "url": "https://www.chinanews.com.cn/cul/2026/03-01/10578741.shtml"
+      "url": "https://finance.sina.com.cn/stock/t/2026-03-01/doc-inhpnmvs6198879.shtml"
+    },
+    {
+      "id": "news_020",
+      "title": "携程2025年财报：超六成利润源于一次性资产处置",
+      "summary": "携程2025年财报净利润虽同比飙升，但超六成利润源于一次性资产处置，核心主业盈利能力持续下滑。同时，其市场支配地位及涉嫌垄断的商业行为正面临反垄断立案调查。",
+      "source": "新浪财经",
+      "heat": 67.0,
+      "impact": {"social": 6.0, "economic": 7.5, "political": 6.0, "tech": 5.0},
+      "keywords": ["携程", "财报", "反垄断", "旅游", "互联网"],
+      "category": "财经",
+      "sentiment": "negative",
+      "url": "https://news.sina.com.cn/zx/ds/2026-03-01/doc-inhpnscn8995336.shtml"
     }
   ],
   "relations": [
-    {"source": "news_001", "target": "news_004", "type": "causal", "strength": 0.95},
-    {"source": "news_001", "target": "news_002", "type": "similar", "strength": 0.65},
-    {"source": "news_002", "target": "news_003", "type": "similar", "strength": 0.82},
-    {"source": "news_002", "target": "news_006", "type": "similar", "strength": 0.75},
-    {"source": "news_003", "target": "news_006", "type": "similar", "strength": 0.88},
-    {"source": "news_003", "target": "news_007", "type": "similar", "strength": 0.72},
-    {"source": "news_003", "target": "news_012", "type": "causal", "strength": 0.85},
-    {"source": "news_004", "target": "news_010", "type": "causal", "strength": 0.68},
-    {"source": "news_005", "target": "news_008", "type": "similar", "strength": 0.78},
-    {"source": "news_005", "target": "news_013", "type": "similar", "strength": 0.72},
-    {"source": "news_006", "target": "news_014", "type": "similar", "strength": 0.80},
-    {"source": "news_006", "target": "news_015", "type": "similar", "strength": 0.65},
-    {"source": "news_007", "target": "news_016", "type": "similar", "strength": 0.70},
-    {"source": "news_009", "target": "news_003", "type": "similar", "strength": 0.85},
-    {"source": "news_009", "target": "news_015", "type": "similar", "strength": 0.68},
-    {"source": "news_011", "target": "news_013", "type": "similar", "strength": 0.75},
-    {"source": "news_011", "target": "news_005", "type": "similar", "strength": 0.62},
-    {"source": "news_012", "target": "news_003", "type": "causal", "strength": 0.88},
-    {"source": "news_014", "target": "news_006", "type": "similar", "strength": 0.82},
-    {"source": "news_015", "target": "news_016", "type": "similar", "strength": 0.72},
-    {"source": "news_017", "target": "news_018", "type": "sequential", "strength": 0.60},
-    {"source": "news_008", "target": "news_010", "type": "similar", "strength": 0.70}
+    {"source": "news_001", "target": "news_002", "type": "causal", "strength": 0.95},
+    {"source": "news_001", "target": "news_018", "type": "similar", "strength": 0.92},
+    {"source": "news_001", "target": "news_006", "type": "economic", "strength": 0.75},
+    {"source": "news_002", "target": "news_009", "type": "economic", "strength": 0.70},
+    {"source": "news_003", "target": "news_004", "type": "similar", "strength": 0.88},
+    {"source": "news_003", "target": "news_005", "type": "similar", "strength": 0.85},
+    {"source": "news_004", "target": "news_005", "type": "similar", "strength": 0.90},
+    {"source": "news_003", "target": "news_009", "type": "causal", "strength": 0.65},
+    {"source": "news_007", "target": "news_015", "type": "tech", "strength": 0.60},
+    {"source": "news_011", "target": "news_015", "type": "tech", "strength": 0.78},
+    {"source": "news_013", "target": "news_015", "type": "tech", "strength": 0.72},
+    {"source": "news_014", "target": "news_015", "type": "tech", "strength": 0.80},
+    {"source": "news_003", "target": "news_014", "type": "tech", "strength": 0.75},
+    {"source": "news_010", "target": "news_016", "type": "economic", "strength": 0.70},
+    {"source": "news_006", "target": "news_016", "type": "economic", "strength": 0.68},
+    {"source": "news_017", "target": "news_010", "type": "policy", "strength": 0.72},
+    {"source": "news_004", "target": "news_009", "type": "tech", "strength": 0.62},
+    {"source": "news_011", "target": "news_013", "type": "tech", "strength": 0.70},
+    {"source": "news_019", "target": "news_015", "type": "tech", "strength": 0.65},
+    {"source": "news_001", "target": "news_009", "type": "economic", "strength": 0.60},
+    {"source": "news_012", "target": "news_020", "type": "similar", "strength": 0.55}
   ],
   "stats": {
-    "total": 18,
-    "highImpact": 6,
+    "total": 20,
+    "highImpact": 8,
     "categories": {
-      "科技": 9,
-      "国际政治": 1,
-      "财经": 4,
+      "国际政治": 2,
+      "财经": 7,
+      "科技": 8,
       "社会": 1,
-      "政策": 2,
-      "其他": 1
+      "政治": 1
     },
     "sentiment": {
-      "positive": 14,
-      "neutral": 1,
-      "negative": 3
+      "positive": 7,
+      "neutral": 4,
+      "negative": 9
     },
-    "avgHeat": 77.8,
-    "topKeywords": ["AI", "人工智能", "科技", "中国", "算力"]
+    "avgHeat": 81.3,
+    "topKeywords": ["AI", "伊朗", "美国", "经济", "中国", "科技", "原油", "中东"]
   }
 }

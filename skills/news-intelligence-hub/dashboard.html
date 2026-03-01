@@ -3,71 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>新闻智能分析中心 - 实时热点监测</title>
+    <title>新闻情报仪表板 | News Intelligence Hub</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        * { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif; }
-        .glass {
-            background: rgba(30, 41, 59, 0.7);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        .glass-card {
-            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(147, 51, 234, 0.1) 100%);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-        }
-        .news-item { transition: all 0.3s ease; }
-        .news-item:hover { transform: translateX(4px); background: rgba(59, 130, 246, 0.15); }
-        .tag {
-            background: rgba(59, 130, 246, 0.2);
-            border: 1px solid rgba(59, 130, 246, 0.3);
-        }
-        .heat-high { color: #ef4444; }
-        .heat-medium { color: #f59e0b; }
-        .heat-low { color: #10b981; }
-        .sentiment-positive { color: #10b981; }
-        .sentiment-negative { color: #ef4444; }
-        .sentiment-neutral { color: #94a3b8; }
-        @media (max-width: 768px) {
-            .chart-container { height: 280px !important; }
-        }
-        .loading {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 200px;
-        }
-        .spinner {
-            width: 40px;
-            height: 40px;
-            border: 3px solid rgba(59, 130, 246, 0.3);
-            border-top-color: #3b82f6;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
+        * { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
+        body { background: #0f172a; color: #e2e8f0; }
+        .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.1); }
+        .gradient-text { background: linear-gradient(135deg, #60a5fa, #a78bfa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .card-hover { transition: all 0.3s ease; }
+        .card-hover:hover { transform: translateY(-4px); box-shadow: 0 20px 40px rgba(0,0,0,0.3); }
+        #network-graph { width: 100%; height: 500px; }
+        .node { cursor: pointer; }
+        .link { stroke-opacity: 0.6; }
+        .pulse { animation: pulse 2s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
-<body class="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 min-h-screen text-white">
+<body class="min-h-screen">
     <!-- Header -->
     <header class="glass sticky top-0 z-50 px-4 py-4">
-        <div class="max-w-7xl mx-auto flex items-center justify-between">
-            <div class="flex items-center space-x-3">
-                <div class="w-12 h-12 bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 rounded-xl flex items-center justify-center shadow-lg">
-                    <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
                     </svg>
                 </div>
                 <div>
-                    <h1 class="text-xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">新闻智能分析中心</h1>
-                    <p class="text-xs text-gray-400">实时热点 · 关联分析 · 影响评估</p>
+                    <h1 class="text-xl font-bold gradient-text">新闻情报仪表板</h1>
+                    <p class="text-xs text-slate-400">News Intelligence Hub</p>
                 </div>
             </div>
-            <div class="text-right hidden sm:block">
-                <p class="text-sm font-medium" id="lastUpdate">加载中...</p>
-                <p class="text-xs text-gray-400">每30分钟自动刷新</p>
+            <div class="flex items-center gap-4 text-sm">
+                <div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-800/50">
+                    <div class="w-2 h-2 rounded-full bg-green-500 pulse"></div>
+                    <span class="text-slate-300" id="timestamp">2026-03-01 18:47</span>
+                </div>
+                <button onclick="refreshData()" class="px-4 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 transition text-white text-sm font-medium">
+                    刷新数据
+                </button>
             </div>
         </div>
     </header>
@@ -75,584 +54,627 @@
     <main class="max-w-7xl mx-auto px-4 py-6 space-y-6">
         <!-- Stats Cards -->
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div class="glass-card rounded-2xl p-4 text-center">
-                <p class="text-gray-400 text-xs mb-1">热点新闻</p>
-                <p class="text-3xl font-bold text-blue-400" id="totalNews">-</p>
-                <p class="text-xs text-gray-500 mt-1">条实时数据</p>
+            <div class="glass rounded-2xl p-4 card-hover">
+                <div class="text-slate-400 text-sm mb-1">总新闻数</div>
+                <div class="text-3xl font-bold text-white" id="stat-total">0</div>
+                <div class="text-xs text-green-400 mt-1">+12 较上小时</div>
             </div>
-            <div class="glass-card rounded-2xl p-4 text-center">
-                <p class="text-gray-400 text-xs mb-1">关联关系</p>
-                <p class="text-3xl font-bold text-purple-400" id="relationsCount">-</p>
-                <p class="text-xs text-gray-500 mt-1">语义相似度>0.5</p>
+            <div class="glass rounded-2xl p-4 card-hover">
+                <div class="text-slate-400 text-sm mb-1">高影响事件</div>
+                <div class="text-3xl font-bold text-red-400" id="stat-high">0</div>
+                <div class="text-xs text-red-400 mt-1">需重点关注</div>
             </div>
-            <div class="glass-card rounded-2xl p-4 text-center">
-                <p class="text-gray-400 text-xs mb-1">高影响事件</p>
-                <p class="text-3xl font-bold text-red-400" id="highImpact">-</p>
-                <p class="text-xs text-gray-500 mt-1">综合评分>8</p>
+            <div class="glass rounded-2xl p-4 card-hover">
+                <div class="text-slate-400 text-sm mb-1">平均热度</div>
+                <div class="text-3xl font-bold text-yellow-400" id="stat-heat">0</div>
+                <div class="text-xs text-yellow-400 mt-1">高度活跃</div>
             </div>
-            <div class="glass-card rounded-2xl p-4 text-center">
-                <p class="text-gray-400 text-xs mb-1">平均热度</p>
-                <p class="text-3xl font-bold text-green-400" id="avgHeat">-</p>
-                <p class="text-xs text-gray-500 mt-1">满分100</p>
-            </div>
-        </div>
-
-        <!-- Charts Row 1 -->
-        <div class="grid md:grid-cols-2 gap-6">
-            <div class="glass rounded-2xl p-4">
-                <div class="flex items-center justify-between mb-4">
-                    <h2 class="text-lg font-semibold flex items-center">
-                        <span class="w-2 h-2 bg-blue-500 rounded-full mr-2"></span>
-                        新闻关联网络
-                    </h2>
-                    <span class="text-xs text-gray-400">拖拽节点可调整布局</span>
-                </div>
-                <div id="networkChart" class="w-full chart-container" style="height: 320px;">
-                    <div class="loading"><div class="spinner"></div></div>
-                </div>
-            </div>
-
-            <div class="glass rounded-2xl p-4">
-                <div class="flex items-center justify-between mb-4">
-                    <h2 class="text-lg font-semibold flex items-center">
-                        <span class="w-2 h-2 bg-purple-500 rounded-full mr-2"></span>
-                        影响维度雷达图
-                    </h2>
-                    <span class="text-xs text-gray-400">社会/经济/政治/科技</span>
-                </div>
-                <div id="impactChart" class="w-full chart-container" style="height: 320px;">
-                    <div class="loading"><div class="spinner"></div></div>
-                </div>
+            <div class="glass rounded-2xl p-4 card-hover">
+                <div class="text-slate-400 text-sm mb-1">情绪指数</div>
+                <div class="text-3xl font-bold text-blue-400" id="stat-sentiment">0</div>
+                <div class="text-xs text-slate-400 mt-1">偏谨慎</div>
             </div>
         </div>
 
-        <!-- Charts Row 2 -->
-        <div class="grid md:grid-cols-2 gap-6">
-            <div class="glass rounded-2xl p-4">
+        <!-- Main Content Grid -->
+        <div class="grid lg:grid-cols-3 gap-6">
+            <!-- Network Graph -->
+            <div class="lg:col-span-2 glass rounded-2xl p-4">
                 <div class="flex items-center justify-between mb-4">
-                    <h2 class="text-lg font-semibold flex items-center">
-                        <span class="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
-                        新闻分类分布
-                    </h2>
+                    <h2 class="text-lg font-semibold text-white">新闻关联网络</h2>
+                    <div class="flex gap-2 text-xs">
+                        <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-red-500"></span>国际政治</span>
+                        <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-blue-500"></span>科技</span>
+                        <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-green-500"></span>财经</span>
+                    </div>
                 </div>
-                <div id="categoryChart" class="w-full chart-container" style="height: 280px;">
-                    <div class="loading"><div class="spinner"></div></div>
-                </div>
+                <div id="network-graph" class="rounded-xl bg-slate-900/50"></div>
             </div>
 
+            <!-- Impact Radar -->
             <div class="glass rounded-2xl p-4">
-                <div class="flex items-center justify-between mb-4">
-                    <h2 class="text-lg font-semibold flex items-center">
-                        <span class="w-2 h-2 bg-orange-500 rounded-full mr-2"></span>
-                        热度排行TOP5
-                    </h2>
-                </div>
-                <div id="heatChart" class="w-full chart-container" style="height: 280px;">
-                    <div class="loading"><div class="spinner"></div></div>
+                <h2 class="text-lg font-semibold text-white mb-4">影响维度分析</h2>
+                <canvas id="radarChart" class="w-full"></canvas>
+                <div class="mt-4 space-y-2 text-sm">
+                    <div class="flex justify-between items-center p-2 rounded-lg bg-slate-800/50">
+                        <span class="text-slate-400">社会影响</span>
+                        <span class="text-white font-medium" id="impact-social">0</span>
+                    </div>
+                    <div class="flex justify-between items-center p-2 rounded-lg bg-slate-800/50">
+                        <span class="text-slate-400">经济影响</span>
+                        <span class="text-white font-medium" id="impact-economic">0</span>
+                    </div>
+                    <div class="flex justify-between items-center p-2 rounded-lg bg-slate-800/50">
+                        <span class="text-slate-400">政治影响</span>
+                        <span class="text-white font-medium" id="impact-political">0</span>
+                    </div>
+                    <div class="flex justify-between items-center p-2 rounded-lg bg-slate-800/50">
+                        <span class="text-slate-400">科技影响</span>
+                        <span class="text-white font-medium" id="impact-tech">0</span>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Sentiment Analysis -->
-        <div class="grid md:grid-cols-3 gap-6">
+        <!-- Category Distribution & Timeline -->
+        <div class="grid lg:grid-cols-3 gap-6">
+            <!-- Category Chart -->
             <div class="glass rounded-2xl p-4">
-                <h2 class="text-lg font-semibold mb-4 flex items-center">
-                    <span class="w-2 h-2 bg-yellow-500 rounded-full mr-2"></span>
-                    情感分布
-                </h2>
-                <div id="sentimentChart" class="w-full" style="height: 200px;"></div>
+                <h2 class="text-lg font-semibold text-white mb-4">新闻分类分布</h2>
+                <canvas id="categoryChart" class="w-full max-h-64"></canvas>
             </div>
-            <div class="glass rounded-2xl p-4 md:col-span-2">
-                <h2 class="text-lg font-semibold mb-4 flex items-center">
-                    <span class="w-2 h-2 bg-cyan-500 rounded-full mr-2"></span>
-                    关键词云
-                </h2>
-                <div id="keywordChart" class="w-full" style="height: 200px;"></div>
+
+            <!-- Sentiment Chart -->
+            <div class="glass rounded-2xl p-4">
+                <h2 class="text-lg font-semibold text-white mb-4">情绪分布</h2>
+                <canvas id="sentimentChart" class="w-full max-h-64"></canvas>
+            </div>
+
+            <!-- Timeline -->
+            <div class="glass rounded-2xl p-4">
+                <h2 class="text-lg font-semibold text-white mb-4">热度时间线</h2>
+                <div class="space-y-3 max-h-64 overflow-y-auto scrollbar-hide" id="timeline">
+                    <!-- Timeline items will be inserted here -->
+                </div>
             </div>
         </div>
 
-        <!-- News Timeline -->
+        <!-- News List -->
         <div class="glass rounded-2xl p-4">
-            <div class="flex items-center justify-between mb-4">
-                <h2 class="text-lg font-semibold flex items-center">
-                    <span class="w-2 h-2 bg-pink-500 rounded-full mr-2"></span>
-                    热点新闻时间线
-                </h2>
-                <div class="flex space-x-2">
-                    <span class="px-2 py-1 text-xs rounded bg-blue-500/20 text-blue-300">科技</span>
-                    <span class="px-2 py-1 text-xs rounded bg-green-500/20 text-green-300">财经</span>
-                    <span class="px-2 py-1 text-xs rounded bg-purple-500/20 text-purple-300">政策</span>
-                    <span class="px-2 py-1 text-xs rounded bg-red-500/20 text-red-300">国际</span>
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-4">
+                <h2 class="text-lg font-semibold text-white">热点新闻列表</h2>
+                <div class="flex flex-wrap gap-2">
+                    <button onclick="filterNews('all')" class="px-3 py-1 rounded-full bg-blue-600 text-white text-sm">全部</button>
+                    <button onclick="filterNews('国际政治')" class="px-3 py-1 rounded-full bg-slate-700 text-slate-300 text-sm hover:bg-slate-600">国际政治</button>
+                    <button onclick="filterNews('财经')" class="px-3 py-1 rounded-full bg-slate-700 text-slate-300 text-sm hover:bg-slate-600">财经</button>
+                    <button onclick="filterNews('科技')" class="px-3 py-1 rounded-full bg-slate-700 text-slate-300 text-sm hover:bg-slate-600">科技</button>
                 </div>
             </div>
-            <div id="newsList" class="space-y-3 max-h-[500px] overflow-y-auto">
-                <div class="loading"><div class="spinner"></div></div>
+            <div class="grid md:grid-cols-2 gap-4" id="news-list">
+                <!-- News cards will be inserted here -->
+            </div>
+        </div>
+
+        <!-- Keywords Cloud -->
+        <div class="glass rounded-2xl p-4">
+            <h2 class="text-lg font-semibold text-white mb-4">关键词云</h2>
+            <div class="flex flex-wrap gap-3 justify-center" id="keywords-cloud">
+                <!-- Keywords will be inserted here -->
             </div>
         </div>
     </main>
 
-    <footer class="max-w-7xl mx-auto px-4 py-6 text-center text-gray-500 text-sm">
-        <p>新闻智能分析中心 © 2026 | 数据来源: 综合各大新闻平台 | 每30分钟自动更新</p>
+    <!-- Footer -->
+    <footer class="glass mt-8 py-6 px-4">
+        <div class="max-w-7xl mx-auto text-center text-slate-400 text-sm">
+            <p>新闻情报仪表板 &copy; 2026 | 数据每30分钟自动更新</p>
+            <p class="mt-1">数据来源：公开新闻API、网络搜索</p>
+        </div>
     </footer>
 
     <script>
-        // Color mapping for categories
+        // Data storage
+        let newsData = null;
+        let currentFilter = 'all';
+
+        // Color schemes
         const categoryColors = {
+            '国际政治': '#ef4444',
+            '财经': '#22c55e',
             '科技': '#3b82f6',
-            '财经': '#10b981',
-            '政策': '#8b5cf6',
             '社会': '#f59e0b',
-            '政治': '#ef4444',
-            '国际政治': '#dc2626',
-            '国际': '#dc2626',
-            '其他': '#6b7280'
+            '政治': '#8b5cf6'
         };
 
         const sentimentColors = {
-            'positive': '#10b981',
-            'negative': '#ef4444',
-            'neutral': '#94a3b8'
+            'positive': '#22c55e',
+            'neutral': '#64748b',
+            'negative': '#ef4444'
         };
 
-        // Initialize charts
-        let networkChart, impactChart, categoryChart, heatChart, sentimentChart, keywordChart;
-
+        // Load data
         async function loadData() {
             try {
-                const response = await fetch('./data.json?t=' + Date.now());
-                const data = await response.json();
-                return data;
+                const response = await fetch('data.json');
+                newsData = await response.json();
+                updateDashboard();
             } catch (error) {
-                console.error('Failed to load data:', error);
-                // Fallback to embedded data
-                return null;
+                console.error('Error loading data:', error);
+                // Use embedded data as fallback
+                newsData = getEmbeddedData();
+                updateDashboard();
             }
         }
 
-        function initCharts(data) {
-            networkChart = echarts.init(document.getElementById('networkChart'));
-            impactChart = echarts.init(document.getElementById('impactChart'));
-            categoryChart = echarts.init(document.getElementById('categoryChart'));
-            heatChart = echarts.init(document.getElementById('heatChart'));
-            sentimentChart = echarts.init(document.getElementById('sentimentChart'));
-            keywordChart = echarts.init(document.getElementById('keywordChart'));
-
-            updateStats(data);
-            renderNetworkChart(data);
-            renderImpactChart(data);
-            renderCategoryChart(data);
-            renderHeatChart(data);
-            renderSentimentChart(data);
-            renderKeywordChart(data);
-            renderNewsList(data);
-
-            // Update timestamp
-            const date = new Date(data.timestamp);
-            document.getElementById('lastUpdate').textContent = 
-                `更新于: ${date.toLocaleString('zh-CN', { 
-                    month: '2-digit', day: '2-digit', 
-                    hour: '2-digit', minute: '2-digit' 
-                })}`;
-        }
-
-        function updateStats(data) {
-            document.getElementById('totalNews').textContent = data.stats.total;
-            document.getElementById('relationsCount').textContent = data.relations.length;
-            document.getElementById('highImpact').textContent = data.stats.highImpact;
-            document.getElementById('avgHeat').textContent = data.stats.avgHeat.toFixed(1);
-        }
-
-        function renderNetworkChart(data) {
-            const nodes = data.news.map(item => ({
-                id: item.id,
-                name: item.title.substring(0, 6) + (item.title.length > 6 ? '...' : ''),
-                fullTitle: item.title,
-                symbolSize: 15 + item.heat / 8,
-                category: item.category,
-                heat: item.heat,
-                impact: ((item.impact.social + item.impact.economic + item.impact.political + item.impact.tech) / 4).toFixed(1),
-                itemStyle: { color: categoryColors[item.category] || '#999' }
-            }));
-
-            const links = data.relations.map(r => ({
-                source: r.source,
-                target: r.target,
-                value: r.strength,
-                relationType: r.type,
-                lineStyle: { 
-                    width: r.strength * 4,
-                    curveness: 0.2,
-                    opacity: 0.5
+        // Embedded fallback data
+        function getEmbeddedData() {
+            return {
+                "timestamp": "2026-03-01T18:47:00+08:00",
+                "news": [
+                    {
+                        "id": "news_001",
+                        "title": "美以联合袭击伊朗，全球金融市场震荡",
+                        "summary": "当地时间2月28日，美国和以色列对伊朗发动联合军事打击，目标包括总统府等。伊朗迅速反击，袭击美国在中东军事基地和以色列多地。",
+                        "source": "新浪财经",
+                        "heat": 98.5,
+                        "impact": {"social": 8.5, "economic": 9.5, "political": 10.0, "tech": 5.0},
+                        "keywords": ["伊朗", "美国", "以色列", "中东局势", "原油"],
+                        "category": "国际政治",
+                        "sentiment": "negative"
+                    },
+                    {
+                        "id": "news_003",
+                        "title": "OpenAI狂揽7500亿元，英伟达、亚马逊、软银抢投",
+                        "summary": "OpenAI于2026年初宣布获得1100亿美元巨额融资，创下全球AI领域单笔融资规模之最。",
+                        "source": "新浪财经",
+                        "heat": 92.0,
+                        "impact": {"social": 6.0, "economic": 8.5, "political": 5.0, "tech": 10.0},
+                        "keywords": ["OpenAI", "AI", "融资", "英伟达"],
+                        "category": "科技",
+                        "sentiment": "positive"
+                    }
+                ],
+                "relations": [
+                    {"source": "news_001", "target": "news_002", "type": "causal", "strength": 0.95}
+                ],
+                "stats": {
+                    "total": 20,
+                    "highImpact": 8,
+                    "categories": {"国际政治": 2, "财经": 7, "科技": 8, "社会": 1, "政治": 1},
+                    "sentiment": {"positive": 7, "neutral": 4, "negative": 9},
+                    "avgHeat": 81.3
                 }
-            }));
-
-            const categories = [...new Set(data.news.map(n => n.category))].map(name => ({ 
-                name,
-                itemStyle: { color: categoryColors[name] || '#999' }
-            }));
-
-            networkChart.setOption({
-                backgroundColor: 'transparent',
-                tooltip: {
-                    trigger: 'item',
-                    backgroundColor: 'rgba(30, 41, 59, 0.95)',
-                    borderColor: 'rgba(255,255,255,0.1)',
-                    textStyle: { color: '#fff' },
-                    formatter: function(params) {
-                        if (params.dataType === 'node') {
-                            return `<div style="max-width:220px">
-                                <strong style="color:#60a5fa">${params.data.fullTitle}</strong><br/>
-                                <span style="color:#94a3b8">分类:</span> ${params.data.category}<br/>
-                                <span style="color:#94a3b8">热度:</span> <span style="color:#fbbf24">${params.data.heat}</span><br/>
-                                <span style="color:#94a3b8">影响分:</span> ${params.data.impact}
-                            </div>`;
-                        }
-                        return `<span style="color:#94a3b8">关联类型:</span> ${params.data.relationType}<br/>
-                                <span style="color:#94a3b8">关联度:</span> <span style="color:#60a5fa">${(params.data.value * 100).toFixed(0)}%</span>`;
-                    }
-                },
-                legend: {
-                    data: categories.map(c => c.name),
-                    textStyle: { color: '#94a3b8', fontSize: 10 },
-                    bottom: 0,
-                    itemWidth: 12,
-                    itemHeight: 12
-                },
-                series: [{
-                    type: 'graph',
-                    layout: 'force',
-                    data: nodes,
-                    links: links,
-                    categories: categories,
-                    roam: true,
-                    draggable: true,
-                    label: {
-                        show: true,
-                        position: 'bottom',
-                        fontSize: 9,
-                        color: '#cbd5e1'
-                    },
-                    force: {
-                        repulsion: 200,
-                        gravity: 0.1,
-                        edgeLength: [60, 120]
-                    },
-                    emphasis: {
-                        focus: 'adjacency',
-                        lineStyle: { width: 6, opacity: 1 }
-                    }
-                }]
-            });
+            };
         }
 
-        function renderImpactChart(data) {
-            // Calculate weighted average impact
-            const totalHeat = data.news.reduce((sum, n) => sum + n.heat, 0);
-            const avgImpact = { social: 0, economic: 0, political: 0, tech: 0 };
-            
-            data.news.forEach(item => {
-                const weight = item.heat / totalHeat;
-                avgImpact.social += item.impact.social * weight;
-                avgImpact.economic += item.impact.economic * weight;
-                avgImpact.political += item.impact.political * weight;
-                avgImpact.tech += item.impact.tech * weight;
+        // Update dashboard
+        function updateDashboard() {
+            if (!newsData) return;
+
+            // Update stats
+            document.getElementById('stat-total').textContent = newsData.stats.total;
+            document.getElementById('stat-high').textContent = newsData.stats.highImpact;
+            document.getElementById('stat-heat').textContent = newsData.stats.avgHeat.toFixed(1);
+            document.getElementById('timestamp').textContent = new Date(newsData.timestamp).toLocaleString('zh-CN');
+
+            // Calculate sentiment score
+            const sentimentScore = (newsData.stats.sentiment.positive * 1 + newsData.stats.sentiment.neutral * 0 + newsData.stats.sentiment.negative * -1) / newsData.stats.total;
+            document.getElementById('stat-sentiment').textContent = (sentimentScore * 100).toFixed(0);
+
+            // Update impact scores
+            const avgImpact = calculateAvgImpact(newsData.news);
+            document.getElementById('impact-social').textContent = avgImpact.social.toFixed(1);
+            document.getElementById('impact-economic').textContent = avgImpact.economic.toFixed(1);
+            document.getElementById('impact-political').textContent = avgImpact.political.toFixed(1);
+            document.getElementById('impact-tech').textContent = avgImpact.tech.toFixed(1);
+
+            // Render visualizations
+            renderNetworkGraph();
+            renderRadarChart(avgImpact);
+            renderCategoryChart();
+            renderSentimentChart();
+            renderTimeline();
+            renderNewsList();
+            renderKeywordsCloud();
+        }
+
+        // Calculate average impact
+        function calculateAvgImpact(news) {
+            const sum = news.reduce((acc, item) => ({
+                social: acc.social + item.impact.social,
+                economic: acc.economic + item.impact.economic,
+                political: acc.political + item.impact.political,
+                tech: acc.tech + item.impact.tech
+            }), {social: 0, economic: 0, political: 0, tech: 0});
+
+            return {
+                social: sum.social / news.length,
+                economic: sum.economic / news.length,
+                political: sum.political / news.length,
+                tech: sum.tech / news.length
+            };
+        }
+
+        // Render network graph
+        function renderNetworkGraph() {
+            const container = document.getElementById('network-graph');
+            container.innerHTML = '';
+
+            const width = container.clientWidth;
+            const height = 500;
+
+            const svg = d3.select('#network-graph')
+                .append('svg')
+                .attr('width', width)
+                .attr('height', height);
+
+            // Prepare nodes and links
+            const nodes = newsData.news.map(d => ({
+                id: d.id,
+                title: d.title.substring(0, 20) + '...',
+                category: d.category,
+                heat: d.heat,
+                sentiment: d.sentiment
+            }));
+
+            const links = newsData.relations.map(d => ({
+                source: d.source,
+                target: d.target,
+                strength: d.strength
+            }));
+
+            // Simulation
+            const simulation = d3.forceSimulation(nodes)
+                .force('link', d3.forceLink(links).id(d => d.id).distance(100))
+                .force('charge', d3.forceManyBody().strength(-300))
+                .force('center', d3.forceCenter(width / 2, height / 2))
+                .force('collision', d3.forceCollide().radius(d => d.heat / 3));
+
+            // Draw links
+            const link = svg.append('g')
+                .selectAll('line')
+                .data(links)
+                .enter()
+                .append('line')
+                .attr('class', 'link')
+                .attr('stroke', '#475569')
+                .attr('stroke-width', d => d.strength * 3);
+
+            // Draw nodes
+            const node = svg.append('g')
+                .selectAll('g')
+                .data(nodes)
+                .enter()
+                .append('g')
+                .attr('class', 'node')
+                .call(d3.drag()
+                    .on('start', dragstarted)
+                    .on('drag', dragged)
+                    .on('end', dragended));
+
+            // Node circles
+            node.append('circle')
+                .attr('r', d => Math.max(15, d.heat / 4))
+                .attr('fill', d => categoryColors[d.category] || '#64748b')
+                .attr('stroke', d => sentimentColors[d.sentiment])
+                .attr('stroke-width', 3);
+
+            // Node labels
+            node.append('text')
+                .text(d => d.title)
+                .attr('x', 0)
+                .attr('y', d => Math.max(15, d.heat / 4) + 15)
+                .attr('text-anchor', 'middle')
+                .attr('fill', '#e2e8f0')
+                .attr('font-size', '10px');
+
+            // Tooltip
+            const tooltip = d3.select('body').append('div')
+                .attr('class', 'absolute bg-slate-800 text-white p-2 rounded-lg text-sm pointer-events-none opacity-0 transition-opacity')
+                .style('z-index', '1000');
+
+            node.on('mouseover', (event, d) => {
+                tooltip.style('opacity', 1)
+                    .html(`<strong>${d.title}</strong><br/>热度: ${d.heat}<br/>分类: ${d.category}`);
+            }).on('mousemove', (event) => {
+                tooltip.style('left', (event.pageX + 10) + 'px')
+                    .style('top', (event.pageY - 10) + 'px');
+            }).on('mouseout', () => {
+                tooltip.style('opacity', 0);
             });
 
-            impactChart.setOption({
-                backgroundColor: 'transparent',
-                tooltip: {
-                    trigger: 'item',
-                    backgroundColor: 'rgba(30, 41, 59, 0.95)',
-                    borderColor: 'rgba(255,255,255,0.1)',
-                    textStyle: { color: '#fff' }
-                },
-                radar: {
-                    indicator: [
-                        { name: '社会影响', max: 10 },
-                        { name: '经济影响', max: 10 },
-                        { name: '政治影响', max: 10 },
-                        { name: '科技影响', max: 10 }
-                    ],
-                    axisName: { color: '#94a3b8', fontSize: 11 },
-                    splitArea: {
-                        areaStyle: {
-                            color: ['rgba(59, 130, 246, 0.05)', 'rgba(59, 130, 246, 0.1)']
-                        }
-                    },
-                    axisLine: { lineStyle: { color: 'rgba(255,255,255,0.2)' } },
-                    splitLine: { lineStyle: { color: 'rgba(255,255,255,0.1)' } }
-                },
-                series: [{
-                    type: 'radar',
-                    data: [{
-                        value: [
-                            avgImpact.social.toFixed(1),
-                            avgImpact.economic.toFixed(1),
-                            avgImpact.political.toFixed(1),
-                            avgImpact.tech.toFixed(1)
-                        ],
-                        name: '加权平均影响',
-                        areaStyle: {
-                            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-                                { offset: 0, color: 'rgba(59, 130, 246, 0.6)' },
-                                { offset: 1, color: 'rgba(147, 51, 234, 0.4)' }
-                            ])
-                        },
-                        lineStyle: { color: '#3b82f6', width: 2 },
-                        itemStyle: { color: '#3b82f6' }
+            simulation.on('tick', () => {
+                link
+                    .attr('x1', d => d.source.x)
+                    .attr('y1', d => d.source.y)
+                    .attr('x2', d => d.target.x)
+                    .attr('y2', d => d.target.y);
+
+                node.attr('transform', d => `translate(${d.x},${d.y})`);
+            });
+
+            function dragstarted(event, d) {
+                if (!event.active) simulation.alphaTarget(0.3).restart();
+                d.fx = d.x;
+                d.fy = d.y;
+            }
+
+            function dragged(event, d) {
+                d.fx = event.x;
+                d.fy = event.y;
+            }
+
+            function dragended(event, d) {
+                if (!event.active) simulation.alphaTarget(0);
+                d.fx = null;
+                d.fy = null;
+            }
+        }
+
+        // Render radar chart
+        function renderRadarChart(impact) {
+            const ctx = document.getElementById('radarChart').getContext('2d');
+            
+            if (window.radarChartInstance) {
+                window.radarChartInstance.destroy();
+            }
+
+            window.radarChartInstance = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: ['社会', '经济', '政治', '科技'],
+                    datasets: [{
+                        label: '影响维度',
+                        data: [impact.social, impact.economic, impact.political, impact.tech],
+                        backgroundColor: 'rgba(59, 130, 246, 0.2)',
+                        borderColor: '#3b82f6',
+                        pointBackgroundColor: '#3b82f6',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: '#3b82f6'
                     }]
-                }]
-            });
-        }
-
-        function renderCategoryChart(data) {
-            const categoryCount = data.stats.categories;
-            
-            categoryChart.setOption({
-                backgroundColor: 'transparent',
-                tooltip: { 
-                    trigger: 'item',
-                    backgroundColor: 'rgba(30, 41, 59, 0.95)',
-                    borderColor: 'rgba(255,255,255,0.1)',
-                    textStyle: { color: '#fff' }
                 },
-                legend: {
-                    orient: 'vertical',
-                    right: 10,
-                    top: 'center',
-                    textStyle: { color: '#94a3b8', fontSize: 11 }
-                },
-                series: [{
-                    type: 'pie',
-                    radius: ['40%', '70%'],
-                    center: ['35%', '50%'],
-                    avoidLabelOverlap: false,
-                    itemStyle: {
-                        borderRadius: 8,
-                        borderColor: '#1e293b',
-                        borderWidth: 2
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    scales: {
+                        r: {
+                            beginAtZero: true,
+                            max: 10,
+                            ticks: {
+                                color: '#94a3b8',
+                                backdropColor: 'transparent'
+                            },
+                            grid: {
+                                color: '#334155'
+                            },
+                            pointLabels: {
+                                color: '#e2e8f0'
+                            }
+                        }
                     },
-                    label: { 
-                        show: true,
-                        formatter: '{b}\n{c}条',
-                        color: '#cbd5e1',
-                        fontSize: 10
-                    },
-                    emphasis: {
-                        label: { fontSize: 12, fontWeight: 'bold' }
-                    },
-                    data: Object.entries(categoryCount).map(([name, value]) => ({
-                        name,
-                        value,
-                        itemStyle: { color: categoryColors[name] || '#6b7280' }
-                    }))
-                }]
-            });
-        }
-
-        function renderHeatChart(data) {
-            const top5News = [...data.news].sort((a, b) => b.heat - a.heat).slice(0, 5);
-            
-            heatChart.setOption({
-                backgroundColor: 'transparent',
-                tooltip: {
-                    trigger: 'axis',
-                    axisPointer: { type: 'shadow' },
-                    backgroundColor: 'rgba(30, 41, 59, 0.95)',
-                    borderColor: 'rgba(255,255,255,0.1)',
-                    textStyle: { color: '#fff' },
-                    formatter: function(params) {
-                        const item = top5News[params[0].dataIndex];
-                        return `<strong style="color:#60a5fa">${item.title}</strong><br/>
-                                <span style="color:#94a3b8">热度:</span> <span style="color:#fbbf24">${item.heat}</span><br/>
-                                <span style="color:#94a3b8">来源:</span> ${item.source}`;
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
                     }
+                }
+            });
+        }
+
+        // Render category chart
+        function renderCategoryChart() {
+            const ctx = document.getElementById('categoryChart').getContext('2d');
+            const categories = newsData.stats.categories;
+
+            if (window.categoryChartInstance) {
+                window.categoryChartInstance.destroy();
+            }
+
+            window.categoryChartInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: Object.keys(categories),
+                    datasets: [{
+                        data: Object.values(categories),
+                        backgroundColor: Object.keys(categories).map(k => categoryColors[k] || '#64748b'),
+                        borderWidth: 0
+                    }]
                 },
-                grid: { left: '3%', right: '12%', bottom: '3%', containLabel: true },
-                xAxis: {
-                    type: 'value',
-                    max: 100,
-                    axisLine: { lineStyle: { color: 'rgba(255,255,255,0.2)' } },
-                    axisLabel: { color: '#94a3b8' },
-                    splitLine: { lineStyle: { color: 'rgba(255,255,255,0.1)' } }
-                },
-                yAxis: {
-                    type: 'category',
-                    data: top5News.map(item => item.title.substring(0, 8) + (item.title.length > 8 ? '...' : '')),
-                    axisLine: { lineStyle: { color: 'rgba(255,255,255,0.2)' } },
-                    axisLabel: { color: '#cbd5e1', fontSize: 10 }
-                },
-                series: [{
-                    type: 'bar',
-                    data: top5News.map(item => ({
-                        value: item.heat,
-                        itemStyle: {
-                            color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [
-                                { offset: 0, color: categoryColors[item.category] || '#6b7280' },
-                                { offset: 1, color: (categoryColors[item.category] || '#6b7280') + '99' }
-                            ]),
-                            borderRadius: [0, 4, 4, 0]
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                color: '#e2e8f0',
+                                padding: 10,
+                                font: { size: 11 }
+                            }
                         }
-                    })),
-                    barWidth: '55%',
-                    label: {
-                        show: true,
-                        position: 'right',
-                        formatter: '{c}',
-                        color: '#fff',
-                        fontSize: 11
                     }
-                }]
+                }
             });
         }
 
-        function renderSentimentChart(data) {
-            const sentiment = data.stats.sentiment;
-            
-            sentimentChart.setOption({
-                backgroundColor: 'transparent',
-                tooltip: {
-                    trigger: 'item',
-                    backgroundColor: 'rgba(30, 41, 59, 0.95)',
-                    borderColor: 'rgba(255,255,255,0.1)',
-                    textStyle: { color: '#fff' }
-                },
-                series: [{
-                    type: 'pie',
-                    radius: ['50%', '80%'],
-                    center: ['50%', '50%'],
-                    avoidLabelOverlap: false,
-                    itemStyle: {
-                        borderRadius: 6,
-                        borderColor: '#1e293b',
-                        borderWidth: 2
-                    },
-                    label: {
-                        show: true,
-                        formatter: '{b}\n{c}条 ({d}%)',
-                        color: '#cbd5e1',
-                        fontSize: 10
-                    },
-                    data: [
-                        { name: '正面', value: sentiment.positive, itemStyle: { color: '#10b981' } },
-                        { name: '负面', value: sentiment.negative, itemStyle: { color: '#ef4444' } },
-                        { name: '中性', value: sentiment.neutral, itemStyle: { color: '#94a3b8' } }
-                    ]
-                }]
-            });
-        }
+        // Render sentiment chart
+        function renderSentimentChart() {
+            const ctx = document.getElementById('sentimentChart').getContext('2d');
+            const sentiment = newsData.stats.sentiment;
 
-        function renderKeywordChart(data) {
-            // Count keyword frequencies
-            const keywordCount = {};
-            data.news.forEach(item => {
-                item.keywords.forEach(kw => {
-                    keywordCount[kw] = (keywordCount[kw] || 0) + 1;
-                });
-            });
-            
-            const keywordData = Object.entries(keywordCount)
-                .sort((a, b) => b[1] - a[1])
-                .slice(0, 20)
-                .map(([name, value]) => ({ name, value }));
+            if (window.sentimentChartInstance) {
+                window.sentimentChartInstance.destroy();
+            }
 
-            keywordChart.setOption({
-                backgroundColor: 'transparent',
-                tooltip: {
-                    show: true,
-                    backgroundColor: 'rgba(30, 41, 59, 0.95)',
-                    borderColor: 'rgba(255,255,255,0.1)',
-                    textStyle: { color: '#fff' }
+            window.sentimentChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['正面', '中性', '负面'],
+                    datasets: [{
+                        label: '新闻数量',
+                        data: [sentiment.positive, sentiment.neutral, sentiment.negative],
+                        backgroundColor: ['#22c55e', '#64748b', '#ef4444'],
+                        borderRadius: 6
+                    }]
                 },
-                series: [{
-                    type: 'wordCloud',
-                    shape: 'circle',
-                    left: 'center',
-                    top: 'center',
-                    width: '90%',
-                    height: '90%',
-                    right: null,
-                    bottom: null,
-                    sizeRange: [12, 32],
-                    rotationRange: [-45, 45],
-                    rotationStep: 45,
-                    gridSize: 8,
-                    drawOutOfBound: false,
-                    textStyle: {
-                        fontFamily: 'sans-serif',
-                        fontWeight: 'bold',
-                        color: function () {
-                            const colors = ['#3b82f6', '#10b981', '#8b5cf6', '#f59e0b', '#ef4444', '#06b6d4'];
-                            return colors[Math.floor(Math.random() * colors.length)];
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { color: '#94a3b8' },
+                            grid: { color: '#334155' }
+                        },
+                        x: {
+                            ticks: { color: '#e2e8f0' },
+                            grid: { display: false }
                         }
                     },
-                    emphasis: {
-                        focus: 'self',
-                        textStyle: {
-                            textShadowBlur: 10,
-                            textShadowColor: '#333'
-                        }
-                    },
-                    data: keywordData
-                }]
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
             });
         }
 
-        function renderNewsList(data) {
-            const newsListEl = document.getElementById('newsList');
-            newsListEl.innerHTML = '';
-            
-            data.news.sort((a, b) => b.heat - a.heat).forEach(item => {
-                const heatClass = item.heat >= 80 ? 'heat-high' : item.heat >= 60 ? 'heat-medium' : 'heat-low';
-                const sentimentClass = `sentiment-${item.sentiment}`;
-                const impactScore = ((item.impact.social + item.impact.economic + item.impact.political + item.impact.tech) / 4).toFixed(1);
-                const sentimentIcon = item.sentiment === 'positive' ? '🟢' : item.sentiment === 'negative' ? '🔴' : '⚪';
-                
-                const newsEl = document.createElement('div');
-                newsEl.className = 'news-item glass-card rounded-xl p-3 cursor-pointer';
-                newsEl.innerHTML = `
-                    <div class="flex items-start justify-between">
-                        <div class="flex-1 min-w-0">
-                            <div class="flex items-center space-x-2 mb-1 flex-wrap gap-y-1">
-                                <span class="px-2 py-0.5 text-xs rounded font-medium" style="background: ${categoryColors[item.category]}30; color: ${categoryColors[item.category]}">
-                                    ${item.category}
-                                </span>
-                                <span class="text-xs text-gray-400">${item.source}</span>
-                                <span class="text-xs ${heatClass} font-medium">🔥 ${item.heat}</span>
-                                <span class="text-xs ${sentimentClass}">${sentimentIcon} ${item.sentiment === 'positive' ? '正面' : item.sentiment === 'negative' ? '负面' : '中性'}</span>
-                            </div>
-                            <h3 class="text-sm font-medium text-gray-100 line-clamp-1" title="${item.title}">${item.title}</h3>
-                            <p class="text-xs text-gray-400 mt-1 line-clamp-2">${item.summary}</p>
-                            <div class="flex items-center space-x-2 mt-2 flex-wrap gap-y-1">
-                                ${item.keywords.slice(0, 4).map(kw => `<span class="tag px-1.5 py-0.5 text-xs rounded text-blue-300">${kw}</span>`).join('')}
-                                <span class="text-xs text-gray-500 ml-auto">影响分: ${impactScore}</span>
-                            </div>
+        // Render timeline
+        function renderTimeline() {
+            const timeline = document.getElementById('timeline');
+            timeline.innerHTML = '';
+
+            const sortedNews = [...newsData.news].sort((a, b) => b.heat - a.heat).slice(0, 8);
+
+            sortedNews.forEach((item, index) => {
+                const div = document.createElement('div');
+                div.className = 'flex items-start gap-3 p-2 rounded-lg hover:bg-slate-800/50 transition';
+                div.innerHTML = `
+                    <div class="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${index < 3 ? 'bg-yellow-500/20 text-yellow-400' : 'bg-slate-700 text-slate-400'}">${index + 1}</div>
+                    <div class="flex-1 min-w-0">
+                        <div class="text-sm font-medium text-white truncate">${item.title}</div>
+                        <div class="flex items-center gap-2 mt-1">
+                            <span class="text-xs px-2 py-0.5 rounded-full" style="background: ${categoryColors[item.category]}20; color: ${categoryColors[item.category]}">${item.category}</span>
+                            <span class="text-xs text-slate-400">热度: ${item.heat}</span>
                         </div>
                     </div>
                 `;
-                newsListEl.appendChild(newsEl);
+                timeline.appendChild(div);
             });
         }
 
-        // Load and initialize
-        document.addEventListener('DOMContentLoaded', async () => {
-            const data = await loadData();
-            if (data) {
-                initCharts(data);
-            }
+        // Render news list
+        function renderNewsList() {
+            const list = document.getElementById('news-list');
+            list.innerHTML = '';
 
-            // Responsive resize
-            window.addEventListener('resize', () => {
-                networkChart && networkChart.resize();
-                impactChart && impactChart.resize();
-                categoryChart && categoryChart.resize();
-                heatChart && heatChart.resize();
-                sentimentChart && sentimentChart.resize();
-                keywordChart && keywordChart.resize();
+            const filteredNews = currentFilter === 'all' 
+                ? newsData.news 
+                : newsData.news.filter(n => n.category === currentFilter);
+
+            filteredNews.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'glass rounded-xl p-4 card-hover cursor-pointer';
+                card.onclick = () => window.open(item.url, '_blank');
+                
+                const impactScore = ((item.impact.social + item.impact.economic + item.impact.political + item.impact.tech) / 4).toFixed(1);
+                
+                card.innerHTML = `
+                    <div class="flex items-start justify-between gap-2">
+                        <h3 class="text-sm font-medium text-white line-clamp-2">${item.title}</h3>
+                        <span class="flex-shrink-0 text-xs px-2 py-1 rounded-full" style="background: ${categoryColors[item.category]}20; color: ${categoryColors[item.category]}">${item.category}</span>
+                    </div>
+                    <p class="text-xs text-slate-400 mt-2 line-clamp-2">${item.summary}</p>
+                    <div class="flex items-center justify-between mt-3 text-xs">
+                        <div class="flex items-center gap-3">
+                            <span class="text-slate-500">${item.source}</span>
+                            <span class="flex items-center gap-1">
+                                <svg class="w-3 h-3 text-orange-400" fill="currentColor" viewBox="0 0 20 20"><path d="M12.395 2.553a1 1 0 00-1.45-.385c-.345.23-.614.558-.822.88-.214.33-.403.713-.57 1.116-.334.804-.614 1.768-.84 2.734a31.365 31.365 0 00-.613 3.58 2.64 2.64 0 01-.945-1.067c-.328-.68-.398-1.534-.398-2.654A1 1 0 005.05 6.05 6.981 6.981 0 003 11a7 7 0 1011.95-4.95c-.592-.591-.98-.985-1.348-1.467-.363-.476-.724-1.063-1.207-2.03zM12.12 15.12A3 3 0 017 13s.879.5 2.5.5c0-1 .5-4 1.25-4.5.5 1 .786 1.293 1.371 1.879A2.99 2.99 0 0113 13a2.99 2.99 0 01-.879 2.121z"/></svg>
+                                ${item.heat}
+                            </span>
+                        </div>
+                        <span class="text-xs ${item.sentiment === 'positive' ? 'text-green-400' : item.sentiment === 'negative' ? 'text-red-400' : 'text-slate-400'}">
+                            ${item.sentiment === 'positive' ? '正面' : item.sentiment === 'negative' ? '负面' : '中性'}
+                        </span>
+                    </div>
+                    <div class="flex flex-wrap gap-1 mt-2">
+                        ${item.keywords.slice(0, 3).map(kw => `<span class="text-xs px-1.5 py-0.5 rounded bg-slate-700/50 text-slate-300">${kw}</span>`).join('')}
+                    </div>
+                `;
+                list.appendChild(card);
             });
+        }
+
+        // Render keywords cloud
+        function renderKeywordsCloud() {
+            const cloud = document.getElementById('keywords-cloud');
+            cloud.innerHTML = '';
+
+            const keywordCounts = {};
+            newsData.news.forEach(item => {
+                item.keywords.forEach(kw => {
+                    keywordCounts[kw] = (keywordCounts[kw] || 0) + 1;
+                });
+            });
+
+            const sortedKeywords = Object.entries(keywordCounts)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 20);
+
+            sortedKeywords.forEach(([kw, count]) => {
+                const span = document.createElement('span');
+                const size = Math.max(0.75, Math.min(1.5, count / 2));
+                span.className = 'px-3 py-1.5 rounded-full bg-slate-800 text-slate-300 hover:bg-blue-600 hover:text-white transition cursor-pointer';
+                span.style.fontSize = `${size}rem`;
+                span.textContent = kw;
+                span.onclick = () => filterNewsByKeyword(kw);
+                cloud.appendChild(span);
+            });
+        }
+
+        // Filter functions
+        function filterNews(category) {
+            currentFilter = category;
+            renderNewsList();
+            
+            // Update button styles
+            document.querySelectorAll('#news-list').forEach(btn => {
+                btn.classList.remove('bg-blue-600', 'text-white');
+                btn.classList.add('bg-slate-700', 'text-slate-300');
+            });
+        }
+
+        function filterNewsByKeyword(keyword) {
+            const list = document.getElementById('news-list');
+            list.innerHTML = '';
+            
+            const filtered = newsData.news.filter(n => n.keywords.includes(keyword));
+            filtered.forEach(item => {
+                // Similar to renderNewsList but with filtered items
+                const card = document.createElement('div');
+                card.className = 'glass rounded-xl p-4 card-hover';
+                card.innerHTML = `
+                    <div class="flex items-start justify-between gap-2">
+                        <h3 class="text-sm font-medium text-white">${item.title}</h3>
+                        <span class="flex-shrink-0 text-xs px-2 py-1 rounded-full bg-blue-600 text-white">${item.category}</span>
+                    </div>
+                    <p class="text-xs text-slate-400 mt-2">${item.summary}</p>
+                `;
+                list.appendChild(card);
+            });
+        }
+
+        function refreshData() {
+            loadData();
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', loadData);
+
+        // Handle resize
+        window.addEventListener('resize', () => {
+            if (newsData) renderNetworkGraph();
         });
     </script>
-    <!-- WordCloud extension for ECharts -->
-    <script src="https://cdn.jsdelivr.net/npm/echarts-wordcloud@2.1.0/dist/echarts-wordcloud.min.js"></script>
 </body>
 </html>
