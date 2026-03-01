@@ -3,122 +3,453 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>新闻智能分析中心</title>
+    <title>新闻智能分析中心 - 实时热点监测</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
     <style>
-        * { font-family: -apple-system, BlinkMacSystemFont, sans-serif; }
+        * { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
         .glass {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .glass-card {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(147, 51, 234, 0.1) 100%);
             backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .news-item { transition: all 0.3s ease; }
+        .news-item:hover { transform: translateX(4px); }
+        .tag {
+            background: rgba(59, 130, 246, 0.2);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+        }
+        .heat-high { color: #ef4444; }
+        .heat-medium { color: #f59e0b; }
+        .heat-low { color: #10b981; }
+        @media (max-width: 768px) {
+            .chart-container { height: 280px !important; }
         }
     </style>
 </head>
-<body class="bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 min-h-screen text-white">
-    <header class="glass sticky top-0 z-50 px-4 py-3">
+<body class="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 min-h-screen text-white">
+    <!-- Header -->
+    <header class="glass sticky top-0 z-50 px-4 py-4">
         <div class="max-w-7xl mx-auto flex items-center justify-between">
             <div class="flex items-center space-x-3">
-                <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
-                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="w-12 h-12 bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 rounded-xl flex items-center justify-center shadow-lg">
+                    <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
                     </svg>
                 </div>
                 <div>
-                    <h1 class="text-lg font-bold">新闻智能分析中心</h1>
+                    <h1 class="text-xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">新闻智能分析中心</h1>
                     <p class="text-xs text-gray-400">实时热点 · 关联分析 · 影响评估</p>
                 </div>
             </div>
-            <div class="text-right">
-                <p class="text-sm font-medium" id="lastUpdate">更新于: --:--</p>
+            <div class="text-right hidden sm:block">
+                <p class="text-sm font-medium" id="lastUpdate">更新于: 2026-03-01 16:47</p>
                 <p class="text-xs text-gray-400">每30分钟自动刷新</p>
             </div>
         </div>
     </header>
 
     <main class="max-w-7xl mx-auto px-4 py-6 space-y-6">
+        <!-- Stats Cards -->
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div class="glass rounded-2xl p-4">
-                <p class="text-gray-400 text-xs">热点新闻</p>
-                <p class="text-2xl font-bold text-blue-400">50</p>
+            <div class="glass-card rounded-2xl p-4 text-center">
+                <p class="text-gray-400 text-xs mb-1">热点新闻</p>
+                <p class="text-3xl font-bold text-blue-400" id="totalNews">15</p>
+                <p class="text-xs text-gray-500 mt-1">条实时数据</p>
             </div>
-            <div class="glass rounded-2xl p-4">
-                <p class="text-gray-400 text-xs">关联关系</p>
-                <p class="text-2xl font-bold text-purple-400">24</p>
+            <div class="glass-card rounded-2xl p-4 text-center">
+                <p class="text-gray-400 text-xs mb-1">关联关系</p>
+                <p class="text-3xl font-bold text-purple-400" id="relationsCount">15</p>
+                <p class="text-xs text-gray-500 mt-1">语义相似度>0.7</p>
             </div>
-            <div class="glass rounded-2xl p-4">
-                <p class="text-gray-400 text-xs">高影响事件</p>
-                <p class="text-2xl font-bold text-red-400">8</p>
+            <div class="glass-card rounded-2xl p-4 text-center">
+                <p class="text-gray-400 text-xs mb-1">高影响事件</p>
+                <p class="text-3xl font-bold text-red-400" id="highImpact">6</p>
+                <p class="text-xs text-gray-500 mt-1">综合评分>8</p>
             </div>
-            <div class="glass rounded-2xl p-4">
-                <p class="text-gray-400 text-xs">趋势预测</p>
-                <p class="text-2xl font-bold text-green-400">12</p>
+            <div class="glass-card rounded-2xl p-4 text-center">
+                <p class="text-gray-400 text-xs mb-1">平均热度</p>
+                <p class="text-3xl font-bold text-green-400" id="avgHeat">70.5</p>
+                <p class="text-xs text-gray-500 mt-1">满分100</p>
             </div>
         </div>
 
+        <!-- Charts Row 1 -->
         <div class="grid md:grid-cols-2 gap-6">
             <div class="glass rounded-2xl p-4">
-                <h2 class="text-lg font-semibold mb-4">新闻关联网络</h2>
-                <div id="networkChart" class="w-full h-64"></div>
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-lg font-semibold flex items-center">
+                        <span class="w-2 h-2 bg-blue-500 rounded-full mr-2"></span>
+                        新闻关联网络
+                    </h2>
+                    <span class="text-xs text-gray-400">拖拽节点可调整布局</span>
+                </div>
+                <div id="networkChart" class="w-full chart-container" style="height: 320px;"></div>
             </div>
 
             <div class="glass rounded-2xl p-4">
-                <h2 class="text-lg font-semibold mb-4">影响维度分析</h2>
-                <div id="impactChart" class="w-full h-64"></div>
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-lg font-semibold flex items-center">
+                        <span class="w-2 h-2 bg-purple-500 rounded-full mr-2"></span>
+                        影响维度雷达图
+                    </h2>
+                    <span class="text-xs text-gray-400">社会/经济/政治/科技</span>
+                </div>
+                <div id="impactChart" class="w-full chart-container" style="height: 320px;"></div>
+            </div>
+        </div>
+
+        <!-- Charts Row 2 -->
+        <div class="grid md:grid-cols-2 gap-6">
+            <div class="glass rounded-2xl p-4">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-lg font-semibold flex items-center">
+                        <span class="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
+                        新闻分类分布
+                    </h2>
+                </div>
+                <div id="categoryChart" class="w-full chart-container" style="height: 280px;"></div>
+            </div>
+
+            <div class="glass rounded-2xl p-4">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-lg font-semibold flex items-center">
+                        <span class="w-2 h-2 bg-orange-500 rounded-full mr-2"></span>
+                        热度排行TOP5
+                    </h2>
+                </div>
+                <div id="heatChart" class="w-full chart-container" style="height: 280px;"></div>
+            </div>
+        </div>
+
+        <!-- News Timeline -->
+        <div class="glass rounded-2xl p-4">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-lg font-semibold flex items-center">
+                    <span class="w-2 h-2 bg-pink-500 rounded-full mr-2"></span>
+                    热点新闻时间线
+                </h2>
+                <div class="flex space-x-2">
+                    <span class="px-2 py-1 text-xs rounded bg-blue-500/20 text-blue-300">科技</span>
+                    <span class="px-2 py-1 text-xs rounded bg-green-500/20 text-green-300">财经</span>
+                    <span class="px-2 py-1 text-xs rounded bg-purple-500/20 text-purple-300">政策</span>
+                </div>
+            </div>
+            <div id="newsList" class="space-y-3 max-h-96 overflow-y-auto">
+                <!-- News items will be inserted here -->
             </div>
         </div>
     </main>
 
+    <footer class="max-w-7xl mx-auto px-4 py-6 text-center text-gray-500 text-sm">
+        <p>新闻智能分析中心 © 2026 | 数据来源: 综合各大新闻平台 | 每30分钟自动更新</p>
+    </footer>
+
     <script>
+        // Data
+        const newsData = {
+            "timestamp": "2026-03-01T16:47:00+08:00",
+            "news": [
+                {"id": "news_001", "title": "2026年中国AI发展趋势前瞻：从聊天走向做事", "summary": "人工智能企业数量超过6000家，AI核心产业规模预计突破1.2万亿元...", "source": "新华社", "heat": 95, "impact": {"social": 7, "economic": 9, "political": 6, "tech": 10}, "keywords": ["AI", "人工智能", "DeepSeek", "智能体", "大模型"], "category": "科技"},
+                {"id": "news_002", "title": "内存价格暴涨超黄金，手机或将迎来涨价潮", "summary": "2026年服务器内存条价格大幅上涨，SD卡涨幅超60%...", "source": "海报新闻/IDC", "heat": 88, "impact": {"social": 6, "economic": 9, "political": 4, "tech": 8}, "keywords": ["内存", "芯片", "手机涨价", "AI", "存储"], "category": "财经"},
+                {"id": "news_003", "title": "2026年A股投资机遇凸显，外资看好中国股市", "summary": "2026年是十五五开局之年，经济增长目标4.5%-5.5%...", "source": "证券市场周刊/高盛", "heat": 85, "impact": {"social": 5, "economic": 10, "political": 7, "tech": 6}, "keywords": ["A股", "股市", "投资", "经济", "外资"], "category": "财经"},
+                {"id": "news_004", "title": "中国AI企业全产业链全景盘点：头部集中引领", "summary": "2025-2026年全球AI产业进入推理落地与场景普惠的黄金期...", "source": "IT之家/北京日报", "heat": 82, "impact": {"social": 6, "economic": 8, "political": 5, "tech": 10}, "keywords": ["AI企业", "芯片", "大模型", "产业链", "科技"], "category": "科技"},
+                {"id": "news_005", "title": "椰树集团擦边营销再引争议，近20年被罚上百万", "summary": "椰树集团工厂参观宣传广告语涉嫌低俗...", "source": "新浪财经", "heat": 78, "impact": {"social": 8, "economic": 5, "political": 4, "tech": 2}, "keywords": ["椰树", "广告", "低俗", "营销", "争议"], "category": "社会"},
+                {"id": "news_006", "title": "中国芯片产业面临瓶颈，AI发展受限于产能", "summary": "中国AI产业发展强劲，但芯片产量仅为外国企业的2%...", "source": "纽约时报", "heat": 76, "impact": {"social": 5, "economic": 8, "political": 9, "tech": 10}, "keywords": ["芯片", "半导体", "AI", "华为", "产能"], "category": "科技"},
+                {"id": "news_007", "title": "2026年AI硬着陆：算力重心从云端转向边缘", "summary": "AI产业经历从云端造梦到边缘实战的转折...", "source": "澎湃新闻/安富利", "heat": 74, "impact": {"social": 5, "economic": 7, "political": 4, "tech": 9}, "keywords": ["AI", "边缘计算", "算力", "量产", "智能制造"], "category": "科技"},
+                {"id": "news_008", "title": "未成年人网络保护新规3月1日起正式施行", "summary": "8部门联合发布《可能影响未成年人身心健康的网络信息分类办法》...", "source": "中国消费者报", "heat": 72, "impact": {"social": 9, "economic": 4, "political": 8, "tech": 6}, "keywords": ["未成年人", "网络保护", "政策", "算法", "信息安全"], "category": "政策"},
+                {"id": "news_009", "title": "深圳发布2026以旧换新实施方案，购车最高补2万", "summary": "深圳发布以旧换新实施方案，购车最高补贴2万元...", "source": "深圳新闻网", "heat": 68, "impact": {"social": 7, "economic": 8, "political": 6, "tech": 5}, "keywords": ["深圳", "以旧换新", "补贴", "消费", "政策"], "category": "政策"},
+                {"id": "news_010", "title": "清华大学发布柔性AI芯片FLEXI，登上Nature", "summary": "清华大学集成电路学院团队提出面向边缘智能加速的柔性数字存内计算芯片...", "source": "清华大学", "heat": 65, "impact": {"social": 4, "economic": 5, "political": 3, "tech": 9}, "keywords": ["清华", "芯片", "柔性电子", "AI", "Nature"], "category": "科技"},
+                {"id": "news_011", "title": "商务部将日本有关实体列入出口管制管控名单", "summary": "商务部表示中方将日本有关实体列入出口管制管控名单...", "source": "新京报", "heat": 63, "impact": {"social": 5, "economic": 6, "political": 10, "tech": 4}, "keywords": ["中日", "出口管制", "军事", "外交", "贸易"], "category": "政治"},
+                {"id": "news_012", "title": "摩根士丹利：2026年是巩固中国股市胜利果实的一年", "summary": "摩根士丹利预计2026年中国股市指数表现可能呈现个位数涨幅...", "source": "摩根士丹利", "heat": 60, "impact": {"social": 4, "economic": 9, "political": 5, "tech": 6}, "keywords": ["摩根士丹利", "A股", "投资", "AI", "盈利"], "category": "财经"},
+                {"id": "news_013", "title": "2026年全球大降息周期开启，AI超级应用大爆发", "summary": "预测2026年全球主要国家将开启新一轮降息放水...", "source": "泽平宏观", "heat": 58, "impact": {"social": 6, "economic": 9, "political": 7, "tech": 8}, "keywords": ["降息", "AI应用", "经济", "政策", "智能驾驶"], "category": "财经"},
+                {"id": "news_014", "title": "高盛预警：股市回调是2026年美国经济最大风险", "summary": "高盛最新报告指出股市大幅回调恐成为最大潜在风险...", "source": "高盛", "heat": 55, "impact": {"social": 5, "economic": 9, "political": 6, "tech": 3}, "keywords": ["高盛", "美股", "经济风险", "GDP", "回调"], "category": "财经"},
+                {"id": "news_015", "title": "日本将设3大支援基地提升AI半导体产业实力", "summary": "日本为提振AI半导体产业，将设立3个基地培育设计、生产设备...", "source": "日经中文网", "heat": 52, "impact": {"social": 3, "economic": 7, "political": 6, "tech": 9}, "keywords": ["日本", "半导体", "AI", "芯片", "产业"], "category": "科技"}
+            ],
+            "relations": [
+                {"source": "news_001", "target": "news_004", "type": "similar", "strength": 0.92},
+                {"source": "news_001", "target": "news_006", "type": "causal", "strength": 0.85},
+                {"source": "news_001", "target": "news_007", "type": "similar", "strength": 0.88},
+                {"source": "news_002", "target": "news_006", "type": "causal", "strength": 0.90},
+                {"source": "news_003", "target": "news_012", "type": "similar", "strength": 0.87},
+                {"source": "news_003", "target": "news_014", "type": "similar", "strength": 0.75},
+                {"source": "news_004", "target": "news_006", "type": "causal", "strength": 0.82},
+                {"source": "news_004", "target": "news_010", "type": "similar", "strength": 0.78},
+                {"source": "news_006", "target": "news_015", "type": "similar", "strength": 0.80},
+                {"source": "news_007", "target": "news_010", "type": "similar", "strength": 0.85},
+                {"source": "news_008", "target": "news_001", "type": "related", "strength": 0.65},
+                {"source": "news_009", "target": "news_003", "type": "related", "strength": 0.70},
+                {"source": "news_012", "target": "news_013", "type": "similar", "strength": 0.76},
+                {"source": "news_013", "target": "news_001", "type": "causal", "strength": 0.83},
+                {"source": "news_002", "target": "news_003", "type": "related", "strength": 0.72}
+            ]
+        };
+
+        // Color mapping for categories
+        const categoryColors = {
+            '科技': '#3b82f6',
+            '财经': '#10b981',
+            '政策': '#8b5cf6',
+            '社会': '#f59e0b',
+            '政治': '#ef4444'
+        };
+
+        // Initialize charts
         const networkChart = echarts.init(document.getElementById('networkChart'));
         const impactChart = echarts.init(document.getElementById('impactChart'));
+        const categoryChart = echarts.init(document.getElementById('categoryChart'));
+        const heatChart = echarts.init(document.getElementById('heatChart'));
 
+        // Prepare network data
+        const nodes = newsData.news.map(item => ({
+            id: item.id,
+            name: item.title.substring(0, 8) + '...',
+            fullTitle: item.title,
+            symbolSize: 20 + item.heat / 5,
+            category: item.category,
+            heat: item.heat,
+            itemStyle: { color: categoryColors[item.category] || '#999' }
+        }));
+
+        const links = newsData.relations.map(r => ({
+            source: r.source,
+            target: r.target,
+            value: r.strength,
+            lineStyle: { 
+                width: r.strength * 3,
+                curveness: 0.2,
+                opacity: 0.6
+            }
+        }));
+
+        // Network Chart
         networkChart.setOption({
             backgroundColor: 'transparent',
+            tooltip: {
+                trigger: 'item',
+                formatter: function(params) {
+                    if (params.dataType === 'node') {
+                        return `<div style="max-width:200px">
+                            <strong>${params.data.fullTitle}</strong><br/>
+                            分类: ${params.data.category}<br/>
+                            热度: ${params.data.heat}
+                        </div>`;
+                    }
+                    return `${params.data.source} → ${params.data.target}<br/>关联度: ${(params.data.value * 100).toFixed(0)}%`;
+                }
+            },
+            legend: {
+                data: Object.keys(categoryColors),
+                textStyle: { color: '#94a3b8', fontSize: 10 },
+                bottom: 0,
+                itemWidth: 12,
+                itemHeight: 12
+            },
             series: [{
                 type: 'graph',
                 layout: 'force',
-                data: [
-                    {name: 'AI技术突破', symbolSize: 50, category: 0},
-                    {name: '股市波动', symbolSize: 40, category: 1},
-                    {name: '新能源政策', symbolSize: 45, category: 2}
-                ],
-                links: [
-                    {source: 'AI技术突破', target: '股市波动'},
-                    {source: '新能源政策', target: '股市波动'}
-                ],
-                categories: [{name: '科技'}, {name: '财经'}, {name: '政策'}],
+                data: nodes,
+                links: links,
+                categories: Object.keys(categoryColors).map(name => ({ name })),
                 roam: true,
-                label: {show: true, color: '#fff'},
-                lineStyle: {color: 'rgba(255,255,255,0.3)'}
+                label: {
+                    show: true,
+                    position: 'bottom',
+                    fontSize: 10,
+                    color: '#cbd5e1'
+                },
+                force: {
+                    repulsion: 150,
+                    gravity: 0.1,
+                    edgeLength: 80
+                },
+                emphasis: {
+                    focus: 'adjacency',
+                    lineStyle: { width: 5 }
+                }
             }]
         });
 
+        // Calculate average impact dimensions
+        const avgImpact = { social: 0, economic: 0, political: 0, tech: 0 };
+        newsData.news.forEach(item => {
+            avgImpact.social += item.impact.social;
+            avgImpact.economic += item.impact.economic;
+            avgImpact.political += item.impact.political;
+            avgImpact.tech += item.impact.tech;
+        });
+        const count = newsData.news.length;
+        Object.keys(avgImpact).forEach(k => avgImpact[k] = (avgImpact[k] / count).toFixed(1));
+
+        // Impact Radar Chart
         impactChart.setOption({
             backgroundColor: 'transparent',
+            tooltip: {
+                trigger: 'item'
+            },
             radar: {
                 indicator: [
-                    {name: '社会', max: 10},
-                    {name: '经济', max: 10},
-                    {name: '政治', max: 10},
-                    {name: '科技', max: 10}
+                    { name: '社会影响', max: 10 },
+                    { name: '经济影响', max: 10 },
+                    { name: '政治影响', max: 10 },
+                    { name: '科技影响', max: 10 }
                 ],
-                axisName: {color: '#fff'}
+                axisName: { color: '#94a3b8', fontSize: 11 },
+                splitArea: {
+                    areaStyle: {
+                        color: ['rgba(59, 130, 246, 0.05)', 'rgba(59, 130, 246, 0.1)']
+                    }
+                },
+                axisLine: { lineStyle: { color: 'rgba(255,255,255,0.2)' } },
+                splitLine: { lineStyle: { color: 'rgba(255,255,255,0.1)' } }
             },
             series: [{
                 type: 'radar',
                 data: [{
-                    value: [8, 7, 6, 9],
-                    name: '综合影响',
-                    areaStyle: {color: 'rgba(59, 130, 246, 0.3)'},
-                    lineStyle: {color: '#3b82f6'}
+                    value: [avgImpact.social, avgImpact.economic, avgImpact.political, avgImpact.tech],
+                    name: '平均影响维度',
+                    areaStyle: {
+                        color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                            { offset: 0, color: 'rgba(59, 130, 246, 0.5)' },
+                            { offset: 1, color: 'rgba(147, 51, 234, 0.3)' }
+                        ])
+                    },
+                    lineStyle: { color: '#3b82f6', width: 2 },
+                    itemStyle: { color: '#3b82f6' }
                 }]
             }]
         });
 
+        // Category Distribution Chart
+        const categoryCount = {};
+        newsData.news.forEach(item => {
+            categoryCount[item.category] = (categoryCount[item.category] || 0) + 1;
+        });
+
+        categoryChart.setOption({
+            backgroundColor: 'transparent',
+            tooltip: { trigger: 'item' },
+            legend: {
+                orient: 'vertical',
+                right: 10,
+                top: 'center',
+                textStyle: { color: '#94a3b8', fontSize: 11 }
+            },
+            series: [{
+                type: 'pie',
+                radius: ['40%', '70%'],
+                center: ['40%', '50%'],
+                avoidLabelOverlap: false,
+                itemStyle: {
+                    borderRadius: 8,
+                    borderColor: '#1e293b',
+                    borderWidth: 2
+                },
+                label: { show: false },
+                emphasis: {
+                    label: {
+                        show: true,
+                        fontSize: 14,
+                        fontWeight: 'bold',
+                        color: '#fff'
+                    }
+                },
+                data: Object.entries(categoryCount).map(([name, value]) => ({
+                    name,
+                    value,
+                    itemStyle: { color: categoryColors[name] }
+                }))
+            }]
+        });
+
+        // Heat Ranking Chart
+        const top5News = [...newsData.news].sort((a, b) => b.heat - a.heat).slice(0, 5);
+        heatChart.setOption({
+            backgroundColor: 'transparent',
+            tooltip: {
+                trigger: 'axis',
+                axisPointer: { type: 'shadow' },
+                formatter: function(params) {
+                    const item = top5News[params[0].dataIndex];
+                    return `<strong>${item.title}</strong><br/>热度: ${item.heat}`;
+                }
+            },
+            grid: { left: '3%', right: '15%', bottom: '3%', containLabel: true },
+            xAxis: {
+                type: 'value',
+                max: 100,
+                axisLine: { lineStyle: { color: 'rgba(255,255,255,0.2)' } },
+                axisLabel: { color: '#94a3b8' },
+                splitLine: { lineStyle: { color: 'rgba(255,255,255,0.1)' } }
+            },
+            yAxis: {
+                type: 'category',
+                data: top5News.map(item => item.title.substring(0, 10) + '...'),
+                axisLine: { lineStyle: { color: 'rgba(255,255,255,0.2)' } },
+                axisLabel: { color: '#cbd5e1', fontSize: 10 }
+            },
+            series: [{
+                type: 'bar',
+                data: top5News.map(item => ({
+                    value: item.heat,
+                    itemStyle: {
+                        color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [
+                            { offset: 0, color: categoryColors[item.category] },
+                            { offset: 1, color: categoryColors[item.category] + '80' }
+                        ])
+                    }
+                })),
+                barWidth: '60%',
+                label: {
+                    show: true,
+                    position: 'right',
+                    formatter: '{c}',
+                    color: '#fff'
+                }
+            }]
+        });
+
+        // Render News List
+        const newsListEl = document.getElementById('newsList');
+        newsData.news.sort((a, b) => b.heat - a.heat).forEach(item => {
+            const heatClass = item.heat >= 80 ? 'heat-high' : item.heat >= 60 ? 'heat-medium' : 'heat-low';
+            const impactScore = ((item.impact.social + item.impact.economic + item.impact.political + item.impact.tech) / 4).toFixed(1);
+            
+            const newsEl = document.createElement('div');
+            newsEl.className = 'news-item glass-card rounded-xl p-3 cursor-pointer';
+            newsEl.innerHTML = `
+                <div class="flex items-start justify-between">
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center space-x-2 mb-1">
+                            <span class="px-2 py-0.5 text-xs rounded" style="background: ${categoryColors[item.category]}30; color: ${categoryColors[item.category]}">
+                                ${item.category}
+                            </span>
+                            <span class="text-xs text-gray-400">${item.source}</span>
+                            <span class="text-xs ${heatClass} font-medium">🔥 ${item.heat}</span>
+                        </div>
+                        <h3 class="text-sm font-medium text-gray-100 truncate">${item.title}</h3>
+                        <p class="text-xs text-gray-400 mt-1 line-clamp-2">${item.summary}</p>
+                        <div class="flex items-center space-x-2 mt-2">
+                            ${item.keywords.slice(0, 3).map(kw => `<span class="tag px-1.5 py-0.5 text-xs rounded text-blue-300">${kw}</span>`).join('')}
+                            <span class="text-xs text-gray-500 ml-auto">影响分: ${impactScore}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+            newsListEl.appendChild(newsEl);
+        });
+
+        // Responsive resize
         window.addEventListener('resize', () => {
             networkChart.resize();
             impactChart.resize();
+            categoryChart.resize();
+            heatChart.resize();
         });
     </script>
 </body>

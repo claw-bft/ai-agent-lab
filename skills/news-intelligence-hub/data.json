@@ -1,93 +1,200 @@
 {
-  "timestamp": "2026-03-01T16:00:00+08:00",
+  "timestamp": "2026-03-01T16:47:00+08:00",
   "news": [
     {
-      "id": "news-001",
-      "title": "2026年全国两会新闻中心启用",
-      "summary": "针对国内外关注的热点话题，新闻中心将邀请国务院有关部门主要负责人出席记者会",
-      "source": "央视网",
-      "url": "https://news.cctv.cn/2026/02/27/ARTIoy6RbimK6hGjW7IfNqo3260227.shtml",
-      "heat_score": 95.0,
-      "category": "时政",
-      "keywords": ["两会", "新闻中心", "政策"],
-      "impact": {"social": 8, "economic": 7, "political": 10, "tech": 5}
-    },
-    {
-      "id": "news-002",
-      "title": "AI产业全面提速：算力需求攀升、智能体价值兑现",
-      "summary": "AI办公智能体产品一站式覆盖办公与开发，已拥有数千家下游客户",
-      "source": "中国新闻网",
-      "url": "https://www.chinanews.com.cn/cj/2026/03-01/10578574.shtml",
-      "heat_score": 88.0,
+      "id": "news_001",
+      "title": "2026年中国AI发展趋势前瞻：从聊天走向做事",
+      "summary": "人工智能企业数量超过6000家，AI核心产业规模预计突破1.2万亿元。AI竞争转向智能体时代，从对话范式转向能办事的智能体。DeepSeek、智谱AI等企业在技术路线上实现突破。",
+      "source": "新华社",
+      "heat": 95,
+      "impact": {"social": 7, "economic": 9, "political": 6, "tech": 10},
+      "keywords": ["AI", "人工智能", "DeepSeek", "智能体", "大模型"],
       "category": "科技",
-      "keywords": ["AI", "智能体", "算力"],
-      "impact": {"social": 7, "economic": 9, "political": 6, "tech": 10}
+      "url": "https://www.news.cn/20260128/ai-trends"
     },
     {
-      "id": "news-003",
-      "title": "中国人形机器人频频破圈，具身智能迈入应用时代",
-      "summary": "具身智能和嵌入式AI被列为2026年度最值得关注的技术趋势之一",
-      "source": "太原新闻网",
-      "url": "http://www.tynews.com.cn/system/2026/03/01/030991401.shtml",
-      "heat_score": 82.0,
-      "category": "科技",
-      "keywords": ["机器人", "具身智能", "AI"],
-      "impact": {"social": 6, "economic": 8, "political": 5, "tech": 9}
-    },
-    {
-      "id": "news-004",
-      "title": "AI热潮挤占芯片产能，国产手机将于3月集体涨价",
-      "summary": "OPPO、一加、vivo、小米等品牌计划3月上旬启动涨价",
-      "source": "艾媒网",
-      "url": "https://www.iimedia.cn/c1040/109873.html",
-      "heat_score": 78.0,
+      "id": "news_002",
+      "title": "内存价格暴涨超黄金，手机或将迎来涨价潮",
+      "summary": "2026年服务器内存条价格大幅上涨，SD卡涨幅超60%，是现货黄金涨幅的3倍以上。AI需求爆发导致存储芯片短缺，智能手机平均售价预计上涨14%至523美元。",
+      "source": "海报新闻/IDC",
+      "heat": 88,
+      "impact": {"social": 6, "economic": 9, "political": 4, "tech": 8},
+      "keywords": ["内存", "芯片", "手机涨价", "AI", "存储"],
       "category": "财经",
-      "keywords": ["芯片", "手机", "涨价"],
-      "impact": {"social": 7, "economic": 9, "political": 4, "tech": 8}
+      "url": "https://www.dzwww.com/memory-price"
     },
     {
-      "id": "news-005",
-      "title": "冰雪经济高质量发展：冷资源释放热效应",
-      "summary": "从哈尔滨国际冰雪节到北极村冰雪秘境，见证中国冰雪经济蝶变",
-      "source": "人民网",
-      "url": "http://politics.people.com.cn/n1/2026/0301/c461001-40672545.html",
-      "heat_score": 72.0,
+      "id": "news_003",
+      "title": "2026年A股投资机遇凸显，外资看好中国股市",
+      "summary": "2026年是十五五开局之年，经济增长目标4.5%-5.5%。高盛预测中国股票市场到2027年末有望实现38%涨幅。企业盈利改善、科技创新突破推动中国资产重估。",
+      "source": "证券市场周刊/高盛",
+      "heat": 85,
+      "impact": {"social": 5, "economic": 10, "political": 7, "tech": 6},
+      "keywords": ["A股", "股市", "投资", "经济", "外资"],
+      "category": "财经",
+      "url": "https://finance.sina.com.cn/stock/2026-outlook"
+    },
+    {
+      "id": "news_004",
+      "title": "中国AI企业全产业链全景盘点：头部集中引领",
+      "summary": "2025-2026年全球AI产业进入推理落地与场景普惠的黄金期。联想、华为等头部企业实现全栈布局，寒武纪、摩尔线程等在芯片领域突破，推想科技、金山办公等在应用层落地。",
+      "source": "IT之家/北京日报",
+      "heat": 82,
+      "impact": {"social": 6, "economic": 8, "political": 5, "tech": 10},
+      "keywords": ["AI企业", "芯片", "大模型", "产业链", "科技"],
+      "category": "科技",
+      "url": "https://www.ithome.com/ai-companies-2026"
+    },
+    {
+      "id": "news_005",
+      "title": "椰树集团擦边营销再引争议，近20年被罚上百万",
+      "summary": "椰树集团工厂参观宣传广告语涉嫌低俗，如椰树女员工胸这么大等。椰树因低俗宣传多次被罚，2019年被罚20万，2024年被罚40万，形成认罚不认错的行事逻辑。",
+      "source": "新浪财经",
+      "heat": 78,
+      "impact": {"social": 8, "economic": 5, "political": 4, "tech": 2},
+      "keywords": ["椰树", "广告", "低俗", "营销", "争议"],
       "category": "社会",
-      "keywords": ["冰雪经济", "旅游", "消费"],
-      "impact": {"social": 8, "economic": 7, "political": 6, "tech": 3}
+      "url": "https://finance.sina.com.cn/tech/yeshu-controversy"
+    },
+    {
+      "id": "news_006",
+      "title": "中国芯片产业面临瓶颈，AI发展受限于产能",
+      "summary": "中国AI产业发展强劲，但芯片产量仅为外国企业的2%。华为表示还需近两年才能造出与英伟达相当的芯片。存储芯片产能差距达70倍，中芯国际良品率偏低。",
+      "source": "纽约时报",
+      "heat": 76,
+      "impact": {"social": 5, "economic": 8, "political": 9, "tech": 10},
+      "keywords": ["芯片", "半导体", "AI", "华为", "产能"],
+      "category": "科技",
+      "url": "https://cn.nytimes.com/china-chips"
+    },
+    {
+      "id": "news_007",
+      "title": "2026年AI硬着陆：算力重心从云端转向边缘",
+      "summary": "AI产业经历从云端造梦到边缘实战的转折。安富利报告显示85%中国受访企业AI产品已进入量产交付阶段，远高于全球56%水平。边缘AI面临功耗、热设计和数据清洗挑战。",
+      "source": "澎湃新闻/安富利",
+      "heat": 74,
+      "impact": {"social": 5, "economic": 7, "political": 4, "tech": 9},
+      "keywords": ["AI", "边缘计算", "算力", "量产", "智能制造"],
+      "category": "科技",
+      "url": "https://m.thepaper.cn/ai-edge-2026"
+    },
+    {
+      "id": "news_008",
+      "title": "未成年人网络保护新规3月1日起正式施行",
+      "summary": "8部门联合发布《可能影响未成年人身心健康的网络信息分类办法》，首次系统性界定风险信息范围。明确不得在首页首屏、弹窗、热搜等位置呈现风险信息，算法推荐平台需建立安全管理制度。",
+      "source": "中国消费者报",
+      "heat": 72,
+      "impact": {"social": 9, "economic": 4, "political": 8, "tech": 6},
+      "keywords": ["未成年人", "网络保护", "政策", "算法", "信息安全"],
+      "category": "政策",
+      "url": "https://www.ccn.com.cn/minor-protection"
+    },
+    {
+      "id": "news_009",
+      "title": "深圳发布2026以旧换新实施方案，购车最高补2万",
+      "summary": "深圳发布以旧换新实施方案，购车最高补贴2万元，多品类享15%补贴。同时发布保险业助力科创与产业发展三年行动方案，推动高质量发展。",
+      "source": "深圳新闻网",
+      "heat": 68,
+      "impact": {"social": 7, "economic": 8, "political": 6, "tech": 5},
+      "keywords": ["深圳", "以旧换新", "补贴", "消费", "政策"],
+      "category": "政策",
+      "url": "https://www.sznews.com/subsidy-2026"
+    },
+    {
+      "id": "news_010",
+      "title": "清华大学发布柔性AI芯片FLEXI，登上Nature",
+      "summary": "清华大学集成电路学院团队提出面向边缘智能加速的柔性数字存内计算芯片FLEXI，采用LTPS CMOS工艺制造，兼具轻薄、低成本和高能效优势，为可穿戴医疗等应用奠定基础。",
+      "source": "清华大学",
+      "heat": 65,
+      "impact": {"social": 4, "economic": 5, "political": 3, "tech": 9},
+      "keywords": ["清华", "芯片", "柔性电子", "AI", "Nature"],
+      "category": "科技",
+      "url": "https://www.tsinghua.edu.cn/flexi-chip"
+    },
+    {
+      "id": "news_011",
+      "title": "商务部将日本有关实体列入出口管制管控名单",
+      "summary": "商务部2月26日表示，中方于2月24日将日本有关实体列入出口管制管控名单和关注名单，目的是制止日本再军事化和拥核企图，完全正当、合理、合法。",
+      "source": "新京报",
+      "heat": 63,
+      "impact": {"social": 5, "economic": 6, "political": 10, "tech": 4},
+      "keywords": ["中日", "出口管制", "军事", "外交", "贸易"],
+      "category": "政治",
+      "url": "https://www.bjnews.com.cn/japan-export-control"
+    },
+    {
+      "id": "news_012",
+      "title": "摩根士丹利：2026年是巩固中国股市胜利果实的一年",
+      "summary": "摩根士丹利预计2026年中国股市指数表现可能呈现个位数涨幅，主要驱动力来自企业盈利提升。看好AI、高端制造、生物制药等板块，反内卷将是持续数年的长期主题。",
+      "source": "摩根士丹利/券商中国",
+      "heat": 60,
+      "impact": {"social": 4, "economic": 9, "political": 5, "tech": 6},
+      "keywords": ["摩根士丹利", "A股", "投资", "AI", "盈利"],
+      "category": "财经",
+      "url": "https://finance.eastmoney.com/ms-2026-outlook"
+    },
+    {
+      "id": "news_013",
+      "title": "2026年全球大降息周期开启，AI超级应用大爆发",
+      "summary": "预测2026年全球主要国家将开启新一轮降息放水。美联储可能有两到五次降息，中国货币政策定调适度宽松。AI超级应用将在智能驾驶、AI助手、人形机器人等领域爆发。",
+      "source": "泽平宏观",
+      "heat": 58,
+      "impact": {"social": 6, "economic": 9, "political": 7, "tech": 8},
+      "keywords": ["降息", "AI应用", "经济", "政策", "智能驾驶"],
+      "category": "财经",
+      "url": "https://www.binance.com/2026-outlook"
+    },
+    {
+      "id": "news_014",
+      "title": "高盛预警：股市回调是2026年美国经济最大风险",
+      "summary": "高盛最新报告指出，尽管2026年美国经济预计将维持温和增长，但股市大幅回调恐成为最大潜在风险。若股市下跌两成，将导致GDP下降1%。",
+      "source": "高盛/雅虎财经",
+      "heat": 55,
+      "impact": {"social": 5, "economic": 9, "political": 6, "tech": 3},
+      "keywords": ["高盛", "美股", "经济风险", "GDP", "回调"],
+      "category": "财经",
+      "url": "https://hk.finance.yahoo.com/goldman-sachs-warning"
+    },
+    {
+      "id": "news_015",
+      "title": "日本将设3大支援基地提升AI半导体产业实力",
+      "summary": "日本为提振AI半导体产业，将设立3个基地培育设计、生产设备、材料等领域的企业。日本企业在AI半导体设计方起步较晚，生产设备及材料领域因中国企业崛起导致份额缩小。",
+      "source": "日经中文网",
+      "heat": 52,
+      "impact": {"social": 3, "economic": 7, "political": 6, "tech": 9},
+      "keywords": ["日本", "半导体", "AI", "芯片", "产业"],
+      "category": "科技",
+      "url": "https://cn.nikkei.com/japan-ai-semiconductor"
     }
   ],
   "relations": [
-    {
-      "source_id": "news-002",
-      "target_id": "news-003",
-      "similarity": 0.85,
-      "relation_type": "similar",
-      "strength": 0.9
-    },
-    {
-      "source_id": "news-002",
-      "target_id": "news-004",
-      "similarity": 0.72,
-      "relation_type": "causal",
-      "strength": 0.8
-    },
-    {
-      "source_id": "news-003",
-      "target_id": "news-004",
-      "similarity": 0.68,
-      "relation_type": "similar",
-      "strength": 0.75
-    }
+    {"source": "news_001", "target": "news_004", "type": "similar", "strength": 0.92},
+    {"source": "news_001", "target": "news_006", "type": "causal", "strength": 0.85},
+    {"source": "news_001", "target": "news_007", "type": "similar", "strength": 0.88},
+    {"source": "news_002", "target": "news_006", "type": "causal", "strength": 0.90},
+    {"source": "news_003", "target": "news_012", "type": "similar", "strength": 0.87},
+    {"source": "news_003", "target": "news_014", "type": "similar", "strength": 0.75},
+    {"source": "news_004", "target": "news_006", "type": "causal", "strength": 0.82},
+    {"source": "news_004", "target": "news_010", "type": "similar", "strength": 0.78},
+    {"source": "news_006", "target": "news_015", "type": "similar", "strength": 0.80},
+    {"source": "news_007", "target": "news_010", "type": "similar", "strength": 0.85},
+    {"source": "news_008", "target": "news_001", "type": "related", "strength": 0.65},
+    {"source": "news_009", "target": "news_003", "type": "related", "strength": 0.70},
+    {"source": "news_012", "target": "news_013", "type": "similar", "strength": 0.76},
+    {"source": "news_013", "target": "news_001", "type": "causal", "strength": 0.83},
+    {"source": "news_002", "target": "news_003", "type": "related", "strength": 0.72}
   ],
   "stats": {
-    "total": 5,
-    "high_impact": 3,
+    "total": 15,
+    "highImpact": 6,
     "categories": {
-      "时政": 1,
-      "科技": 2,
-      "财经": 1,
-      "社会": 1
-    }
+      "科技": 6,
+      "财经": 5,
+      "政策": 2,
+      "社会": 1,
+      "政治": 1
+    },
+    "avgHeat": 70.5,
+    "relationsCount": 15
   }
 }
