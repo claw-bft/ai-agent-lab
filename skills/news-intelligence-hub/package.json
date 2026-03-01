@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "新闻情报抓取与可视化仪表板",
   "scripts": {
+    "build": "echo 'Static build complete'",
     "start": "npx serve ."
   }
 }

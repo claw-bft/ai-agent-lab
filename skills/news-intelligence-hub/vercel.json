@@ -3,11 +3,8 @@
   "name": "news-intelligence-hub",
   "builds": [
     {
-      "src": "package.json",
-      "use": "@vercel/static-build",
-      "config": {
-        "distDir": "."
-      }
+      "src": "dashboard.html",
+      "use": "@vercel/static"
     }
   ],
   "routes": [
@@ -19,5 +16,8 @@
       "src": "/(.*)",
       "dest": "/dashboard.html"
     }
-  ]
+  ],
+  "github": {
+    "enabled": false
+  }
 }
