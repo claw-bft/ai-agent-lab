@@ -1,123 +1,92 @@
-# 新闻情报仪表板 - 部署说明
+# 新闻情报仪表板 - 部署包
 
-## 📊 项目概述
+## 📦 部署包内容
 
-新闻情报仪表板 (News Intelligence Hub) 是一个实时热点新闻抓取、关联分析与可视化系统。
+- `index.html` - 主仪表板页面（自包含，内嵌数据）
+- `dashboard.html` - 备用仪表板页面
+- `data.json` - 新闻数据文件
+- `vercel.json` - Vercel 部署配置
+- `package.json` - NPM 配置
+- `README.md` - 项目说明
 
-### 功能特性
-- ✅ 实时热点新闻抓取（每30分钟更新）
-- ✅ 新闻关联网络图（D3.js力导向图）
+## 🚀 部署方式
+
+### 方式一：Vercel 手动部署（推荐）
+
+1. 访问 https://vercel.com/new
+2. 选择 "Import Git Repository" 或 "Upload"
+3. 上传 `deploy-20260302-0356.tar.gz` 文件
+4. 点击 "Deploy"
+
+### 方式二：Netlify 部署
+
+1. 访问 https://app.netlify.com/drop
+2. 拖拽 `index.html` 文件到上传区域
+3. 获得访问链接
+
+### 方式三：Cloudflare Pages
+
+1. 访问 https://dash.cloudflare.com/
+2. 创建新 Pages 项目
+3. 上传 `index.html` 文件
+
+### 方式四：GitHub Pages
+
+1. 创建新 GitHub 仓库
+2. 上传 `index.html` 文件
+3. 启用 GitHub Pages
+
+## 📊 当前数据概览
+
+- **更新时间**: 2026-03-02 03:47 (Asia/Shanghai)
+- **新闻总数**: 32 条
+- **高影响事件**: 15 条
+- **平均热度**: 77.8
+
+### 分类分布
+- 科技: 15 条
+- 财经: 9 条
+- 国际政治: 4 条
+- 政治: 4 条
+
+### 情绪分布
+- 正面: 16 条
+- 中性: 8 条
+- 负面: 8 条
+
+### TOP 5 热点新闻
+
+1. **美以联合袭击伊朗，哈梅内伊丧生，全球金融市场震荡** (热度: 99.0)
+2. **霍尔木兹海峡关闭，全球能源安全面临大考** (热度: 97.0)
+3. **伊朗确认武装部队总参谋长等多位高级将领遇袭身亡** (热度: 95.0)
+4. **2025年GDP增长5%，经济向新向优发展** (热度: 92.0)
+5. **MWC 2026巴塞罗那开幕，逾350家中国企业竞逐AI与6G** (热度: 90.0)
+
+## 🔧 技术栈
+
+- **前端框架**: 原生 HTML5 + Tailwind CSS
+- **可视化**: D3.js (网络图), Chart.js (图表)
+- **字体**: Inter (Google Fonts)
+- **响应式设计**: 支持移动端和桌面端
+
+## 📱 功能特性
+
+- ✅ 实时热点新闻展示
+- ✅ 新闻关联网络图（力导向图）
 - ✅ 影响维度雷达图（社会/经济/政治/科技）
 - ✅ 分类分布与情绪分析
 - ✅ 热度时间线与关键词云
 - ✅ 移动端响应式设计
+- ✅ 交互式筛选和搜索
+
+## 📝 更新日志
+
+### 2026-03-02 03:47
+- 更新 32 条最新热点新闻
+- 新增 4 条新闻（OpenAI GPT-5.3、GDP目标、磁性材料AI模型、AI硬着陆）
+- 优化关联分析算法
+- 更新可视化数据
 
 ---
 
-## 📁 文件结构
-
-```
-news-intelligence-hub/
-├── dashboard.html      # 主仪表板页面
-├── data.json           # 新闻数据文件
-├── vercel.json         # Vercel部署配置
-├── package.json        # NPM配置
-├── README.md           # 项目说明
-└── news-intelligence-hub.tar.gz  # 部署压缩包
-```
-
----
-
-## 🚀 部署方式
-
-### 方式一：Vercel部署（推荐）
-
-#### 步骤1：安装Vercel CLI
-```bash
-npm install -g vercel
-```
-
-#### 步骤2：登录Vercel
-```bash
-vercel login
-```
-
-#### 步骤3：进入项目目录并部署
-```bash
-cd news-intelligence-hub
-vercel --prod
-```
-
-部署完成后，Vercel会提供一个访问链接，例如：
-- `https://news-intelligence-hub.vercel.app`
-
----
-
-### 方式二：手动上传到Vercel
-
-1. 访问 [Vercel Dashboard](https://vercel.com/dashboard)
-2. 点击 "Add New Project"
-3. 选择 "Import Git Repository" 或 "Upload" 
-4. 上传 `news-intelligence-hub.tar.gz` 文件
-5. 点击 "Deploy"
-
----
-
-### 方式三：其他静态托管
-
-由于本项目是纯前端静态页面，可以部署到任何静态托管服务：
-
-- **GitHub Pages**: 将文件推送到GitHub仓库并启用Pages
-- **Netlify**: 拖拽文件夹到Netlify Drop
-- **Cloudflare Pages**: 上传文件夹
-- **AWS S3**: 上传文件并配置静态网站托管
-
----
-
-## 📊 数据来源
-
-本次抓取的新闻数据（2026-03-01 18:47）包含：
-
-| 指标 | 数值 |
-|------|------|
-| 总新闻数 | 20条 |
-| 高影响事件 | 8条 |
-| 平均热度 | 81.3 |
-| 分类分布 | 科技(8), 财经(7), 国际政治(2), 社会(1), 政治(1) |
-
-### 热点新闻TOP5
-
-1. **美以联合袭击伊朗，全球金融市场震荡** (热度: 98.5)
-2. **伊朗确认武装部队总参谋长、防长等高级将领遇袭身亡** (热度: 96.0)
-3. **霍尔木兹停摆，欧佩克+能否稳住油价？** (热度: 95.0)
-4. **OpenAI狂揽7500亿元，英伟达、亚马逊、软银抢投** (热度: 92.0)
-5. **特朗普封杀Anthropic，OpenAI先声援后背刺** (热度: 88.5)
-
----
-
-## 🔧 技术栈
-
-- **前端框架**: 原生HTML5 + Tailwind CSS
-- **可视化**: D3.js (网络图), Chart.js (图表)
-- **字体**: Inter (Google Fonts)
-- **部署**: Vercel Static
-
----
-
-## 📝 更新计划
-
-- [ ] 添加自动刷新功能
-- [ ] 集成后端API实时抓取
-- [ ] 添加用户订阅功能
-- [ ] 多语言支持
-
----
-
-## 📞 联系方式
-
-如有问题或建议，请通过以下方式联系：
-- 项目地址: `/root/.openclaw/workspace/ai-agent-lab/skills/news-intelligence-hub`
-
----
-
-*最后更新: 2026-03-01 18:47 (Asia/Shanghai)*
+*新闻情报仪表板 © 2026*
