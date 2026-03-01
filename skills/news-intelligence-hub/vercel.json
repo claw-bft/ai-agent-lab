@@ -3,7 +3,7 @@
   "name": "news-intelligence-hub",
   "builds": [
     {
-      "src": "dashboard.html",
+      "src": "index.html",
       "use": "@vercel/static"
     }
   ],
@@ -14,7 +14,7 @@
     },
     {
       "src": "/(.*)",
-      "dest": "/dashboard.html"
+      "dest": "/index.html"
     }
   ],
   "github": {
