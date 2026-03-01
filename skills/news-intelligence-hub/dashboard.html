@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>新闻智能分析中心</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <style>
+        * { font-family: -apple-system, BlinkMacSystemFont, sans-serif; }
+        .glass {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 min-h-screen text-white">
+    <header class="glass sticky top-0 z-50 px-4 py-3">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="text-lg font-bold">新闻智能分析中心</h1>
+                    <p class="text-xs text-gray-400">实时热点 · 关联分析 · 影响评估</p>
+                </div>
+            </div>
+            <div class="text-right">
+                <p class="text-sm font-medium" id="lastUpdate">更新于: --:--</p>
+                <p class="text-xs text-gray-400">每30分钟自动刷新</p>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 py-6 space-y-6">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="glass rounded-2xl p-4">
+                <p class="text-gray-400 text-xs">热点新闻</p>
+                <p class="text-2xl font-bold text-blue-400">50</p>
+            </div>
+            <div class="glass rounded-2xl p-4">
+                <p class="text-gray-400 text-xs">关联关系</p>
+                <p class="text-2xl font-bold text-purple-400">24</p>
+            </div>
+            <div class="glass rounded-2xl p-4">
+                <p class="text-gray-400 text-xs">高影响事件</p>
+                <p class="text-2xl font-bold text-red-400">8</p>
+            </div>
+            <div class="glass rounded-2xl p-4">
+                <p class="text-gray-400 text-xs">趋势预测</p>
+                <p class="text-2xl font-bold text-green-400">12</p>
+            </div>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-6">
+            <div class="glass rounded-2xl p-4">
+                <h2 class="text-lg font-semibold mb-4">新闻关联网络</h2>
+                <div id="networkChart" class="w-full h-64"></div>
+            </div>
+
+            <div class="glass rounded-2xl p-4">
+                <h2 class="text-lg font-semibold mb-4">影响维度分析</h2>
+                <div id="impactChart" class="w-full h-64"></div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const networkChart = echarts.init(document.getElementById('networkChart'));
+        const impactChart = echarts.init(document.getElementById('impactChart'));
+
+        networkChart.setOption({
+            backgroundColor: 'transparent',
+            series: [{
+                type: 'graph',
+                layout: 'force',
+                data: [
+                    {name: 'AI技术突破', symbolSize: 50, category: 0},
+                    {name: '股市波动', symbolSize: 40, category: 1},
+                    {name: '新能源政策', symbolSize: 45, category: 2}
+                ],
+                links: [
+                    {source: 'AI技术突破', target: '股市波动'},
+                    {source: '新能源政策', target: '股市波动'}
+                ],
+                categories: [{name: '科技'}, {name: '财经'}, {name: '政策'}],
+                roam: true,
+                label: {show: true, color: '#fff'},
+                lineStyle: {color: 'rgba(255,255,255,0.3)'}
+            }]
+        });
+
+        impactChart.setOption({
+            backgroundColor: 'transparent',
+            radar: {
+                indicator: [
+                    {name: '社会', max: 10},
+                    {name: '经济', max: 10},
+                    {name: '政治', max: 10},
+                    {name: '科技', max: 10}
+                ],
+                axisName: {color: '#fff'}
+            },
+            series: [{
+                type: 'radar',
+                data: [{
+                    value: [8, 7, 6, 9],
+                    name: '综合影响',
+                    areaStyle: {color: 'rgba(59, 130, 246, 0.3)'},
+                    lineStyle: {color: '#3b82f6'}
+                }]
+            }]
+        });
+
+        window.addEventListener('resize', () => {
+            networkChart.resize();
+            impactChart.resize();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,64 @@
+{
+  "name": "news-intelligence-hub",
+  "version": "1.0.0",
+  "description": "热点新闻抓取、关联分析与可视化系统",
+  "schedule": "*/30 * * * *",
+  "sources": [
+    {
+      "name": "weibo-hot",
+      "url": "https://weibo.com/hot/search",
+      "type": "social",
+      "priority": 1
+    },
+    {
+      "name": "zhihu-hot",
+      "url": "https://www.zhihu.com/hot",
+      "type": "social",
+      "priority": 2
+    },
+    {
+      "name": "toutiao-hot",
+      "url": "https://www.toutiao.com/hot-event/",
+      "type": "news",
+      "priority": 1
+    },
+    {
+      "name": "36kr-fast",
+      "url": "https://36kr.com/newsflashes",
+      "type": "tech",
+      "priority": 2
+    }
+  ],
+  "analysis": {
+    "correlation": {
+      "enabled": true,
+      "method": "semantic-similarity",
+      "threshold": 0.75
+    },
+    "impact": {
+      "enabled": true,
+      "dimensions": ["social", "economic", "political", "tech"],
+      "scoreRange": [1, 10]
+    },
+    "trend": {
+      "enabled": true,
+      "window": "24h",
+      "prediction": "short-term"
+    }
+  },
+  "visualization": {
+    "type": "interactive-dashboard",
+    "mobileFirst": true,
+    "charts": [
+      "network-graph",
+      "timeline",
+      "heatmap",
+      "word-cloud"
+    ]
+  },
+  "deployment": {
+    "target": "vercel",
+    "autoDeploy": true,
+    "domain": "news-intelligence.vercel.app"
+  }
+}

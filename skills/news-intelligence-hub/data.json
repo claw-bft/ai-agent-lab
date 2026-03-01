@@ -1,0 +1,93 @@
+{
+  "timestamp": "2026-03-01T16:00:00+08:00",
+  "news": [
+    {
+      "id": "news-001",
+      "title": "2026年全国两会新闻中心启用",
+      "summary": "针对国内外关注的热点话题，新闻中心将邀请国务院有关部门主要负责人出席记者会",
+      "source": "央视网",
+      "url": "https://news.cctv.cn/2026/02/27/ARTIoy6RbimK6hGjW7IfNqo3260227.shtml",
+      "heat_score": 95.0,
+      "category": "时政",
+      "keywords": ["两会", "新闻中心", "政策"],
+      "impact": {"social": 8, "economic": 7, "political": 10, "tech": 5}
+    },
+    {
+      "id": "news-002",
+      "title": "AI产业全面提速：算力需求攀升、智能体价值兑现",
+      "summary": "AI办公智能体产品一站式覆盖办公与开发，已拥有数千家下游客户",
+      "source": "中国新闻网",
+      "url": "https://www.chinanews.com.cn/cj/2026/03-01/10578574.shtml",
+      "heat_score": 88.0,
+      "category": "科技",
+      "keywords": ["AI", "智能体", "算力"],
+      "impact": {"social": 7, "economic": 9, "political": 6, "tech": 10}
+    },
+    {
+      "id": "news-003",
+      "title": "中国人形机器人频频破圈，具身智能迈入应用时代",
+      "summary": "具身智能和嵌入式AI被列为2026年度最值得关注的技术趋势之一",
+      "source": "太原新闻网",
+      "url": "http://www.tynews.com.cn/system/2026/03/01/030991401.shtml",
+      "heat_score": 82.0,
+      "category": "科技",
+      "keywords": ["机器人", "具身智能", "AI"],
+      "impact": {"social": 6, "economic": 8, "political": 5, "tech": 9}
+    },
+    {
+      "id": "news-004",
+      "title": "AI热潮挤占芯片产能，国产手机将于3月集体涨价",
+      "summary": "OPPO、一加、vivo、小米等品牌计划3月上旬启动涨价",
+      "source": "艾媒网",
+      "url": "https://www.iimedia.cn/c1040/109873.html",
+      "heat_score": 78.0,
+      "category": "财经",
+      "keywords": ["芯片", "手机", "涨价"],
+      "impact": {"social": 7, "economic": 9, "political": 4, "tech": 8}
+    },
+    {
+      "id": "news-005",
+      "title": "冰雪经济高质量发展：冷资源释放热效应",
+      "summary": "从哈尔滨国际冰雪节到北极村冰雪秘境，见证中国冰雪经济蝶变",
+      "source": "人民网",
+      "url": "http://politics.people.com.cn/n1/2026/0301/c461001-40672545.html",
+      "heat_score": 72.0,
+      "category": "社会",
+      "keywords": ["冰雪经济", "旅游", "消费"],
+      "impact": {"social": 8, "economic": 7, "political": 6, "tech": 3}
+    }
+  ],
+  "relations": [
+    {
+      "source_id": "news-002",
+      "target_id": "news-003",
+      "similarity": 0.85,
+      "relation_type": "similar",
+      "strength": 0.9
+    },
+    {
+      "source_id": "news-002",
+      "target_id": "news-004",
+      "similarity": 0.72,
+      "relation_type": "causal",
+      "strength": 0.8
+    },
+    {
+      "source_id": "news-003",
+      "target_id": "news-004",
+      "similarity": 0.68,
+      "relation_type": "similar",
+      "strength": 0.75
+    }
+  ],
+  "stats": {
+    "total": 5,
+    "high_impact": 3,
+    "categories": {
+      "时政": 1,
+      "科技": 2,
+      "财经": 1,
+      "社会": 1
+    }
+  }
+}
