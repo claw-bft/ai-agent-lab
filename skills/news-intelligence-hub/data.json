@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-03-01T19:47:00+08:00",
+  "timestamp": "2026-03-01T21:17:00+08:00",
   "news": [
     {
       "id": "news_001",
@@ -240,6 +240,54 @@
       "category": "科技",
       "sentiment": "positive",
       "url": "http://k.sina.com.cn/article_5953466437_162dab0450670a4a0y.html"
+    },
+    {
+      "id": "news_021",
+      "title": "中国海上油田首次实现低空经济规模化应用",
+      "summary": "中国海油北部湾海域油田无人机系统运营项目于2月28日落地，这是中国海上油田首次实现无人机规模化作业，为海洋能源开发与低空经济融合提供了实践范例。全年可节约船舶租赁和燃油费用近1500万元，减少碳排放达25000吨。",
+      "source": "中国新闻网",
+      "heat": 68.0,
+      "impact": {"social": 6.5, "economic": 7.5, "political": 5.5, "tech": 8.5},
+      "keywords": ["低空经济", "无人机", "海上油田", "碳中和", "中国海油"],
+      "category": "科技",
+      "sentiment": "positive",
+      "url": "https://www.chinanews.com.cn/cj/2026/03-01/10578823.shtml"
+    },
+    {
+      "id": "news_022",
+      "title": "上海跨境电商规模实现从百亿级向千亿级跃升",
+      "summary": "上海市商务委员会表示，近年来上海跨境电商规模实现从百亿级向千亿级跃升。2025年上海外贸进出口规模历史性突破4.5万亿元，进出口值、出口值和进口值均创历史新高。",
+      "source": "中国新闻网",
+      "heat": 65.0,
+      "impact": {"social": 6.0, "economic": 8.0, "political": 6.0, "tech": 6.5},
+      "keywords": ["跨境电商", "上海", "外贸", "数字经济", "一带一路"],
+      "category": "财经",
+      "sentiment": "positive",
+      "url": "https://www.chinanews.com.cn/cj/2026/03-01/10578905.shtml"
+    },
+    {
+      "id": "news_023",
+      "title": "兴业银行发布科技金融专属品牌"兴火科技"",
+      "summary": "兴业银行在'十五五'开局在即之际，正式推出'兴火科技'品牌，希望抢抓新一轮科技革命和产业变革机遇，坚持深耕现代化产业体系，为科技型企业提供全方位金融服务。",
+      "source": "人民网",
+      "heat": 62.0,
+      "impact": {"social": 5.5, "economic": 7.5, "political": 5.5, "tech": 7.5},
+      "keywords": ["兴业银行", "科技金融", "兴火科技", "十五五", "金融科技"],
+      "category": "财经",
+      "sentiment": "positive",
+      "url": "http://fj.people.com.cn/n2/2026/0301/c181466-41511799.html"
+    },
+    {
+      "id": "news_024",
+      "title": "具身智能进入发展快车道，产业链加速闭环",
+      "summary": "从上游的芯片、传感器，到中游的本体制造、大模型算法，再到下游的系统集成，一条自主可控的具身智能产业链正在加速闭环。2025年中国工业机器人产量77.3万台，具身智能正从概念宠儿变为热点风口。",
+      "source": "羊城晚报",
+      "heat": 60.0,
+      "impact": {"social": 6.0, "economic": 7.5, "political": 5.0, "tech": 9.0},
+      "keywords": ["具身智能", "机器人", "大模型", "产业链", "智能制造"],
+      "category": "科技",
+      "sentiment": "positive",
+      "url": "https://news.ycwb.com/ikimvkhtkj/content_53985053.htm"
     }
   ],
   "relations": [
@@ -262,23 +310,30 @@
     {"source": "news_001", "target": "news_012", "type": "political", "strength": 0.70},
     {"source": "news_009", "target": "news_018", "type": "economic", "strength": 0.68},
     {"source": "news_005", "target": "news_009", "type": "economic", "strength": 0.60},
-    {"source": "news_003", "target": "news_001", "type": "similar", "strength": 0.88}
+    {"source": "news_003", "target": "news_001", "type": "similar", "strength": 0.88},
+    {"source": "news_021", "target": "news_015", "type": "tech", "strength": 0.72},
+    {"source": "news_021", "target": "news_004", "type": "economic", "strength": 0.65},
+    {"source": "news_022", "target": "news_004", "type": "economic", "strength": 0.70},
+    {"source": "news_023", "target": "news_017", "type": "policy", "strength": 0.68},
+    {"source": "news_024", "target": "news_013", "type": "tech", "strength": 0.82},
+    {"source": "news_024", "target": "news_014", "type": "tech", "strength": 0.85},
+    {"source": "news_024", "target": "news_015", "type": "tech", "strength": 0.78}
   ],
   "stats": {
-    "total": 20,
-    "highImpact": 9,
+    "total": 24,
+    "highImpact": 11,
     "categories": {
       "国际政治": 4,
-      "财经": 7,
-      "科技": 7,
+      "财经": 8,
+      "科技": 10,
       "政治": 2
     },
     "sentiment": {
-      "positive": 8,
+      "positive": 11,
       "neutral": 6,
-      "negative": 6
+      "negative": 7
     },
-    "avgHeat": 82.5,
-    "topKeywords": ["AI", "伊朗", "美国", "经济", "中国", "科技", "原油", "中东", "十五五", "大模型"]
+    "avgHeat": 79.8,
+    "topKeywords": ["AI", "伊朗", "美国", "经济", "中国", "科技", "原油", "中东", "十五五", "大模型", "机器人", "低空经济"]
   }
 }
