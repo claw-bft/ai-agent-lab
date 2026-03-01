@@ -11,26 +11,30 @@
 
 ## 🚀 部署方式
 
-### 方式一：Vercel 手动部署（推荐）
+### 方式一：Surge.sh 部署（当前使用）
+
+**访问链接**: https://news-intelligence-hub-1772407260.surge.sh
+
+### 方式二：Vercel 手动部署
 
 1. 访问 https://vercel.com/new
 2. 选择 "Import Git Repository" 或 "Upload"
-3. 上传 `deploy-20260302-0356.tar.gz` 文件
+3. 上传 `deploy-20260302-0720.tar.gz` 文件
 4. 点击 "Deploy"
 
-### 方式二：Netlify 部署
+### 方式三：Netlify 部署
 
 1. 访问 https://app.netlify.com/drop
 2. 拖拽 `index.html` 文件到上传区域
 3. 获得访问链接
 
-### 方式三：Cloudflare Pages
+### 方式四：Cloudflare Pages
 
 1. 访问 https://dash.cloudflare.com/
 2. 创建新 Pages 项目
 3. 上传 `index.html` 文件
 
-### 方式四：GitHub Pages
+### 方式五：GitHub Pages
 
 1. 创建新 GitHub 仓库
 2. 上传 `index.html` 文件
@@ -38,21 +42,21 @@
 
 ## 📊 当前数据概览
 
-- **更新时间**: 2026-03-02 06:47 (Asia/Shanghai)
-- **新闻总数**: 32 条
-- **高影响事件**: 15 条
-- **平均热度**: 77.8
+- **更新时间**: 2026-03-02 07:17 (Asia/Shanghai)
+- **新闻总数**: 35 条
+- **高影响事件**: 16 条
+- **平均热度**: 76.5
 
 ### 分类分布
-- 科技: 15 条
-- 财经: 9 条
+- 科技: 17 条
+- 财经: 10 条
 - 国际政治: 4 条
 - 政治: 4 条
 
 ### 情绪分布
-- 正面: 16 条
-- 中性: 8 条
-- 负面: 8 条
+- 正面: 17 条
+- 中性: 9 条
+- 负面: 9 条
 
 ### TOP 5 热点新闻
 
@@ -81,11 +85,17 @@
 
 ## 📝 更新日志
 
+### 2026-03-02 07:17
+- 更新 35 条最新热点新闻（新增3条）
+- 新增新闻：药品零售具身智能机器人、AI投资逻辑重塑、全球投资者告别美国
+- 数据时间戳更新至当前时间
+- 生成新的部署包 deploy-20260302-0720.tar.gz
+- **已部署至**: https://news-intelligence-hub-1772407260.surge.sh
+
 ### 2026-03-02 06:47
 - 更新 32 条最新热点新闻
 - 数据时间戳更新至当前时间
 - 生成新的部署包 deploy-20260302-0647.tar.gz
-- **已部署至**: https://news-intelligence-hub.surge.sh
 
 ### 2026-03-02 03:47
 - 更新 32 条最新热点新闻

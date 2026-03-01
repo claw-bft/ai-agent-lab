@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-03-02T06:47:00+08:00",
+  "timestamp": "2026-03-02T07:17:00+08:00",
   "news": [
     {
       "id": "news_001",
@@ -384,6 +384,42 @@
       "category": "科技",
       "sentiment": "neutral",
       "url": "https://m.thepaper.cn/newsDetail_forward_32668126"
+    },
+    {
+      "id": "news_033",
+      "title": "药品零售行业具身智能机器人落地北京海淀",
+      "summary": "新浪人工智能热点小时报报道，药品零售行业具身智能机器人已正式落地北京海淀。这一创新应用标志着AI技术在传统零售领域的深度渗透，为智慧零售和医疗健康服务融合提供新范式。",
+      "source": "新浪财经",
+      "heat": 65.0,
+      "impact": {"social": 7.0, "economic": 6.5, "political": 5.0, "tech": 8.5},
+      "keywords": ["具身智能", "机器人", "药品零售", "北京海淀", "智慧零售", "医疗AI"],
+      "category": "科技",
+      "sentiment": "positive",
+      "url": "https://k.sina.com.cn/article_7857201856_1d45362c001902rl5a.html"
+    },
+    {
+      "id": "news_034",
+      "title": "AI投资逻辑重塑，新投资主线逐渐明晰",
+      "summary": "2026年AI投资逻辑正在经历深刻重塑。从单纯追逐大模型参数规模转向关注实际应用场景和商业变现能力，从云端算力向边缘计算延伸，投资者更加注重AI技术的落地价值和长期盈利能力。",
+      "source": "证券时报",
+      "heat": 78.0,
+      "impact": {"social": 5.5, "economic": 8.0, "political": 5.0, "tech": 8.5},
+      "keywords": ["AI投资", "投资逻辑", "边缘计算", "商业变现", "应用场景"],
+      "category": "财经",
+      "sentiment": "neutral",
+      "url": "https://www.stcn.com/article/detail/3655975.html"
+    },
+    {
+      "id": "news_035",
+      "title": "为何越来越多全球投资者告别美国转向新兴市场",
+      "summary": "2026年以来，市场资金流向显示，越来越多投资者正告别美国，转向更具吸引力的新兴市场股市。美国高盛集团数据显示，美股正经历1995年以来最差开局。资本正在重新配置，寻求更高回报和更低风险的投资标的。",
+      "source": "中国日报",
+      "heat": 75.0,
+      "impact": {"social": 5.5, "economic": 8.5, "political": 7.0, "tech": 4.0},
+      "keywords": ["美股", "新兴市场", "资本配置", "高盛", "投资策略", "全球资金"],
+      "category": "财经",
+      "sentiment": "negative",
+      "url": "http://cn.chinadaily.com.cn/a/202602/28/WS69a2f158a310942cc49a0ffd.html"
     }
   ],
   "relations": [
@@ -430,23 +466,29 @@
     {"source": "news_029", "target": "news_012", "type": "tech", "strength": 0.75},
     {"source": "news_031", "target": "news_008", "type": "tech", "strength": 0.70},
     {"source": "news_032", "target": "news_014", "type": "tech", "strength": 0.80},
-    {"source": "news_032", "target": "news_026", "type": "tech", "strength": 0.75}
+    {"source": "news_032", "target": "news_026", "type": "tech", "strength": 0.75},
+    {"source": "news_033", "target": "news_015", "type": "tech", "strength": 0.78},
+    {"source": "news_033", "target": "news_016", "type": "tech", "strength": 0.75},
+    {"source": "news_034", "target": "news_008", "type": "tech", "strength": 0.82},
+    {"source": "news_034", "target": "news_012", "type": "economic", "strength": 0.78},
+    {"source": "news_035", "target": "news_012", "type": "economic", "strength": 0.72},
+    {"source": "news_035", "target": "news_020", "type": "economic", "strength": 0.80}
   ],
   "stats": {
-    "total": 32,
-    "highImpact": 15,
+    "total": 35,
+    "highImpact": 16,
     "categories": {
       "国际政治": 4,
-      "财经": 9,
-      "科技": 15,
+      "财经": 10,
+      "科技": 17,
       "政治": 4
     },
     "sentiment": {
-      "positive": 16,
-      "neutral": 8,
-      "negative": 8
+      "positive": 17,
+      "neutral": 9,
+      "negative": 9
     },
-    "avgHeat": 77.8,
+    "avgHeat": 76.5,
     "topKeywords": ["AI", "伊朗", "美国", "经济", "中国", "科技", "原油", "中东", "十五五", "大模型", "机器人", "算力", "具身智能", "地缘政治"]
   }
 }
