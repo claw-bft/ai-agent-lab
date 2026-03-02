@@ -1,0 +1,8 @@
+{
+  "name": "news-intelligence-hub",
+  "version": "1.0.0",
+  "description": "News Intelligence Dashboard",
+  "scripts": {
+    "start": "npx serve ."
+  }
+}
