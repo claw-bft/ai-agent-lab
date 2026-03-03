@@ -11,7 +11,16 @@
 
 ## 🚀 部署方式
 
-### 方式一：Vercel 部署（推荐）
+### 方式一：Surge.sh 部署（当前使用）
+
+**访问链接**: https://news-intelligence-hub.surge.sh
+
+```bash
+cd /root/.openclaw/workspace/ai-agent-lab/skills/news-intelligence-hub/deploy
+surge --project . --domain news-intelligence-hub.surge.sh
+```
+
+### 方式二：Vercel 部署
 
 1. 安装 Vercel CLI:
 ```bash
@@ -29,13 +38,6 @@ cd /root/.openclaw/workspace/ai-agent-lab/skills/news-intelligence-hub
 vercel --prod
 ```
 
-### 方式二：Surge.sh 部署
-
-```bash
-npm i -g surge
-surge --project . --domain your-domain.surge.sh
-```
-
 ### 方式三：Netlify 部署
 
 ```bash
@@ -48,6 +50,8 @@ netlify deploy --prod --dir=.
 - **新闻总数**: 20 条
 - **高影响事件**: 12 条
 - **平均热度**: 82.1
+- **部署时间**: 2026-03-04 01:48 (Asia/Shanghai)
+- **访问链接**: https://news-intelligence-hub.surge.sh
 
 ### 分类分布
 - 科技: 9 条
@@ -80,6 +84,13 @@ netlify deploy --prod --dir=.
 - ✅ 交互式筛选
 
 ## 📝 更新日志
+
+### 2026-03-04 01:48
+- ✅ 成功部署到 Surge.sh: https://news-intelligence-hub.surge.sh
+- 更新 20 条最新热点新闻
+- 新增：美以袭击伊朗、全国两会、具身智能融资热潮等
+- 数据时间戳更新至当前时间
+- 生成部署包: news-intelligence-hub-deploy-20260304-0117.tar.gz
 
 ### 2026-03-04 01:17
 - 更新 20 条最新热点新闻
