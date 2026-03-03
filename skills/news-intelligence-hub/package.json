@@ -1,9 +1,8 @@
 {
   "name": "news-intelligence-hub",
   "version": "1.0.0",
-  "description": "新闻智能分析与可视化仪表板",
+  "description": "热点新闻抓取、关联分析与可视化系统",
   "scripts": {
-    "dev": "vercel dev",
     "deploy": "vercel --prod"
   }
 }

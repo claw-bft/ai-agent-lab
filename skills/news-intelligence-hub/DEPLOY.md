@@ -3,23 +3,51 @@
 ## 📦 部署包内容
 
 - `index.html` - 主仪表板页面（自包含，内嵌数据）
+- `dashboard.html` - 备用仪表板页面
 - `data.json` - 新闻数据文件
 - `vercel.json` - Vercel 部署配置
 - `package.json` - NPM 配置
+- `README.md` - 项目说明
 
-## 🚀 部署状态
+## 🚀 部署方式
 
-### 当前部署（已上线）
+### 方式一：Vercel 部署（推荐）
 
-**访问链接**: https://news-intelligence-2026-03-04.surge.sh
+1. 安装 Vercel CLI:
+```bash
+npm i -g vercel
+```
 
-**更新时间**: 2026-03-04 01:20 (Asia/Shanghai)
+2. 登录 Vercel:
+```bash
+vercel login
+```
+
+3. 部署:
+```bash
+cd /root/.openclaw/workspace/ai-agent-lab/skills/news-intelligence-hub
+vercel --prod
+```
+
+### 方式二：Surge.sh 部署
+
+```bash
+npm i -g surge
+surge --project . --domain your-domain.surge.sh
+```
+
+### 方式三：Netlify 部署
+
+```bash
+npm i -g netlify-cli
+netlify deploy --prod --dir=.
+```
 
 ## 📊 数据概览
 
 - **新闻总数**: 20 条
 - **高影响事件**: 12 条
-- **平均热度**: 82.3
+- **平均热度**: 82.1
 
 ### 分类分布
 - 科技: 9 条
@@ -32,15 +60,15 @@
 1. **美以袭击伊朗致中东局势升级 霍尔木兹海峡关闭** (热度: 99)
 2. **全国政协十四届四次会议开幕 2026全国两会时间开启** (热度: 95)
 3. **卡塔尔能源设施遭袭停产 欧洲天然气飙涨40%** (热度: 92)
-4. **WTI原油期货大涨6.28% 油价突破71美元** (热度: 87)
-5. **韩国2月半导体出口额创历史新高 同比暴涨160.8%** (热度: 86)
+4. **具身智能开年狂揽超200亿融资 银河通用完成25亿元融资** (热度: 88)
+5. **WTI原油期货大涨6.28% 油价突破71美元** (热度: 87)
 
 ## 🔧 技术栈
 
-- **前端框架**: 原生 HTML5 + CSS3 + Tailwind CSS
-- **可视化**: D3.js (网络图), ECharts (雷达图、时间线)
+- **前端框架**: 原生 HTML5 + CSS3
+- **可视化**: D3.js (网络图), Chart.js (雷达图)
 - **响应式设计**: 支持移动端和桌面端
-- **部署平台**: Surge.sh
+- **部署平台**: Vercel / Surge.sh / Netlify
 
 ## 📱 功能特性
 
@@ -50,23 +78,14 @@
 - ✅ 热度时间线
 - ✅ 移动端响应式设计
 - ✅ 交互式筛选
-- ✅ 暗黑模式支持
 
 ## 📝 更新日志
 
-### 2026-03-04 01:20
+### 2026-03-04 01:17
 - 更新 20 条最新热点新闻
-- 新增：马云现身云谷学校、谷歌员工呼吁限制AI军事应用、智元机器人进军德国等
+- 新增：美以袭击伊朗、全国两会、具身智能融资热潮等
 - 数据时间戳更新至当前时间
-- **已部署至**: https://news-intelligence-2026-03-04.surge.sh
-
-### 2026-03-03 20:17
-- 更新 15 条最新热点新闻
-- **已部署至**: https://news-intelligence-2026-03-03.surge.sh
-
-### 2026-03-02 22:17
-- 更新 12 条最新热点新闻
-- **已部署至**: https://news-intelligence-2026-03-02.surge.sh
+- 生成部署包: news-intelligence-hub-deploy-20260304-0117.tar.gz
 
 ---
 
