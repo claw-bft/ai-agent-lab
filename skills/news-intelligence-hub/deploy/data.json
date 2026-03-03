@@ -1,10 +1,10 @@
 {
-  "timestamp": "2026-03-04T01:17:00+08:00",
+  "timestamp": "2026-03-04T02:17:00+08:00",
   "news": [
     {
       "id": "news_001",
       "title": "美以袭击伊朗致中东局势升级 霍尔木兹海峡关闭",
-      "summary": "美国联合以色列对伊朗发动军事打击已超过60小时，伊朗最高领袖哈梅内伊遇害。伊朗宣布关闭霍尔木兹海峡，全球约20%原油海运受阻，国际油价或突破100美元/桶，引发全球通胀担忧。特朗普称不排除派遣地面部队。",
+      "summary": "美国联合以色列对伊朗发动军事打击已超过60小时，伊朗最高领袖哈梅内伊遇害。伊朗宣布关闭霍尔木兹海峡，全球约20%原油海运受阻，国际油价或突破100美元/桶，引发全球通胀担忧。",
       "source": "新浪财经/财新网",
       "heat": 99,
       "impact": {"social": 85, "economic": 98, "political": 99, "tech": 40},
@@ -220,6 +220,50 @@
       "keywords": ["原油期货", "WTI", "布伦特原油", "油价上涨", "能源市场"],
       "category": "经济金融",
       "time": "2026-03-03"
+    },
+    {
+      "id": "news_021",
+      "title": "高盛：中国AI走出独立行情 潜在价值低估50%至100%",
+      "summary": "高盛在最新研报中对中国AI产业给出罕见的乐观判断，认为中国AI所带来的潜在经济效益远未被充分定价，且正在形成独立于全球科技股的新主线，目前市场仍低估AI潜在价值达50%至100%。",
+      "source": "新浪财经",
+      "heat": 91,
+      "impact": {"social": 65, "economic": 92, "political": 60, "tech": 95},
+      "keywords": ["高盛", "中国AI", "DeepSeek", "科技股", "投资"],
+      "category": "经济金融",
+      "time": "2026-03-03"
+    },
+    {
+      "id": "news_022",
+      "title": "荣耀MagicAgent大模型全球开源 助力AI生态建设",
+      "summary": "MWC 2026期间，荣耀正式发布自研智能体基础模型MagicAgent，面向全球正式开源。该模型是荣耀联合复旦大学研究团队推出的通用任务规划模型，支撑YOYO智能体任务规划与编排。",
+      "source": "新浪科技",
+      "heat": 78,
+      "impact": {"social": 70, "economic": 72, "political": 50, "tech": 94},
+      "keywords": ["荣耀", "MagicAgent", "开源", "智能体", "MWC"],
+      "category": "科技",
+      "time": "2026-03-03"
+    },
+    {
+      "id": "news_023",
+      "title": "华为超节点算力集群首次面向海外市场亮相",
+      "summary": "MWC 2026期间，华为首次面向海外市场展示超节点算力集群，推出智算超节点Atlas 950 SuperPoD、通算超节点TaiShan 950 SuperPoD等多个型号超节点产品及解决方案。",
+      "source": "每日经济新闻",
+      "heat": 80,
+      "impact": {"social": 60, "economic": 78, "political": 65, "tech": 97},
+      "keywords": ["华为", "Atlas", "超节点", "算力集群", "MWC"],
+      "category": "科技",
+      "time": "2026-03-02"
+    },
+    {
+      "id": "news_024",
+      "title": "世界经济论坛：地缘经济对抗是2026年首要风险",
+      "summary": "世界经济论坛发布《2026年全球风险报告》，地缘经济对抗被列为2026年首要风险。报告显示，除地缘经济对抗外，主要风险还包括国家间武装冲突、极端天气、社会极化以及错误和虚假信息。",
+      "source": "人民网/新华社",
+      "heat": 84,
+      "impact": {"social": 75, "economic": 90, "political": 95, "tech": 50},
+      "keywords": ["世界经济论坛", "地缘经济", "全球风险", "地缘政治", "经济"],
+      "category": "国际政治",
+      "time": "2026-01-14"
     }
   ],
   "relations": [
@@ -228,6 +272,7 @@
     {"source": "news_001", "target": "news_010", "type": "行业催化", "strength": 0.90},
     {"source": "news_001", "target": "news_012", "type": "避险联动", "strength": 0.88},
     {"source": "news_001", "target": "news_020", "type": "价格传导", "strength": 0.94},
+    {"source": "news_001", "target": "news_017", "type": "AI军事", "strength": 0.75},
     {"source": "news_002", "target": "news_015", "type": "政策关联", "strength": 0.85},
     {"source": "news_002", "target": "news_011", "type": "提案关联", "strength": 0.80},
     {"source": "news_004", "target": "news_005", "type": "产业链", "strength": 0.75},
@@ -245,25 +290,30 @@
     {"source": "news_015", "target": "news_004", "type": "政策支持", "strength": 0.82},
     {"source": "news_015", "target": "news_007", "type": "AI战略", "strength": 0.78},
     {"source": "news_016", "target": "news_015", "type": "AI生态", "strength": 0.70},
-    {"source": "news_017", "target": "news_001", "type": "军事AI", "strength": 0.75},
     {"source": "news_018", "target": "news_004", "type": "具身智能", "strength": 0.80},
     {"source": "news_019", "target": "news_016", "type": "AI应用", "strength": 0.65},
-    {"source": "news_020", "target": "news_012", "type": "通胀预期", "strength": 0.70}
+    {"source": "news_020", "target": "news_012", "type": "通胀预期", "strength": 0.70},
+    {"source": "news_021", "target": "news_004", "type": "AI投资", "strength": 0.78},
+    {"source": "news_021", "target": "news_015", "type": "智能经济", "strength": 0.72},
+    {"source": "news_022", "target": "news_015", "type": "AI开源", "strength": 0.68},
+    {"source": "news_023", "target": "news_007", "type": "算力竞争", "strength": 0.75},
+    {"source": "news_023", "target": "news_009", "type": "通信技术", "strength": 0.70},
+    {"source": "news_024", "target": "news_001", "type": "地缘风险", "strength": 0.82}
   ],
   "stats": {
-    "total": 20,
-    "highImpact": 12,
+    "total": 24,
+    "highImpact": 14,
     "categories": {
-      "国际政治": 3,
+      "国际政治": 4,
       "国内政治": 2,
-      "科技": 9,
-      "经济金融": 6
+      "科技": 11,
+      "经济金融": 7
     },
     "impactDistribution": {
-      "social": {"avg": 69.5, "max": 90, "min": 50},
-      "economic": {"avg": 83.2, "max": 98, "min": 55},
-      "political": {"avg": 69.5, "max": 99, "min": 40},
-      "tech": {"avg": 79.8, "max": 98, "min": 30}
+      "social": {"avg": 68.5, "max": 90, "min": 50},
+      "economic": {"avg": 84.2, "max": 98, "min": 55},
+      "political": {"avg": 70.8, "max": 99, "min": 40},
+      "tech": {"avg": 81.5, "max": 98, "min": 30}
     }
   }
 }
