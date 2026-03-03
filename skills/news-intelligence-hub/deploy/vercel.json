@@ -1,5 +1,6 @@
 {
   "version": 2,
+  "name": "news-intelligence-hub",
   "builds": [
     {
       "src": "index.html",
@@ -15,5 +16,8 @@
       "src": "/(.*)",
       "dest": "/index.html"
     }
-  ]
+  ],
+  "github": {
+    "enabled": false
+  }
 }
