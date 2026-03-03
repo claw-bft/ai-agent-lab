@@ -42,3 +42,18 @@ env/
 # OS
 .DS_Store
 Thumbs.db
+
+# Project specific - generated files
+logs/
+reports/
+temp/
+*.log
+.auto_commit_status.md
+
+# Keep directories but ignore contents
+logs/*
+!logs/.gitkeep
+reports/*
+!reports/.gitkeep
+temp/*
+!temp/.gitkeep
