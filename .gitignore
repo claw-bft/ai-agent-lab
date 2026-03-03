@@ -57,3 +57,8 @@ reports/*
 !reports/.gitkeep
 temp/*
 !temp/.gitkeep
+# Project data files
+data/
+*.sqlite
+*.db
+.memory_store.json
