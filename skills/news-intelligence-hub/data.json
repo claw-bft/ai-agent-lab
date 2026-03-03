@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-03-04T02:17:00+08:00",
+  "timestamp": "2026-03-04T03:47:00+08:00",
   "news": [
     {
       "id": "news_001",
@@ -264,6 +264,72 @@
       "keywords": ["世界经济论坛", "地缘经济", "全球风险", "地缘政治", "经济"],
       "category": "国际政治",
       "time": "2026-01-14"
+    },
+    {
+      "id": "news_025",
+      "title": "阿里巴巴AI品牌统一为千问 通义实验室为AI机构名称",
+      "summary": "阿里巴巴集团内部将AI的总称和核心品牌统一为千问，千问大模型（Qwen）涵盖基础大模型和专业领域模型，千问App是阿里巴巴在C端的旗舰AI应用。此举旨在避免多个名称导致的混淆问题。",
+      "source": "新浪科技",
+      "heat": 82,
+      "impact": {"social": 65, "economic": 78, "political": 55, "tech": 92},
+      "keywords": ["阿里巴巴", "千问", "Qwen", "AI品牌", "通义实验室"],
+      "category": "科技",
+      "time": "2026-03-02"
+    },
+    {
+      "id": "news_026",
+      "title": "我国生成式AI用户超6亿 成全球AI专利最大拥有国",
+      "summary": "中国互联网络信息中心报告显示，截至2025年12月，我国生成式人工智能用户达6.02亿人，较2024年底增长141.7%。我国已成为全球人工智能专利最大拥有国，占比高达60%。",
+      "source": "人民日报/中新网",
+      "heat": 88,
+      "impact": {"social": 85, "economic": 88, "political": 75, "tech": 96},
+      "keywords": ["生成式AI", "人工智能", "用户规模", "AI专利", "中国AI"],
+      "category": "科技",
+      "time": "2026-03-03"
+    },
+    {
+      "id": "news_027",
+      "title": "北京海淀发布未来产业布局 AI为塔尖具身智能为重点",
+      "summary": "北京市海淀区发布1+X+1现代化产业体系建设布局，以人工智能为塔尖、以具身智能等未来产业为重要支撑的创新产业金字塔亮相。海淀区把人工智能摆在产业体系的核心位置。",
+      "source": "上观新闻",
+      "heat": 79,
+      "impact": {"social": 70, "economic": 82, "political": 80, "tech": 94},
+      "keywords": ["北京海淀", "AI产业", "具身智能", "未来产业", "新质生产力"],
+      "category": "国内政治",
+      "time": "2026-03-02"
+    },
+    {
+      "id": "news_028",
+      "title": "Anthropic Claude服务一度中断 公司称需求空前",
+      "summary": "Anthropic人工智能聊天机器人Claude及相关应用在周一早晨一度出现服务中断。公司称过去一周其忙于应对对服务的空前需求。近2000名用户报告Claude AI服务异常。",
+      "source": "新浪财经",
+      "heat": 76,
+      "impact": {"social": 60, "economic": 65, "political": 50, "tech": 88},
+      "keywords": ["Anthropic", "Claude", "AI服务", "服务中断", "大模型"],
+      "category": "科技",
+      "time": "2026-03-03"
+    },
+    {
+      "id": "news_029",
+      "title": "十四五102项重大工程98%以上已完成规划目标",
+      "summary": "国家发改委消息，十四五102项重大工程98%以上的项目已完成规划目标，有力支撑了经济社会高质量发展。这些工程涵盖交通、能源、水利、新型基础设施等多个领域。",
+      "source": "新华社",
+      "heat": 75,
+      "impact": {"social": 80, "economic": 90, "political": 85, "tech": 70},
+      "keywords": ["十四五", "重大工程", "规划目标", "基础设施", "经济发展"],
+      "category": "国内政治",
+      "time": "2026-03-03"
+    },
+    {
+      "id": "news_030",
+      "title": "特朗普将英语指定为美国官方语言",
+      "summary": "当地时间3月1日，美国总统特朗普发布行政命令，将英语指定为美国官方语言。这是美国历史上首次在联邦层面确立官方语言，引发广泛争议。",
+      "source": "央视新闻",
+      "heat": 78,
+      "impact": {"social": 85, "economic": 60, "political": 90, "tech": 40},
+      "keywords": ["特朗普", "英语", "官方语言", "美国", "移民政策"],
+      "category": "国际政治",
+      "time": "2026-03-01"
     }
   ],
   "relations": [
@@ -273,15 +339,20 @@
     {"source": "news_001", "target": "news_012", "type": "避险联动", "strength": 0.88},
     {"source": "news_001", "target": "news_020", "type": "价格传导", "strength": 0.94},
     {"source": "news_001", "target": "news_017", "type": "AI军事", "strength": 0.75},
+    {"source": "news_001", "target": "news_024", "type": "地缘风险", "strength": 0.85},
     {"source": "news_002", "target": "news_015", "type": "政策关联", "strength": 0.85},
     {"source": "news_002", "target": "news_011", "type": "提案关联", "strength": 0.80},
+    {"source": "news_002", "target": "news_027", "type": "产业布局", "strength": 0.78},
+    {"source": "news_002", "target": "news_029", "type": "规划延续", "strength": 0.82},
     {"source": "news_004", "target": "news_005", "type": "产业链", "strength": 0.75},
     {"source": "news_004", "target": "news_011", "type": "技术协同", "strength": 0.70},
     {"source": "news_004", "target": "news_018", "type": "行业竞争", "strength": 0.72},
+    {"source": "news_004", "target": "news_027", "type": "区域布局", "strength": 0.80},
     {"source": "news_005", "target": "news_007", "type": "AI基础设施", "strength": 0.80},
     {"source": "news_005", "target": "news_008", "type": "算力需求", "strength": 0.78},
     {"source": "news_007", "target": "news_008", "type": "技术互补", "strength": 0.72},
     {"source": "news_007", "target": "news_009", "type": "英伟达生态", "strength": 0.75},
+    {"source": "news_007", "target": "news_023", "type": "算力竞争", "strength": 0.82},
     {"source": "news_010", "target": "news_006", "type": "市场联动", "strength": 0.85},
     {"source": "news_010", "target": "news_020", "type": "能源板块", "strength": 0.82},
     {"source": "news_012", "target": "news_001", "type": "避险反应", "strength": 0.88},
@@ -289,31 +360,39 @@
     {"source": "news_014", "target": "news_004", "type": "航天科技", "strength": 0.60},
     {"source": "news_015", "target": "news_004", "type": "政策支持", "strength": 0.82},
     {"source": "news_015", "target": "news_007", "type": "AI战略", "strength": 0.78},
+    {"source": "news_015", "target": "news_026", "type": "AI普及", "strength": 0.85},
     {"source": "news_016", "target": "news_015", "type": "AI生态", "strength": 0.70},
+    {"source": "news_016", "target": "news_025", "type": "AI布局", "strength": 0.75},
     {"source": "news_018", "target": "news_004", "type": "具身智能", "strength": 0.80},
     {"source": "news_019", "target": "news_016", "type": "AI应用", "strength": 0.65},
     {"source": "news_020", "target": "news_012", "type": "通胀预期", "strength": 0.70},
     {"source": "news_021", "target": "news_004", "type": "AI投资", "strength": 0.78},
     {"source": "news_021", "target": "news_015", "type": "智能经济", "strength": 0.72},
+    {"source": "news_021", "target": "news_026", "type": "AI价值", "strength": 0.80},
     {"source": "news_022", "target": "news_015", "type": "AI开源", "strength": 0.68},
+    {"source": "news_022", "target": "news_025", "type": "开源竞争", "strength": 0.72},
     {"source": "news_023", "target": "news_007", "type": "算力竞争", "strength": 0.75},
     {"source": "news_023", "target": "news_009", "type": "通信技术", "strength": 0.70},
-    {"source": "news_024", "target": "news_001", "type": "地缘风险", "strength": 0.82}
+    {"source": "news_024", "target": "news_001", "type": "地缘风险", "strength": 0.82},
+    {"source": "news_025", "target": "news_026", "type": "AI生态", "strength": 0.78},
+    {"source": "news_026", "target": "news_015", "type": "AI发展", "strength": 0.88},
+    {"source": "news_027", "target": "news_004", "type": "产业聚焦", "strength": 0.85},
+    {"source": "news_028", "target": "news_017", "type": "AI伦理", "strength": 0.60}
   ],
   "stats": {
-    "total": 24,
-    "highImpact": 14,
+    "total": 30,
+    "highImpact": 18,
     "categories": {
-      "国际政治": 4,
-      "国内政治": 2,
-      "科技": 11,
-      "经济金融": 7
+      "国际政治": 5,
+      "国内政治": 4,
+      "科技": 15,
+      "经济金融": 6
     },
     "impactDistribution": {
-      "social": {"avg": 68.5, "max": 90, "min": 50},
-      "economic": {"avg": 84.2, "max": 98, "min": 55},
-      "political": {"avg": 70.8, "max": 99, "min": 40},
-      "tech": {"avg": 81.5, "max": 98, "min": 30}
+      "social": {"avg": 70.2, "max": 90, "min": 50},
+      "economic": {"avg": 82.5, "max": 98, "min": 55},
+      "political": {"avg": 72.3, "max": 99, "min": 40},
+      "tech": {"avg": 80.8, "max": 98, "min": 30}
     }
   }
 }
