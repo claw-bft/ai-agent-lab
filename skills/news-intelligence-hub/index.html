@@ -3,406 +3,840 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>新闻情报仪表板 | News Intelligence Hub</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <title>News Intelligence Hub - 热点新闻情报中心</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://d3js.org/d3.v7.min.js"></script>
     <style>
-        * { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
-        body { background: #0f172a; color: #e2e8f0; }
-        .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.1); }
-        .gradient-text { background: linear-gradient(135deg, #60a5fa, #a78bfa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .card-hover { transition: all 0.3s ease; }
-        .card-hover:hover { transform: translateY(-4px); box-shadow: 0 20px 40px rgba(0,0,0,0.3); }
-        #network-graph { width: 100%; height: 500px; }
-        .node { cursor: pointer; }
-        .link { stroke-opacity: 0.6; }
-        .pulse { animation: pulse 2s infinite; }
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
-        .scrollbar-hide::-webkit-scrollbar { display: none; }
-        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #ec4899;
+            --accent: #06b6d4;
+            --bg-dark: #0f172a;
+            --bg-card: #1e293b;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --border: #334155;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            text-align: center;
+            padding: 40px 20px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            border-radius: 20px;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
+            background-size: 20px 20px;
+            animation: gridMove 20s linear infinite;
+        }
+        
+        @keyframes gridMove {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(20px, 20px); }
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .subtitle {
+            color: rgba(255,255,255,0.8);
+            font-size: 1.1rem;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .timestamp {
+            color: rgba(255,255,255,0.6);
+            font-size: 0.9rem;
+            margin-top: 10px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 24px;
+            border: 1px solid var(--border);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+        
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+        
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        @media (max-width: 968px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .card {
+            background: var(--bg-card);
+            border-radius: 20px;
+            padding: 24px;
+            border: 1px solid var(--border);
+        }
+        
+        .card-title {
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .card-title::before {
+            content: '';
+            width: 4px;
+            height: 24px;
+            background: linear-gradient(180deg, var(--primary), var(--accent));
+            border-radius: 2px;
+        }
+        
+        #network-graph {
+            width: 100%;
+            height: 400px;
+        }
+        
+        .radar-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 400px;
+        }
+        
+        #radar-chart {
+            max-width: 100%;
+            max-height: 100%;
+        }
+        
+        .news-list {
+            margin-top: 30px;
+        }
+        
+        .news-item {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 16px;
+            border: 1px solid var(--border);
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        
+        .news-item:hover {
+            border-color: var(--primary);
+            transform: translateX(5px);
+        }
+        
+        .news-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .news-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            flex: 1;
+        }
+        
+        .news-heat {
+            background: linear-gradient(135deg, var(--secondary), #f97316);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        
+        .news-summary {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            margin-bottom: 12px;
+            line-height: 1.5;
+        }
+        
+        .news-meta {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        
+        .news-source {
+            color: var(--accent);
+            font-size: 0.85rem;
+        }
+        
+        .news-category {
+            background: rgba(99, 102, 241, 0.2);
+            color: var(--primary);
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+        }
+        
+        .news-time {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+        
+        .impact-bars {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        
+        .impact-bar {
+            flex: 1;
+            height: 6px;
+            background: var(--border);
+            border-radius: 3px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .impact-bar::before {
+            content: attr(data-label);
+            position: absolute;
+            top: -18px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+        }
+        
+        .impact-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+        
+        .impact-social { background: linear-gradient(90deg, #ec4899, #f472b6); }
+        .impact-economic { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+        .impact-political { background: linear-gradient(90deg, #ef4444, #f87171); }
+        .impact-tech { background: linear-gradient(90deg, #06b6d4, #22d3ee); }
+        
+        .timeline {
+            margin-top: 30px;
+        }
+        
+        .timeline-item {
+            display: flex;
+            gap: 20px;
+            padding: 15px 0;
+            border-left: 2px solid var(--border);
+            margin-left: 10px;
+            padding-left: 20px;
+            position: relative;
+        }
+        
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -6px;
+            top: 20px;
+            width: 10px;
+            height: 10px;
+            background: var(--primary);
+            border-radius: 50%;
+        }
+        
+        .timeline-time {
+            color: var(--accent);
+            font-size: 0.85rem;
+            min-width: 80px;
+        }
+        
+        .timeline-content {
+            flex: 1;
+        }
+        
+        .category-legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+            justify-content: center;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+        
+        .legend-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+        
+        @media (max-width: 640px) {
+            h1 { font-size: 1.8rem; }
+            .stat-value { font-size: 2rem; }
+            .news-header { flex-direction: column; }
+            #network-graph { height: 300px; }
+        }
+        
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 200px;
+        }
+        
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--border);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .node-label {
+            font-size: 10px;
+            fill: var(--text-primary);
+            pointer-events: none;
+        }
+        
         .tooltip {
             position: absolute;
             background: rgba(15, 23, 42, 0.95);
-            border: 1px solid rgba(255,255,255,0.1);
+            border: 1px solid var(--border);
             border-radius: 8px;
-            padding: 12px;
+            padding: 10px;
+            font-size: 0.85rem;
             pointer-events: none;
-            opacity: 0;
-            transition: opacity 0.2s;
             z-index: 1000;
-            max-width: 300px;
+            max-width: 250px;
         }
     </style>
 </head>
-<body class="min-h-screen">
-    <!-- Header -->
-    <header class="glass sticky top-0 z-50 px-4 py-4">
-        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
-                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
-                    </svg>
-                </div>
-                <div>
-                    <h1 class="text-xl font-bold gradient-text">新闻情报仪表板</h1>
-                    <p class="text-xs text-slate-400">News Intelligence Hub</p>
-                </div>
+<body>
+    <div class="container">
+        <header>
+            <h1>📰 News Intelligence Hub</h1>
+            <p class="subtitle">热点新闻智能分析与可视化平台</p>
+            <p class="timestamp" id="timestamp">更新时间: 2026-03-03 21:17 (Asia/Shanghai)</p>
+        </header>
+        
+        <div class="stats-grid" id="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value" id="stat-total">15</div>
+                <div class="stat-label">热点新闻总数</div>
             </div>
-            <div class="flex items-center gap-4 text-sm">
-                <div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-800/50">
-                    <div class="w-2 h-2 rounded-full bg-green-500 pulse"></div>
-                    <span class="text-slate-300" id="timestamp">2026-03-02 06:47</span>
-                </div>
-                <button onclick="refreshData()" class="px-4 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 transition text-white text-sm font-medium">
-                    刷新数据
-                </button>
+            <div class="stat-card">
+                <div class="stat-value" id="stat-high">7</div>
+                <div class="stat-label">高影响力事件</div>
             </div>
-        </div>
-    </header>
-
-    <main class="max-w-7xl mx-auto px-4 py-6 space-y-6">
-        <!-- Stats Cards -->
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div class="glass rounded-2xl p-4 card-hover">
-                <div class="text-slate-400 text-sm mb-1">总新闻数</div>
-                <div class="text-3xl font-bold text-white" id="stat-total">32</div>
-                <div class="text-xs text-green-400 mt-1">+4 较上小时</div>
+            <div class="stat-card">
+                <div class="stat-value" id="stat-categories">5</div>
+                <div class="stat-label">新闻类别数</div>
             </div>
-            <div class="glass rounded-2xl p-4 card-hover">
-                <div class="text-slate-400 text-sm mb-1">高影响事件</div>
-                <div class="text-3xl font-bold text-red-400" id="stat-high">15</div>
-                <div class="text-xs text-red-400 mt-1">需重点关注</div>
-            </div>
-            <div class="glass rounded-2xl p-4 card-hover">
-                <div class="text-slate-400 text-sm mb-1">平均热度</div>
-                <div class="text-3xl font-bold text-yellow-400" id="stat-heat">77.8</div>
-                <div class="text-xs text-yellow-400 mt-1">高度活跃</div>
-            </div>
-            <div class="glass rounded-2xl p-4 card-hover">
-                <div class="text-slate-400 text-sm mb-1">情绪指数</div>
-                <div class="text-3xl font-bold text-blue-400" id="stat-sentiment">+25</div>
-                <div class="text-xs text-slate-400 mt-1">偏积极</div>
+            <div class="stat-card">
+                <div class="stat-value" id="stat-relations">17</div>
+                <div class="stat-label">关联关系数</div>
             </div>
         </div>
-
-        <!-- Main Content Grid -->
-        <div class="grid lg:grid-cols-3 gap-6">
-            <!-- Network Graph -->
-            <div class="lg:col-span-2 glass rounded-2xl p-4">
-                <div class="flex items-center justify-between mb-4">
-                    <h2 class="text-lg font-semibold text-white">新闻关联网络</h2>
-                    <div class="flex gap-2 text-xs">
-                        <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-red-500"></span>国际政治</span>
-                        <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-blue-500"></span>科技</span>
-                        <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-green-500"></span>财经</span>
-                        <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-purple-500"></span>政治</span>
-                    </div>
-                </div>
-                <div id="network-graph" class="rounded-xl bg-slate-900/50"></div>
+        
+        <div class="dashboard-grid">
+            <div class="card">
+                <h2 class="card-title">新闻关联网络图</h2>
+                <div id="network-graph"></div>
+                <div class="category-legend" id="network-legend"></div>
             </div>
-
-            <!-- Impact Radar -->
-            <div class="glass rounded-2xl p-4">
-                <h2 class="text-lg font-semibold text-white mb-4">影响维度分析</h2>
-                <canvas id="radarChart" class="w-full"></canvas>
-                <div class="mt-4 space-y-2 text-sm">
-                    <div class="flex justify-between items-center p-2 rounded-lg bg-slate-800/50">
-                        <span class="text-slate-400">社会影响</span>
-                        <span class="text-white font-medium" id="impact-social">6.5</span>
-                    </div>
-                    <div class="flex justify-between items-center p-2 rounded-lg bg-slate-800/50">
-                        <span class="text-slate-400">经济影响</span>
-                        <span class="text-white font-medium" id="impact-economic">8.2</span>
-                    </div>
-                    <div class="flex justify-between items-center p-2 rounded-lg bg-slate-800/50">
-                        <span class="text-slate-400">政治影响</span>
-                        <span class="text-white font-medium" id="impact-political">7.1</span>
-                    </div>
-                    <div class="flex justify-between items-center p-2 rounded-lg bg-slate-800/50">
-                        <span class="text-slate-400">科技影响</span>
-                        <span class="text-white font-medium" id="impact-tech">8.0</span>
-                    </div>
+            
+            <div class="card">
+                <h2 class="card-title">影响维度雷达图</h2>
+                <div class="radar-container">
+                    <canvas id="radar-chart"></canvas>
                 </div>
             </div>
         </div>
-
-        <!-- Category Distribution & Timeline -->
-        <div class="grid lg:grid-cols-3 gap-6">
-            <!-- Category Chart -->
-            <div class="glass rounded-2xl p-4">
-                <h2 class="text-lg font-semibold text-white mb-4">新闻分类分布</h2>
-                <canvas id="categoryChart" class="w-full max-h-64"></canvas>
-            </div>
-
-            <!-- Sentiment Chart -->
-            <div class="glass rounded-2xl p-4">
-                <h2 class="text-lg font-semibold text-white mb-4">情绪分布</h2>
-                <canvas id="sentimentChart" class="w-full max-h-64"></canvas>
-            </div>
-
-            <!-- Timeline -->
-            <div class="glass rounded-2xl p-4">
-                <h2 class="text-lg font-semibold text-white mb-4">热度时间线</h2>
-                <div class="space-y-3 max-h-64 overflow-y-auto scrollbar-hide" id="timeline">
-                    <!-- Timeline items will be inserted here -->
-                </div>
-            </div>
+        
+        <div class="card">
+            <h2 class="card-title">热点新闻列表</h2>
+            <div class="news-list" id="news-list"></div>
         </div>
-
-        <!-- News List -->
-        <div class="glass rounded-2xl p-4">
-            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-4">
-                <h2 class="text-lg font-semibold text-white">热点新闻列表</h2>
-                <div class="flex flex-wrap gap-2">
-                    <button onclick="filterNews('all')" class="px-3 py-1 rounded-full bg-blue-600 text-white text-sm">全部</button>
-                    <button onclick="filterNews('国际政治')" class="px-3 py-1 rounded-full bg-slate-700 text-slate-300 text-sm hover:bg-slate-600">国际政治</button>
-                    <button onclick="filterNews('财经')" class="px-3 py-1 rounded-full bg-slate-700 text-slate-300 text-sm hover:bg-slate-600">财经</button>
-                    <button onclick="filterNews('科技')" class="px-3 py-1 rounded-full bg-slate-700 text-slate-300 text-sm hover:bg-slate-600">科技</button>
-                    <button onclick="filterNews('政治')" class="px-3 py-1 rounded-full bg-slate-700 text-slate-300 text-sm hover:bg-slate-600">政治</button>
-                </div>
-            </div>
-            <div class="grid md:grid-cols-2 gap-4" id="news-list">
-                <!-- News cards will be inserted here -->
-            </div>
+        
+        <div class="card timeline">
+            <h2 class="card-title">新闻时间线</h2>
+            <div id="timeline-container"></div>
         </div>
-
-        <!-- Keywords Cloud -->
-        <div class="glass rounded-2xl p-4">
-            <h2 class="text-lg font-semibold text-white mb-4">关键词云</h2>
-            <div class="flex flex-wrap gap-3 justify-center" id="keywords-cloud">
-                <!-- Keywords will be inserted here -->
-            </div>
-        </div>
-    </main>
-
-    <!-- Footer -->
-    <footer class="glass mt-8 py-6 px-4">
-        <div class="max-w-7xl mx-auto text-center text-slate-400 text-sm">
-            <p>新闻情报仪表板 &copy; 2026 | 数据每30分钟自动更新</p>
-            <p class="mt-1">数据来源：公开新闻API、网络搜索 | 更新时间: 2026-03-02 03:47</p>
-        </div>
-    </footer>
-
-    <!-- Tooltip -->
-    <div id="tooltip" class="tooltip"></div>
-
+    </div>
+    
     <script>
-        // Embedded data
-        const newsData = {"timestamp": "2026-03-02T09:47:00+08:00", "news": [{"id": "news_001", "title": "美以联合袭击伊朗，哈梅内伊丧生，全球金融市场震荡", "summary": "当地时间2月28日，美国和以色列对伊朗发动联合军事打击，伊朗最高领袖哈梅内伊丧生。伊朗迅速反击，袭击美国在中东军事基地和以色列多地。此冲突导致金融市场剧烈波动，黄金、原油价格上涨，比特币等加密货币暴跌，超15万人爆仓。", "source": "BBC中文/新浪财经", "heat": 99.0, "impact": {"social": 9.0, "economic": 9.8, "political": 10.0, "tech": 5.0}, "keywords": ["伊朗", "美国", "以色列", "哈梅内伊", "中东局势", "原油", "黄金", "地缘政治"], "category": "国际政治", "sentiment": "negative", "url": "https://www.bbc.com/zhongwen/simp"}, {"id": "news_002", "title": "霍尔木兹海峡关闭，全球能源安全面临大考", "summary": "伊朗遇袭后宣布关闭霍尔木兹海峡，全球约20%原油海运受阻，船运保费飙升。作为全球能源棋盘上关键棋子，伊朗被袭击对其霍尔木兹海峡这一能源咽喉产生的威胁，正在触发一场波及全球供应链、产业链乃至金融市场的剧烈海啸。", "source": "中国新闻网", "heat": 97.0, "impact": {"social": 8.0, "economic": 9.9, "political": 9.5, "tech": 4.0}, "keywords": ["霍尔木兹海峡", "原油", "能源", "油价", "全球供应链", "海运"], "category": "国际政治", "sentiment": "negative", "url": "https://www.chinanews.com.cn/cj/2026/03-01/10578855.shtml"}, {"id": "news_003", "title": "伊朗确认武装部队总参谋长等多位高级将领遇袭身亡", "summary": "伊朗官方确认，其武装部队总参谋长、革命卫队总司令、国防委员会秘书及国防部长等多位高级将领，于2月28日在美国和以色列发动的袭击中身亡。", "source": "新浪军事", "heat": 95.0, "impact": {"social": 7.5, "economic": 7.0, "political": 10.0, "tech": 4.0}, "keywords": ["伊朗", "军事", "战争", "中东", "将领", "革命卫队"], "category": "国际政治", "sentiment": "negative", "url": "https://news.sina.com.cn/zx/ds/2026-03-01/doc-inhpnscn8997707.shtml"}, {"id": "news_004", "title": "2025年GDP增长5%，经济向新向优发展", "summary": "2月28日国家统计局发布公报，2025年国内生产总值1401879亿元，增长5.0%。人均GDP比上年增长5.1%，全国人均可支配收入43377元，增长5.0%。各产业稳步发展，新质生产力成长，绿色低碳转型成效突出。", "source": "国家统计局", "heat": 92.0, "impact": {"social": 8.0, "economic": 9.5, "political": 8.5, "tech": 6.0}, "keywords": ["GDP", "经济增长", "国家统计局", "新质生产力", "十五五", "绿色低碳"], "category": "财经", "sentiment": "positive", "url": "https://finance.sina.com.cn/headline/2026-03-01/doc-inhpmqry9406217.shtml"}, {"id": "news_005", "title": "MWC 2026巴塞罗那开幕，逾350家中国企业竞逐AI与6G", "summary": "3月2日至5日，世界移动通信大会（MWC 2026）在西班牙巴塞罗那举行。本届大会聚焦AI与通信行业的深度融合等核心议题，预计将吸引全球2900余家展商，逾350家中国企业亮相竞逐AI与6G产业机遇。", "source": "上海证券报", "heat": 90.0, "impact": {"social": 6.5, "economic": 8.5, "political": 6.0, "tech": 9.8}, "keywords": ["MWC", "6G", "AI", "通信", "巴塞罗那", "中国移动", "华为"], "category": "科技", "sentiment": "positive", "url": "https://paper.cnstock.com/html/2026-03/02/content_2183840.htm"}, {"id": "news_006", "title": "人民币汇率三日急涨，央行下调外汇风险准备金率", "summary": "马年春节假期后，人民币汇率三连涨，离岸人民币一度大涨超600基点。2月27日央行宣布，3月2日起将远期售汇外汇风险准备金率从20%降至0，以稳定汇率、降低企业成本，释放抑制人民币过度升值信号。", "source": "央行/新浪财经", "heat": 88.0, "impact": {"social": 6.5, "economic": 9.0, "political": 7.5, "tech": 3.0}, "keywords": ["人民币", "汇率", "央行", "外汇", "金融政策", "离岸人民币"], "category": "财经", "sentiment": "positive", "url": "https://finance.sina.com.cn/headline/2026-03-01/doc-inhpmqry9406217.shtml"}, {"id": "news_007", "title": "2026年全国两会即将召开，十五五规划受关注", "summary": "全国政协十四届四次会议和十四届全国人大四次会议分别将于2026年3月4日和3月5日在北京召开。市场关注十五五规划、经济政策、新质生产力、人工智能+等议题。", "source": "中国新闻网/科技日报", "heat": 87.0, "impact": {"social": 7.5, "economic": 9.0, "political": 9.5, "tech": 7.0}, "keywords": ["两会", "十五五", "政策", "经济", "新质生产力", "人工智能+"], "category": "政治", "sentiment": "neutral", "url": "https://www.stdaily.com/web/gdxw/2026-03/01/content_478476.html"}, {"id": "news_008", "title": "中国大模型调用量首超美国，国产AI前景广阔", "summary": "2月9日—2月15日这周，中国人工智能大模型以4.12万亿Token的调用量，首次超过同期美国模型的2.94万亿Token。摩根大通预计，中国AI推理Token消耗量到2030年将增近369倍。", "source": "上观新闻/新浪财经", "heat": 86.0, "impact": {"social": 6.5, "economic": 8.0, "political": 7.0, "tech": 9.5}, "keywords": ["大模型", "AI", "Token", "中美竞争", "人工智能", "国产模型"], "category": "科技", "sentiment": "positive", "url": "https://k.sina.com.cn/article_5953190047_162d6789e06702qaa8.html"}, {"id": "news_009", "title": "AI大模型Token需求激增，算力市场爆发", "summary": "2026年人工智能大模型行业竞争激烈，Token消耗量显著增长，大模型服务面临算力考验。国产大模型在OpenRouter平台表现出色，2月Token消耗量占比超50%。AI算力市场伴随需求增长而爆发。", "source": "新浪财经", "heat": 85.0, "impact": {"social": 6.0, "economic": 8.0, "political": 5.5, "tech": 9.5}, "keywords": ["AI", "大模型", "Token", "算力", "智算中心", "OpenRouter"], "category": "科技", "sentiment": "positive", "url": "https://finance.sina.cn/headline/2026-03-01/detail-inhpnscn9014491.d.html"}, {"id": "news_010", "title": "地缘政治突变如何布局？聚焦周期与科技两大主线", "summary": "东方证券研究所所长黄燕铭表示，当前全球资本市场正面临核心变量切换，投资逻辑将被深刻重塑。未来投资机会将集中于两大主线：关键矿产、化工、能源等保障安全的周期领域，以及代表新质生产力的科技突破方向。", "source": "证券时报", "heat": 84.0, "impact": {"social": 6.0, "economic": 8.5, "political": 7.5, "tech": 8.0}, "keywords": ["地缘政治", "投资", "周期", "科技", "新质生产力", "能源安全"], "category": "财经", "sentiment": "neutral", "url": "https://www.stcn.com/article/detail/3655809.html"}, {"id": "news_011", "title": "恒生科技指数跌超20%，基金经理解读投资机会", "summary": "从2025年10月高点至今，恒生科技指数累计下跌超20%，进入技术性熊市。五位基金经理认为，本轮调整属中短期结构性调整，非长期趋势走弱。2026年核心投资主线或围绕AI展开，板块有望迎来趋势性修复行情。", "source": "新浪财经", "heat": 83.0, "impact": {"social": 5.5, "economic": 8.5, "political": 5.0, "tech": 8.5}, "keywords": ["恒生科技", "港股", "AI", "科技股", "投资", "熊市"], "category": "财经", "sentiment": "neutral", "url": "https://finance.sina.cn/headline/2026-03-01/detail-inhpnscn9014491.d.html"}, {"id": "news_012", "title": "美科技股集体重挫，AI泡沫担忧与通胀数据施压", "summary": "受人工智能泡沫担忧和美国通胀数据超预期影响，隔夜美股三大指数全线大跌，大型科技股多数下跌，英伟达近2日蒸发市值约3.1万亿元。云端AI算力租赁巨头CoreWeave股价盘中一度暴跌超22%。", "source": "新浪财经", "heat": 82.0, "impact": {"social": 6.0, "economic": 8.0, "political": 5.0, "tech": 9.0}, "keywords": ["AI", "科技股", "美股", "英伟达", "纳指", "通胀", "CoreWeave"], "category": "财经", "sentiment": "negative", "url": "https://finance.sina.cn/headline/2026-03-01/detail-inhpnscn9014491.d.html"}, {"id": "news_013", "title": "特朗普欲废除中国永久正常贸易关系地位", "summary": "特朗普访华未获中方确切回复后，美国国际贸易委员会启动调查，评估撤销中国永久正常贸易关系地位的经济影响。中方表示，若美国推进调查并出台限制措施，将捍卫自身合法权益。", "source": "新浪财经", "heat": 81.0, "impact": {"social": 6.0, "economic": 8.5, "political": 9.0, "tech": 5.0}, "keywords": ["特朗普", "中美贸易", "关税", "WTO", "贸易关系", "PNTR"], "category": "国际政治", "sentiment": "negative", "url": "https://finance.sina.cn/headline/2026-03-01/detail-inhpnscn9014491.d.html"}, {"id": "news_014", "title": "算力需求攀升、智能体价值兑现，2026年AI产业全面提速", "summary": "从算力到大模型，再到智能体，AI企业全力冲刺一季度开门红。位于上海临港的一个大型人工智能计算中心，机柜矩阵整齐排列，算力集群已经在马年开启海量运算。", "source": "央视网", "heat": 80.0, "impact": {"social": 6.0, "economic": 8.0, "political": 6.0, "tech": 9.5}, "keywords": ["AI", "算力", "智能体", "智算中心", "大模型", "上海临港"], "category": "科技", "sentiment": "positive", "url": "https://news.cctv.cn/2026/03/01/ARTIOjYPeka8KWcSaXp3oHcM260301.shtml"}, {"id": "news_015", "title": "深圳机器人谷创新技术推动产业发展", "summary": "深圳机器人谷位于阳台山南部余脉和塘朗山之间的谷地，孕育了越疆科技、速腾聚创、优必选等多家机器人上市企业。4月初越疆科技发布新一代智能力控协作机器人，在精密装配、复杂打磨等高端制造领域性能大幅提升。", "source": "新浪财经", "heat": 78.0, "impact": {"social": 6.0, "economic": 7.5, "political": 5.0, "tech": 9.0}, "keywords": ["机器人", "深圳", "越疆科技", "优必选", "智能制造", "协作机器人"], "category": "科技", "sentiment": "positive", "url": "https://k.sina.com.cn/article_7857201856_1d45362c001902qgzq.html"}, {"id": "news_016", "title": "人形机器人产教融合加速跑，人才缺口激增4倍", "summary": "全球首届人形机器人运动会落幕，16个国家280支队伍在26个赛项中展开比拼。懂算法和机械结构设计的技术类人才正跃升为职场上的香饽饽。业内人士指出，未来人形机器人领域高复合型人才需求将保持增长显著。", "source": "新浪财经", "heat": 77.0, "impact": {"social": 7.0, "economic": 7.0, "political": 5.0, "tech": 9.0}, "keywords": ["人形机器人", "人才", "产教融合", "运动会", "宇树科技", "具身智能"], "category": "科技", "sentiment": "positive", "url": "https://k.sina.com.cn/article_7857201856_1d45362c001902qh6i.html"}, {"id": "news_017", "title": "北京人工智能核心产业规模约占全国四成", "summary": "2025年北京人工智能核心产业规模达4500亿元，约占全国四成。北京在2025全球数字经济标杆城市指数评价中排名全球第二，去年数字经济增加值突破2.4万亿元。今年将培育硅基劳动力，推动具身智能产业发展。", "source": "千龙网", "heat": 76.0, "impact": {"social": 6.0, "economic": 8.0, "political": 6.5, "tech": 9.5}, "keywords": ["北京", "AI", "数字经济", "具身智能", "硅基劳动力", "4500亿"], "category": "科技", "sentiment": "positive", "url": "https://finance.sina.com.cn/jjxw/2026-03-01/doc-inhpmqrx2558910.shtml"}, {"id": "news_018", "title": "超150家半导体公司业绩揭晓，涨价潮为2026再添变量", "summary": "截至2026年2月底，超150家半导体公司披露2025年业绩。行业营收普遍增长，但利润分化显著。当前，受原材料成本攀升及AI需求爆发驱动，涨价潮已从存储芯片蔓延至功率、模拟等多领域。", "source": "新浪财经", "heat": 75.0, "impact": {"social": 5.0, "economic": 8.0, "political": 5.0, "tech": 9.0}, "keywords": ["半导体", "芯片", "AI", "业绩", "涨价", "存储芯片"], "category": "科技", "sentiment": "neutral", "url": "https://news.sina.com.cn/zx/ds/2026-03-01/doc-inhpnscn8995336.shtml"}, {"id": "news_019", "title": "十五五规划透露中国三大经济战略主线", "summary": "十五五规划呈现三个突出特点：科技自主战略的升级，从被动应对转向主动出击；AI+战略的提出，对标十三五时期的互联网+；消费升级首次成为优先事项，标志着政策方向从投资驱动向需求驱动转变。", "source": "BBC中文", "heat": 74.0, "impact": {"social": 7.0, "economic": 9.0, "political": 8.5, "tech": 8.0}, "keywords": ["十五五", "规划", "AI+", "科技自主", "消费升级", "战略"], "category": "政治", "sentiment": "neutral", "url": "https://www.bbc.com/zhongwen/articles/c7v80np7853o/simp"}, {"id": "news_020", "title": "世界经济五问：2026年全球增长面临挑战与机遇", "summary": "IMF等主要机构预测2026年世界经济增速将有所放缓。地缘冲突、保护主义、宏观经济政策分化、新技术革命冲击共同编织复杂图景。亚洲作为全球最具韧性的增长引擎将继续保持领先增长速度。", "source": "人民网", "heat": 73.0, "impact": {"social": 6.0, "economic": 8.5, "political": 7.0, "tech": 6.0}, "keywords": ["世界经济", "IMF", "全球贸易", "AI", "亚洲经济", "地缘冲突"], "category": "财经", "sentiment": "neutral", "url": "http://world.people.com.cn/n1/2026/0104/c1002-40637938.html"}, {"id": "news_021", "title": "比特币受美以袭击伊朗影响，价格急跌后反弹", "summary": "2月28日受以色列袭击伊朗消息影响，比特币急跌跌破64000美元，主流币种集体跳水，24小时内全球超15万人爆仓，爆仓金额4.94亿美元。随后加密货币市场完成V形反转。", "source": "新浪财经", "heat": 72.0, "impact": {"social": 5.5, "economic": 7.5, "political": 6.0, "tech": 6.5}, "keywords": ["比特币", "加密货币", "伊朗", "爆仓", "数字货币", "V形反转"], "category": "财经", "sentiment": "negative", "url": "https://finance.sina.cn/headline/2026-03-01/detail-inhpnscn9014491.d.html"}, {"id": "news_022", "title": "如何迎接AI重塑？美的与伊利各有心得", "summary": "生成式AI自2022年大模型推出以来，已深刻影响实体产业——从营销创意到产线运维，从消费者洞察到供应链协同，AI正在悄然重塑制造企业的价值链。", "source": "虎嗅APP", "heat": 70.0, "impact": {"social": 6.0, "economic": 7.5, "political": 4.0, "tech": 8.5}, "keywords": ["AI", "制造业", "美的", "伊利", "数字化转型", "生成式AI"], "category": "科技", "sentiment": "positive", "url": "http://k.sina.com.cn/article_5953466437_162dab0450670a4a0y.html"}, {"id": "news_023", "title": "中国海上油田首次实现低空经济规模化应用", "summary": "中国海油北部湾海域油田无人机系统运营项目于2月28日落地，这是中国海上油田首次实现无人机规模化作业，为海洋能源开发与低空经济融合提供了实践范例。全年可节约船舶租赁和燃油费用近1500万元，减少碳排放达25000吨。", "source": "中国新闻网", "heat": 68.0, "impact": {"social": 6.5, "economic": 7.5, "political": 5.5, "tech": 8.5}, "keywords": ["低空经济", "无人机", "海上油田", "碳中和", "中国海油", "北部湾"], "category": "科技", "sentiment": "positive", "url": "https://www.chinanews.com.cn/cj/2026/03-01/10578823.shtml"}, {"id": "news_024", "title": "上海跨境电商规模实现从百亿级向千亿级跃升", "summary": "上海市商务委员会表示，近年来上海跨境电商规模实现从百亿级向千亿级跃升。2025年上海外贸进出口规模历史性突破4.5万亿元，进出口值、出口值和进口值均创历史新高。", "source": "中国新闻网", "heat": 65.0, "impact": {"social": 6.0, "economic": 8.0, "political": 6.0, "tech": 6.5}, "keywords": ["跨境电商", "上海", "外贸", "数字经济", "一带一路", "4.5万亿"], "category": "财经", "sentiment": "positive", "url": "https://www.chinanews.com.cn/cj/2026/03-01/10578905.shtml"}, {"id": "news_025", "title": "兴业银行发布科技金融专属品牌「兴火科技」", "summary": "兴业银行在「十五五」开局在即之际，正式推出「兴火科技」品牌，希望抢抓新一轮科技革命和产业变革机遇，坚持深耕现代化产业体系，为科技型企业提供全方位金融服务。", "source": "人民网", "heat": 62.0, "impact": {"social": 5.5, "economic": 7.5, "political": 5.5, "tech": 7.5}, "keywords": ["兴业银行", "科技金融", "兴火科技", "十五五", "金融科技"], "category": "财经", "sentiment": "positive", "url": "http://fj.people.com.cn/n2/2026/0301/c181466-41511799.html"}, {"id": "news_026", "title": "具身智能进入发展快车道，产业链加速闭环", "summary": "从上游的芯片、传感器，到中游的本体制造、大模型算法，再到下游的系统集成，一条自主可控的具身智能产业链正在加速闭环。2025年中国工业机器人产量77.3万台，具身智能正从概念宠儿变为热点风口。", "source": "羊城晚报", "heat": 60.0, "impact": {"social": 6.0, "economic": 7.5, "political": 5.0, "tech": 9.0}, "keywords": ["具身智能", "机器人", "大模型", "产业链", "智能制造", "77.3万台"], "category": "科技", "sentiment": "positive", "url": "https://news.ycwb.com/ikimvkhtkj/content_53985053.htm"}, {"id": "news_027", "title": "AI热潮挤占芯片产能，国产手机将于2026年3月集体涨价", "summary": "艾媒网获悉，2026年3月初，中国国产手机市场将迎来一场大规模涨价潮。OPPO、一加、vivo、小米、iQOO、荣耀等头部品牌已计划于3月上旬启动新一轮涨价，AI需求爆发挤占芯片产能是主因。", "source": "艾媒网", "heat": 58.0, "impact": {"social": 6.5, "economic": 7.0, "political": 4.0, "tech": 8.0}, "keywords": ["AI", "手机涨价", "小米", "OPPO", "vivo", "芯片产能"], "category": "科技", "sentiment": "negative", "url": "https://www.iimedia.cn/c1040/109873.html"}, {"id": "news_028", "title": "华工科技举行AI战略暨新产品发布会", "summary": "3月2日，华工科技将在线上举行AI战略暨新产品、新场景发布会。这场备受瞩目的活动，不仅是这家光谷光电子领军企业对国家人工智能+行动的积极响应，更标志着其全面拥抱AI转型的决心。", "source": "长江日报", "heat": 55.0, "impact": {"social": 5.0, "economic": 6.5, "political": 5.0, "tech": 8.5}, "keywords": ["华工科技", "AI战略", "光谷", "光电子", "人工智能+"], "category": "科技", "sentiment": "positive", "url": "https://cjrb.cjn.cn/html/2026-03/02/content_151735_3182216.htm"}, {"id": "news_029", "title": "全球人工智能领域2月发展盘点：OpenAI发布GPT-5.3-Codex", "summary": "2月，美国AI企业密集发布了多款前沿模型。OpenAI推出GPT-5.3-Codex编程模型，谷歌发布双子座3.1 Pro模型，Anthropic推出Claude 4系列。中国大模型调用量首次超过美国，显示国产AI竞争力提升。", "source": "中国网", "heat": 84.0, "impact": {"social": 6.0, "economic": 7.5, "political": 6.0, "tech": 9.5}, "keywords": ["OpenAI", "GPT-5.3", "谷歌", "Claude", "大模型", "AI竞赛"], "category": "科技", "sentiment": "positive", "url": "http://news.china.com.cn/2026-03/02/content_118354483.shtml"}, {"id": "news_030", "title": "2026年GDP增长目标或设为4.5%-5%区间", "summary": "专家共话2026年经济增长目标，预判全国GDP增长目标或调整为4.5%-5%区间。31省份加权平均增速目标约5%、较上年小幅下调，释放务实增长信号。作为十五五开局之年，财政政策将延续稳定基调。", "source": "证券时报", "heat": 79.0, "impact": {"social": 6.5, "economic": 9.0, "political": 8.5, "tech": 5.0}, "keywords": ["GDP目标", "经济增长", "十五五", "财政政策", "4.5%-5%"], "category": "政治", "sentiment": "neutral", "url": "https://www.stcn.com/article/detail/3655807.html"}, {"id": "news_031", "title": "磁性材料AI原子基座模型发布，材料研发进入智能时代", "summary": "科学网报道，磁性材料AI原子基座模型发布，可精准指导工艺、预测性能，大幅缩短磁性材料研发周期、降低研发成本，推动研发模式从经验驱动向数据智能驱动转型。", "source": "科学网", "heat": 56.0, "impact": {"social": 5.0, "economic": 6.5, "political": 4.5, "tech": 9.0}, "keywords": ["磁性材料", "AI模型", "材料科学", "原子基座", "智能制造"], "category": "科技", "sentiment": "positive", "url": "https://news.sciencenet.cn/htmlnews/2026/3/560664.shtm"}, {"id": "news_032", "title": "AI硬着陆：算力重心从云端转向边缘", "summary": "历经过去几年各行业在大模型参数规模飙升下狂欢，2026年AI算力重心正从云端转向边缘。AI推理需求激增，边缘计算设备需求爆发，推动AI应用从实验室走向实际场景。", "source": "澎湃新闻", "heat": 72.0, "impact": {"social": 5.5, "economic": 7.0, "political": 4.5, "tech": 9.0}, "keywords": ["AI", "边缘计算", "云端", "算力", "推理", "智能设备"], "category": "科技", "sentiment": "neutral", "url": "https://m.thepaper.cn/newsDetail_forward_32668126"}, {"id": "news_033", "title": "药品零售行业具身智能机器人落地北京海淀", "summary": "新浪人工智能热点小时报报道，药品零售行业具身智能机器人已正式落地北京海淀。这一创新应用标志着AI技术在传统零售领域的深度渗透，为智慧零售和医疗健康服务融合提供新范式。", "source": "新浪财经", "heat": 65.0, "impact": {"social": 7.0, "economic": 6.5, "political": 5.0, "tech": 8.5}, "keywords": ["具身智能", "机器人", "药品零售", "北京海淀", "智慧零售", "医疗AI"], "category": "科技", "sentiment": "positive", "url": "https://k.sina.com.cn/article_7857201856_1d45362c001902rl5a.html"}, {"id": "news_034", "title": "AI投资逻辑重塑，新投资主线逐渐明晰", "summary": "2026年AI投资逻辑正在经历深刻重塑。从单纯追逐大模型参数规模转向关注实际应用场景和商业变现能力，从云端算力向边缘计算延伸，投资者更加注重AI技术的落地价值和长期盈利能力。", "source": "证券时报", "heat": 78.0, "impact": {"social": 5.5, "economic": 8.0, "political": 5.0, "tech": 8.5}, "keywords": ["AI投资", "投资逻辑", "边缘计算", "商业变现", "应用场景"], "category": "财经", "sentiment": "neutral", "url": "https://www.stcn.com/article/detail/3655975.html"}, {"id": "news_035", "title": "为何越来越多全球投资者告别美国转向新兴市场", "summary": "2026年以来，市场资金流向显示，越来越多投资者正告别美国，转向更具吸引力的新兴市场股市。美国高盛集团数据显示，美股正经历1995年以来最差开局。资本正在重新配置，寻求更高回报和更低风险的投资标的。", "source": "中国日报", "heat": 75.0, "impact": {"social": 5.5, "economic": 8.5, "political": 7.0, "tech": 4.0}, "keywords": ["美股", "新兴市场", "资本配置", "高盛", "投资策略", "全球资金"], "category": "财经", "sentiment": "negative", "url": "http://cn.chinadaily.com.cn/a/202602/28/WS69a2f158a310942cc49a0ffd.html"}, {"id": "news_036", "title": "人形机器人与具身智能迎来国家级标准体系", "summary": "2月28日，人形机器人与具身智能标准化（HEIS）年会在北京召开。会上正式发布《人形机器人与具身智能标准体系（2026版）》。这是我国首个覆盖人形机器人全产业链、全生命周期的标准顶层设计。", "source": "东方财富", "heat": 82.0, "impact": {"social": 6.5, "economic": 7.5, "political": 6.0, "tech": 9.5}, "keywords": ["人形机器人", "具身智能", "标准体系", "HEIS", "国家标准", "产业链"], "category": "科技", "sentiment": "positive", "url": "https://finance.eastmoney.com/a/202603023657843640.html"}, {"id": "news_037", "title": "欧佩克+确认4月份将增产20.6万桶/日", "summary": "3月1日，沙特、俄罗斯等八个欧佩克+成员国举行视频会议。鉴于全球经济前景稳定及低库存现状，各国决定从2026年4月起实施每日20.6万桶的增产调整，各国重申将保持灵活性，根据市场变化随时调整产量计划。", "source": "东方财富", "heat": 80.0, "impact": {"social": 5.5, "economic": 8.5, "political": 6.5, "tech": 3.0}, "keywords": ["欧佩克", "原油", "增产", "沙特", "俄罗斯", "油价"], "category": "财经", "sentiment": "neutral", "url": "https://finance.eastmoney.com/a/202603023657843640.html"}, {"id": "news_038", "title": "DeepSeek将于下周发布最新大模型V4", "summary": "据金融时报报道，DeepSeek将于下周发布其最新的大模型V4。这是一款具备图片、视频和文本生成功能的多模态模型。DeepSeek致力于优化V4模型以适配中国制造的芯片，有望提振中国市场对其半导体产品的需求。", "source": "金融时报", "heat": 88.0, "impact": {"social": 6.0, "economic": 7.5, "political": 6.0, "tech": 9.5}, "keywords": ["DeepSeek", "V4", "大模型", "多模态", "国产芯片", "AI模型"], "category": "科技", "sentiment": "positive", "url": "https://www.ft.com/content/deepseek-v4"}], "relations": [{"source": "news_001", "target": "news_002", "type": "causal", "strength": 0.98}, {"source": "news_001", "target": "news_003", "type": "similar", "strength": 0.95}, {"source": "news_001", "target": "news_021", "type": "economic", "strength": 0.88}, {"source": "news_002", "target": "news_010", "type": "economic", "strength": 0.82}, {"source": "news_002", "target": "news_037", "type": "economic", "strength": 0.85}, {"source": "news_004", "target": "news_007", "type": "policy", "strength": 0.9}, {"source": "news_004", "target": "news_019", "type": "policy", "strength": 0.92}, {"source": "news_004", "target": "news_030", "type": "policy", "strength": 0.88}, {"source": "news_007", "target": "news_019", "type": "policy", "strength": 0.95}, {"source": "news_007", "target": "news_030", "type": "policy", "strength": 0.93}, {"source": "news_008", "target": "news_009", "type": "tech", "strength": 0.88}, {"source": "news_008", "target": "news_014", "type": "tech", "strength": 0.85}, {"source": "news_008", "target": "news_017", "type": "tech", "strength": 0.78}, {"source": "news_008", "target": "news_029", "type": "tech", "strength": 0.92}, {"source": "news_008", "target": "news_038", "type": "tech", "strength": 0.9}, {"source": "news_009", "target": "news_018", "type": "tech", "strength": 0.82}, {"source": "news_009", "target": "news_032", "type": "tech", "strength": 0.85}, {"source": "news_010", "target": "news_011", "type": "economic", "strength": 0.75}, {"source": "news_011", "target": "news_012", "type": "economic", "strength": 0.8}, {"source": "news_012", "target": "news_018", "type": "tech", "strength": 0.85}, {"source": "news_012", "target": "news_035", "type": "economic", "strength": 0.78}, {"source": "news_015", "target": "news_016", "type": "tech", "strength": 0.9}, {"source": "news_015", "target": "news_017", "type": "tech", "strength": 0.72}, {"source": "news_016", "target": "news_017", "type": "tech", "strength": 0.78}, {"source": "news_016", "target": "news_036", "type": "tech", "strength": 0.95}, {"source": "news_008", "target": "news_022", "type": "tech", "strength": 0.7}, {"source": "news_001", "target": "news_013", "type": "political", "strength": 0.75}, {"source": "news_010", "target": "news_020", "type": "economic", "strength": 0.72}, {"source": "news_006", "target": "news_010", "type": "economic", "strength": 0.65}, {"source": "news_003", "target": "news_001", "type": "similar", "strength": 0.92}, {"source": "news_023", "target": "news_017", "type": "tech", "strength": 0.75}, {"source": "news_023", "target": "news_004", "type": "economic", "strength": 0.68}, {"source": "news_024", "target": "news_004", "type": "economic", "strength": 0.75}, {"source": "news_025", "target": "news_019", "type": "policy", "strength": 0.72}, {"source": "news_026", "target": "news_015", "type": "tech", "strength": 0.88}, {"source": "news_026", "target": "news_016", "type": "tech", "strength": 0.92}, {"source": "news_026", "target": "news_017", "type": "tech", "strength": 0.85}, {"source": "news_026", "target": "news_036", "type": "tech", "strength": 0.9}, {"source": "news_027", "target": "news_018", "type": "tech", "strength": 0.8}, {"source": "news_027", "target": "news_012", "type": "economic", "strength": 0.7}, {"source": "news_028", "target": "news_008", "type": "tech", "strength": 0.75}, {"source": "news_005", "target": "news_008", "type": "tech", "strength": 0.82}, {"source": "news_005", "target": "news_014", "type": "tech", "strength": 0.78}, {"source": "news_014", "target": "news_017", "type": "tech", "strength": 0.88}, {"source": "news_029", "target": "news_009", "type": "tech", "strength": 0.85}, {"source": "news_029", "target": "news_012", "type": "tech", "strength": 0.75}, {"source": "news_031", "target": "news_008", "type": "tech", "strength": 0.7}, {"source": "news_032", "target": "news_014", "type": "tech", "strength": 0.8}, {"source": "news_032", "target": "news_026", "type": "tech", "strength": 0.75}, {"source": "news_033", "target": "news_015", "type": "tech", "strength": 0.78}, {"source": "news_033", "target": "news_016", "type": "tech", "strength": 0.75}, {"source": "news_034", "target": "news_008", "type": "tech", "strength": 0.82}, {"source": "news_034", "target": "news_012", "type": "economic", "strength": 0.78}, {"source": "news_035", "target": "news_012", "type": "economic", "strength": 0.72}, {"source": "news_035", "target": "news_020", "type": "economic", "strength": 0.8}, {"source": "news_036", "target": "news_015", "type": "tech", "strength": 0.88}, {"source": "news_036", "target": "news_016", "type": "tech", "strength": 0.92}, {"source": "news_037", "target": "news_002", "type": "economic", "strength": 0.85}, {"source": "news_038", "target": "news_008", "type": "tech", "strength": 0.88}, {"source": "news_038", "target": "news_009", "type": "tech", "strength": 0.85}], "stats": {"total": 38, "highImpact": 18, "categories": {"国际政治": 4, "财经": 11, "科技": 19, "政治": 4}, "sentiment": {"positive": 19, "neutral": 10, "negative": 9}, "avgHeat": 76.8, "topKeywords": ["AI", "伊朗", "美国", "经济", "中国", "科技", "原油", "中东", "十五五", "大模型", "机器人", "算力", "具身智能", "地缘政治", "Token", "DeepSeek"]}};
+        // 内嵌数据
+        const newsData = {
+            "timestamp": "2026-03-03T21:17:00+08:00",
+            "news": [
+                {
+                    "id": "news-001",
+                    "title": "伊朗最高领袖哈梅内伊在美以袭击中遇害",
+                    "summary": "2月28日，美国联合以色列对伊朗发动军事打击，行动代号"咆哮的狮子"。伊朗方面3月1日证实，伊朗最高领袖哈梅内伊在美以对伊朗的袭击中遇害。伊朗伊斯兰革命卫队宣布关闭霍尔木兹海峡，并称将发动"历史上最猛烈的进攻行动"。",
+                    "source": "新华网/央视新闻",
+                    "heat": 99,
+                    "impact": {"social": 92, "economic": 96, "political": 99, "tech": 45},
+                    "keywords": ["伊朗", "哈梅内伊", "中东局势", "霍尔木兹海峡"],
+                    "category": "国际政治",
+                    "time": "2026-03-01"
+                },
+                {
+                    "id": "news-002",
+                    "title": "全国政协十四届四次会议将于3月4日在京召开",
+                    "summary": "3月1日召开的中国人民政治协商会议第十四届全国委员会常务委员会第十五次会议决定：全国政协十四届四次会议于2026年3月4日在北京召开，讨论国民经济和社会发展第十五个五年规划纲要草案。",
+                    "source": "新华社",
+                    "heat": 93,
+                    "impact": {"social": 86, "economic": 91, "political": 96, "tech": 55},
+                    "keywords": ["两会", "全国政协", "十五五规划"],
+                    "category": "国内政治",
+                    "time": "2026-03-01"
+                },
+                {
+                    "id": "news-003",
+                    "title": "四部门发布20项举措推动科技保险高质量发展",
+                    "summary": "科技部等四部门发布《关于加快推动科技保险高质量发展有力支撑高水平科技自立自强的若干意见》，从6个方面提出20项政策举措，聚焦国家重大科技任务和科技型中小企业。",
+                    "source": "人民日报/科技部",
+                    "heat": 88,
+                    "impact": {"social": 70, "economic": 90, "political": 85, "tech": 92},
+                    "keywords": ["科技保险", "科技创新", "政策"],
+                    "category": "科技政策",
+                    "time": "2026-03-02"
+                },
+                {
+                    "id": "news-004",
+                    "title": "我国生成式人工智能用户规模超6亿人",
+                    "summary": "2026年是"十五五"开局之年，生成式人工智能的突破性发展正推动经济社会从"互联网+"加速迈向"人工智能+"的深度智能时代。",
+                    "source": "国家科技图书文献中心",
+                    "heat": 87,
+                    "impact": {"social": 82, "economic": 86, "political": 62, "tech": 96},
+                    "keywords": ["生成式AI", "人工智能", "用户规模"],
+                    "category": "科技",
+                    "time": "2026-03-02"
+                },
+                {
+                    "id": "news-005",
+                    "title": "霍尔木兹海峡关闭：全球能源大动脉陷入停滞",
+                    "summary": "伊朗伊斯兰革命卫队宣布关闭霍尔木兹海峡，称由于美以袭击，该航道已不再安全。国际油轮交通监测数据显示，海峡周边海域油轮航行速度已普遍降至零，航运陷入停滞。",
+                    "source": "中国新闻网",
+                    "heat": 95,
+                    "impact": {"social": 78, "economic": 99, "political": 94, "tech": 42},
+                    "keywords": ["霍尔木兹海峡", "石油", "航运", "全球经济"],
+                    "category": "国际政治",
+                    "time": "2026-03-02"
+                },
+                {
+                    "id": "news-006",
+                    "title": "MWC 2026：阿里千问发布首款同名AI眼镜",
+                    "summary": "2026年世界移动通信大会(MWC)在巴塞罗那盛大启幕，阿里千问在MWC上发布首款同名AI眼镜，并于3月2日开启线上线下全渠道预约。",
+                    "source": "新浪科技/华尔街见闻",
+                    "heat": 85,
+                    "impact": {"social": 70, "economic": 82, "political": 55, "tech": 94},
+                    "keywords": ["MWC", "阿里千问", "AI眼镜", "智能硬件"],
+                    "category": "科技",
+                    "time": "2026-03-02"
+                },
+                {
+                    "id": "news-007",
+                    "title": "人形机器人与具身智能标准体系(2026版)发布",
+                    "summary": "人形机器人与具身智能标准化(HEIS)年会在北京召开，正式发布《人形机器人与具身智能标准体系(2026版)》，这是我国首个覆盖人形机器人全产业链的标准顶层设计。",
+                    "source": "东方财富",
+                    "heat": 84,
+                    "impact": {"social": 72, "economic": 86, "political": 68, "tech": 96},
+                    "keywords": ["人形机器人", "具身智能", "标准体系"],
+                    "category": "科技",
+                    "time": "2026-03-02"
+                },
+                {
+                    "id": "news-008",
+                    "title": "王毅同俄罗斯外长拉夫罗夫通电话",
+                    "summary": "3月1日，王毅应约同俄罗斯外长拉夫罗夫通电话，就伊朗局势交换意见。中方提出立即停止军事行动、尽快重回对话谈判、共同反对单边行径三点立场。",
+                    "source": "外交部",
+                    "heat": 90,
+                    "impact": {"social": 62, "economic": 78, "political": 96, "tech": 38},
+                    "keywords": ["中俄关系", "伊朗局势", "外交"],
+                    "category": "国际政治",
+                    "time": "2026-03-01"
+                },
+                {
+                    "id": "news-009",
+                    "title": "存储芯片价格创2016年以来新高，手机涨价在即",
+                    "summary": "国家发改委价格监测中心发文称，全球存储器市场缺口扩大，存储芯片价格持续上涨。1月DRAM合约价格上涨约24%，NAND闪存价格上涨约65%，均创2016年有数据以来最高。中国手机市场3月起全行业涨价。",
+                    "source": "证券时报/中关村在线",
+                    "heat": 86,
+                    "impact": {"social": 65, "economic": 92, "political": 55, "tech": 90},
+                    "keywords": ["存储芯片", "DRAM", "NAND", "半导体", "手机涨价"],
+                    "category": "财经",
+                    "time": "2026-03-02"
+                },
+                {
+                    "id": "news-010",
+                    "title": "深圳：2026年人工智能终端产业规模力争1万亿元",
+                    "summary": "深圳市工信局发布《深圳市加快推进人工智能终端产业发展行动计划（2025—2026年）》，提出到2026年人工智能终端产业规模达1万亿元，并发布具身智能机器人技术创新行动计划。",
+                    "source": "财新网/证券时报",
+                    "heat": 82,
+                    "impact": {"social": 68, "economic": 88, "political": 78, "tech": 94},
+                    "keywords": ["深圳", "人工智能", "具身智能", "产业政策"],
+                    "category": "科技政策",
+                    "time": "2026-03-03"
+                },
+                {
+                    "id": "news-011",
+                    "title": "欧佩克+确认4月份将增产20.6万桶/日",
+                    "summary": "沙特、俄罗斯等八个欧佩克+成员国举行视频会议，决定从2026年4月起实施每日20.6万桶的增产调整，各国重申将根据市场变化随时调整产量计划。",
+                    "source": "21世纪经济报道",
+                    "heat": 83,
+                    "impact": {"social": 58, "economic": 93, "political": 72, "tech": 38},
+                    "keywords": ["欧佩克", "石油", "增产", "能源"],
+                    "category": "财经",
+                    "time": "2026-03-01"
+                },
+                {
+                    "id": "news-012",
+                    "title": "余杭区：2026年人工智能核心产业营收突破1500亿元",
+                    "summary": "余杭区打造人工智能创新发展第一城核心承载地行动发布，2026年全区人工智能核心产业营收要突破1500亿元，累计培育行业领先的垂直大模型5个以上。",
+                    "source": "中国日报/浙江日报",
+                    "heat": 79,
+                    "impact": {"social": 65, "economic": 85, "political": 70, "tech": 92},
+                    "keywords": ["余杭", "人工智能", "大模型", "数字经济"],
+                    "category": "科技政策",
+                    "time": "2026-03-03"
+                },
+                {
+                    "id": "news-013",
+                    "title": "首批中国公民从伊朗撤离至阿塞拜疆",
+                    "summary": "中国驻伊朗大使馆发布撤离信息，首批18名中国公民已从伊朗撤离至阿塞拜疆。使馆同时发布经土库曼斯坦撤离的详细指引。",
+                    "source": "中国新闻网",
+                    "heat": 91,
+                    "impact": {"social": 88, "economic": 65, "political": 85, "tech": 35},
+                    "keywords": ["伊朗", "撤侨", "公民保护", "中东"],
+                    "category": "国际政治",
+                    "time": "2026-03-03"
+                },
+                {
+                    "id": "news-014",
+                    "title": "周鸿祎：未来互联网或分"人用"和"智能体用"",
+                    "summary": "全国政协委员周鸿祎预测，随着智能体的普及，未来的网站和应用程序可能将分化为两套体系：一套服务于人类用户，一套服务于智能体之间交互。",
+                    "source": "中国新闻网",
+                    "heat": 81,
+                    "impact": {"social": 75, "economic": 70, "political": 60, "tech": 90},
+                    "keywords": ["周鸿祎", "智能体", "AI", "两会"],
+                    "category": "科技",
+                    "time": "2026-03-03"
+                },
+                {
+                    "id": "news-015",
+                    "title": "苹果将于3月4日举行发布会，M5芯片Mac即将登场",
+                    "summary": "苹果将于3月4日在纽约、上海、伦敦同步举办发布会，预计推出搭载M5芯片的MacBook新品，以及新款iPad和Apple Watch。",
+                    "source": "腾讯新闻",
+                    "heat": 80,
+                    "impact": {"social": 68, "economic": 78, "political": 45, "tech": 92},
+                    "keywords": ["苹果", "M5芯片", "MacBook", "发布会"],
+                    "category": "科技",
+                    "time": "2026-03-03"
+                }
+            ],
+            "relations": [
+                {"source": "news-001", "target": "news-005", "type": "因果关联", "strength": 0.96},
+                {"source": "news-001", "target": "news-008", "type": "政治关联", "strength": 0.88},
+                {"source": "news-001", "target": "news-011", "type": "经济影响", "strength": 0.82},
+                {"source": "news-001", "target": "news-013", "type": "事件关联", "strength": 0.94},
+                {"source": "news-005", "target": "news-011", "type": "能源关联", "strength": 0.90},
+                {"source": "news-002", "target": "news-003", "type": "政策关联", "strength": 0.76},
+                {"source": "news-002", "target": "news-007", "type": "产业关联", "strength": 0.72},
+                {"source": "news-003", "target": "news-010", "type": "主题关联", "strength": 0.80},
+                {"source": "news-003", "target": "news-004", "type": "科技关联", "strength": 0.78},
+                {"source": "news-004", "target": "news-007", "type": "技术关联", "strength": 0.86},
+                {"source": "news-004", "target": "news-014", "type": "AI关联", "strength": 0.82},
+                {"source": "news-006", "target": "news-004", "type": "产业关联", "strength": 0.75},
+                {"source": "news-007", "target": "news-010", "type": "政策关联", "strength": 0.88},
+                {"source": "news-009", "target": "news-004", "type": "产业链关联", "strength": 0.72},
+                {"source": "news-010", "target": "news-012", "type": "地域关联", "strength": 0.78},
+                {"source": "news-010", "target": "news-007", "type": "产业协同", "strength": 0.85},
+                {"source": "news-014", "target": "news-002", "type": "两会关联", "strength": 0.70}
+            ],
+            "stats": {
+                "total": 15,
+                "highImpact": 7,
+                "categories": {
+                    "国际政治": 4,
+                    "国内政治": 1,
+                    "科技": 4,
+                    "科技政策": 3,
+                    "财经": 3
+                }
+            }
+        };
 
-        // Color schemes
+        // 类别颜色映射
         const categoryColors = {
             '国际政治': '#ef4444',
-            '财经': '#22c55e',
-            '科技': '#3b82f6',
-            '社会': '#f59e0b',
-            '政治': '#8b5cf6'
+            '国内政治': '#f97316',
+            '科技': '#06b6d4',
+            '科技政策': '#8b5cf6',
+            '财经': '#f59e0b'
         };
 
-        const sentimentColors = {
-            'positive': '#22c55e',
-            'neutral': '#64748b',
-            'negative': '#ef4444'
-        };
-
-        let currentFilter = 'all';
-        let radarChartInstance, categoryChartInstance, sentimentChartInstance;
-
-        // Calculate average impact
-        function calculateAvgImpact(news) {
-            const sum = news.reduce((acc, item) => ({
-                social: acc.social + item.impact.social,
-                economic: acc.economic + item.impact.economic,
-                political: acc.political + item.impact.political,
-                tech: acc.tech + item.impact.tech
-            }), {social: 0, economic: 0, political: 0, tech: 0});
-
-            return {
-                social: sum.social / news.length,
-                economic: sum.economic / news.length,
-                political: sum.political / news.length,
-                tech: sum.tech / news.length
-            };
-        }
-
-        // Update dashboard
-        function updateDashboard() {
-            // Update stats
-            document.getElementById('stat-total').textContent = newsData.stats.total;
-            document.getElementById('stat-high').textContent = newsData.stats.highImpact;
-            document.getElementById('stat-heat').textContent = newsData.stats.avgHeat.toFixed(1);
-            document.getElementById('timestamp').textContent = new Date(newsData.timestamp).toLocaleString('zh-CN');
-
-            // Calculate sentiment score
-            const sentimentScore = (newsData.stats.sentiment.positive * 1 + newsData.stats.sentiment.neutral * 0 + newsData.stats.sentiment.negative * -1) / newsData.stats.total;
-            document.getElementById('stat-sentiment').textContent = (sentimentScore * 100).toFixed(0);
-
-            // Update impact scores
-            const avgImpact = calculateAvgImpact(newsData.news);
-            document.getElementById('impact-social').textContent = avgImpact.social.toFixed(1);
-            document.getElementById('impact-economic').textContent = avgImpact.economic.toFixed(1);
-            document.getElementById('impact-political').textContent = avgImpact.political.toFixed(1);
-            document.getElementById('impact-tech').textContent = avgImpact.tech.toFixed(1);
-
-            // Render visualizations
+        // 渲染仪表板
+        function renderDashboard() {
             renderNetworkGraph();
-            renderRadarChart(avgImpact);
-            renderCategoryChart();
-            renderSentimentChart();
-            renderTimeline();
+            renderRadarChart();
             renderNewsList();
-            renderKeywordsCloud();
+            renderTimeline();
         }
 
-        // Render network graph
+        // 渲染网络图
         function renderNetworkGraph() {
             const container = document.getElementById('network-graph');
             container.innerHTML = '';
-
+            
             const width = container.clientWidth;
-            const height = 500;
-
+            const height = 400;
+            
             const svg = d3.select('#network-graph')
                 .append('svg')
                 .attr('width', width)
                 .attr('height', height);
-
-            // Prepare nodes and links
+            
+            // 准备节点和连接数据
             const nodes = newsData.news.map(d => ({
                 id: d.id,
-                title: d.title.substring(0, 20) + '...',
-                fullTitle: d.title,
+                title: d.title.substring(0, 15) + '...',
                 category: d.category,
                 heat: d.heat,
-                sentiment: d.sentiment,
-                summary: d.summary
+                fullTitle: d.title
             }));
-
+            
             const links = newsData.relations.map(d => ({
                 source: d.source,
                 target: d.target,
-                strength: d.strength
+                strength: d.strength,
+                type: d.type
             }));
-
-            // Simulation
+            
+            // 创建力导向模拟
             const simulation = d3.forceSimulation(nodes)
-                .force('link', d3.forceLink(links).id(d => d.id).distance(100))
+                .force('link', d3.forceLink(links).id(d => d.id).distance(80))
                 .force('charge', d3.forceManyBody().strength(-300))
                 .force('center', d3.forceCenter(width / 2, height / 2))
-                .force('collision', d3.forceCollide().radius(d => d.heat / 3));
-
-            // Draw links
+                .force('collision', d3.forceCollide().radius(30));
+            
+            // 绘制连接线
             const link = svg.append('g')
                 .selectAll('line')
                 .data(links)
-                .enter()
-                .append('line')
-                .attr('class', 'link')
+                .join('line')
                 .attr('stroke', '#475569')
+                .attr('stroke-opacity', 0.6)
                 .attr('stroke-width', d => d.strength * 3);
-
-            // Draw nodes
+            
+            // 绘制节点
             const node = svg.append('g')
                 .selectAll('g')
                 .data(nodes)
-                .enter()
-                .append('g')
-                .attr('class', 'node')
+                .join('g')
                 .call(d3.drag()
                     .on('start', dragstarted)
                     .on('drag', dragged)
                     .on('end', dragended));
-
-            // Node circles
+            
+            // 节点圆形
             node.append('circle')
-                .attr('r', d => Math.max(15, d.heat / 4))
-                .attr('fill', d => categoryColors[d.category] || '#64748b')
-                .attr('stroke', d => sentimentColors[d.sentiment])
-                .attr('stroke-width', 3);
-
-            // Node labels
+                .attr('r', d => 8 + d.heat / 10)
+                .attr('fill', d => categoryColors[d.category] || '#6366f1')
+                .attr('stroke', '#fff')
+                .attr('stroke-width', 2);
+            
+            // 节点标签
             node.append('text')
-                .text(d => d.title)
-                .attr('x', 0)
-                .attr('y', d => Math.max(15, d.heat / 4) + 15)
-                .attr('text-anchor', 'middle')
-                .attr('fill', '#e2e8f0')
-                .attr('font-size', '10px');
-
-            // Tooltip
-            const tooltip = d3.select('#tooltip');
-
-            node.on('mouseover', (event, d) => {
-                tooltip.style('opacity', 1)
-                    .html(`<strong>${d.fullTitle}</strong><br/><span style="color:#94a3b8">热度: ${d.heat} | 分类: ${d.category}</span><br/><p style="margin-top:8px;font-size:12px">${d.summary.substring(0, 100)}...</p>`);
-            }).on('mousemove', (event) => {
-                tooltip.style('left', (event.pageX + 10) + 'px')
+                .attr('class', 'node-label')
+                .attr('dx', 12)
+                .attr('dy', 4)
+                .text(d => d.title);
+            
+            // 工具提示
+            const tooltip = d3.select('body').append('div')
+                .attr('class', 'tooltip')
+                .style('opacity', 0);
+            
+            node.on('mouseover', function(event, d) {
+                tooltip.transition().duration(200).style('opacity', 1);
+                tooltip.html(`<strong>${d.fullTitle}</strong><br/>类别: ${d.category}<br/>热度: ${d.heat}`)
+                    .style('left', (event.pageX + 10) + 'px')
                     .style('top', (event.pageY - 10) + 'px');
-            }).on('mouseout', () => {
-                tooltip.style('opacity', 0);
+            })
+            .on('mouseout', function() {
+                tooltip.transition().duration(200).style('opacity', 0);
             });
-
+            
             simulation.on('tick', () => {
                 link
                     .attr('x1', d => d.source.x)
                     .attr('y1', d => d.source.y)
                     .attr('x2', d => d.target.x)
                     .attr('y2', d => d.target.y);
-
+                
                 node.attr('transform', d => `translate(${d.x},${d.y})`);
             });
-
+            
             function dragstarted(event, d) {
                 if (!event.active) simulation.alphaTarget(0.3).restart();
                 d.fx = d.x;
                 d.fy = d.y;
             }
-
+            
             function dragged(event, d) {
                 d.fx = event.x;
                 d.fy = event.y;
             }
-
+            
             function dragended(event, d) {
                 if (!event.active) simulation.alphaTarget(0);
                 d.fx = null;
                 d.fy = null;
             }
+            
+            // 渲染图例
+            const legendContainer = document.getElementById('network-legend');
+            legendContainer.innerHTML = '';
+            Object.entries(categoryColors).forEach(([cat, color]) => {
+                const item = document.createElement('div');
+                item.className = 'legend-item';
+                item.innerHTML = `<span class="legend-dot" style="background:${color}"></span>${cat}`;
+                legendContainer.appendChild(item);
+            });
         }
 
-        // Render radar chart
-        function renderRadarChart(impact) {
-            const ctx = document.getElementById('radarChart').getContext('2d');
+        // 渲染雷达图
+        function renderRadarChart() {
+            const ctx = document.getElementById('radar-chart').getContext('2d');
             
-            if (radarChartInstance) {
-                radarChartInstance.destroy();
-            }
-
-            radarChartInstance = new Chart(ctx, {
+            // 计算各维度平均影响值
+            const dimensions = ['social', 'economic', 'political', 'tech'];
+            const dimLabels = ['社会影响', '经济影响', '政治影响', '科技影响'];
+            
+            const avgImpact = dimensions.map(dim => {
+                const sum = newsData.news.reduce((acc, n) => acc + n.impact[dim], 0);
+                return Math.round(sum / newsData.news.length);
+            });
+            
+            // 找出高影响力新闻
+            const highImpactNews = newsData.news
+                .sort((a, b) => b.heat - a.heat)
+                .slice(0, 3);
+            
+            const datasets = [{
+                label: '平均影响',
+                data: avgImpact,
+                backgroundColor: 'rgba(99, 102, 241, 0.2)',
+                borderColor: '#6366f1',
+                borderWidth: 2,
+                pointBackgroundColor: '#6366f1'
+            }];
+            
+            // 添加Top3新闻
+            const colors = ['#ec4899', '#06b6d4', '#f59e0b'];
+            highImpactNews.forEach((news, i) => {
+                datasets.push({
+                    label: news.title.substring(0, 10) + '...',
+                    data: dimensions.map(dim => news.impact[dim]),
+                    backgroundColor: colors[i] + '20',
+                    borderColor: colors[i],
+                    borderWidth: 1,
+                    pointBackgroundColor: colors[i]
+                });
+            });
+            
+            new Chart(ctx, {
                 type: 'radar',
                 data: {
-                    labels: ['社会', '经济', '政治', '科技'],
-                    datasets: [{
-                        label: '影响维度',
-                        data: [impact.social, impact.economic, impact.political, impact.tech],
-                        backgroundColor: 'rgba(59, 130, 246, 0.2)',
-                        borderColor: '#3b82f6',
-                        pointBackgroundColor: '#3b82f6',
-                        pointBorderColor: '#fff',
-                        pointHoverBackgroundColor: '#fff',
-                        pointHoverBorderColor: '#3b82f6'
-                    }]
+                    labels: dimLabels,
+                    datasets: datasets
                 },
                 options: {
                     responsive: true,
-                    maintainAspectRatio: true,
+                    maintainAspectRatio: false,
                     scales: {
                         r: {
                             beginAtZero: true,
-                            max: 10,
+                            max: 100,
                             ticks: {
                                 color: '#94a3b8',
                                 backdropColor: 'transparent'
@@ -411,48 +845,18 @@
                                 color: '#334155'
                             },
                             pointLabels: {
-                                color: '#e2e8f0'
+                                color: '#f1f5f9',
+                                font: { size: 12 }
                             }
                         }
                     },
-                    plugins: {
-                        legend: {
-                            display: false
-                        }
-                    }
-                }
-            });
-        }
-
-        // Render category chart
-        function renderCategoryChart() {
-            const ctx = document.getElementById('categoryChart').getContext('2d');
-            const categories = newsData.stats.categories;
-
-            if (categoryChartInstance) {
-                categoryChartInstance.destroy();
-            }
-
-            categoryChartInstance = new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: Object.keys(categories),
-                    datasets: [{
-                        data: Object.values(categories),
-                        backgroundColor: Object.keys(categories).map(k => categoryColors[k] || '#64748b'),
-                        borderWidth: 0
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
                     plugins: {
                         legend: {
                             position: 'bottom',
                             labels: {
-                                color: '#e2e8f0',
-                                padding: 10,
-                                font: { size: 11 }
+                                color: '#f1f5f9',
+                                font: { size: 11 },
+                                boxWidth: 12
                             }
                         }
                     }
@@ -460,185 +864,75 @@
             });
         }
 
-        // Render sentiment chart
-        function renderSentimentChart() {
-            const ctx = document.getElementById('sentimentChart').getContext('2d');
-            const sentiment = newsData.stats.sentiment;
-
-            if (sentimentChartInstance) {
-                sentimentChartInstance.destroy();
-            }
-
-            sentimentChartInstance = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: ['正面', '中性', '负面'],
-                    datasets: [{
-                        label: '新闻数量',
-                        data: [sentiment.positive, sentiment.neutral, sentiment.negative],
-                        backgroundColor: ['#22c55e', '#64748b', '#ef4444'],
-                        borderRadius: 6
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: { color: '#94a3b8' },
-                            grid: { color: '#334155' }
-                        },
-                        x: {
-                            ticks: { color: '#e2e8f0' },
-                            grid: { display: false }
-                        }
-                    },
-                    plugins: {
-                        legend: { display: false }
-                    }
-                }
-            });
-        }
-
-        // Render timeline
-        function renderTimeline() {
-            const timeline = document.getElementById('timeline');
-            timeline.innerHTML = '';
-
-            const sortedNews = [...newsData.news].sort((a, b) => b.heat - a.heat).slice(0, 8);
-
-            sortedNews.forEach((item, index) => {
-                const div = document.createElement('div');
-                div.className = 'flex items-start gap-3 p-2 rounded-lg hover:bg-slate-800/50 transition cursor-pointer';
-                div.onclick = () => window.open(item.url, '_blank');
-                div.innerHTML = `
-                    <div class="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${index < 3 ? 'bg-yellow-500/20 text-yellow-400' : 'bg-slate-700 text-slate-400'}">${index + 1}</div>
-                    <div class="flex-1 min-w-0">
-                        <div class="text-sm font-medium text-white truncate">${item.title}</div>
-                        <div class="flex items-center gap-2 mt-1">
-                            <span class="text-xs px-2 py-0.5 rounded-full" style="background: ${categoryColors[item.category]}20; color: ${categoryColors[item.category]}">${item.category}</span>
-                            <span class="text-xs text-slate-400">热度: ${item.heat}</span>
-                        </div>
-                    </div>
-                `;
-                timeline.appendChild(div);
-            });
-        }
-
-        // Render news list
+        // 渲染新闻列表
         function renderNewsList() {
-            const list = document.getElementById('news-list');
-            list.innerHTML = '';
-
-            const filteredNews = currentFilter === 'all' 
-                ? newsData.news 
-                : newsData.news.filter(n => n.category === currentFilter);
-
-            filteredNews.forEach(item => {
-                const card = document.createElement('div');
-                card.className = 'glass rounded-xl p-4 card-hover cursor-pointer';
-                card.onclick = () => window.open(item.url, '_blank');
-                
-                const impactScore = ((item.impact.social + item.impact.economic + item.impact.political + item.impact.tech) / 4).toFixed(1);
-                
-                card.innerHTML = `
-                    <div class="flex items-start justify-between gap-2">
-                        <h3 class="text-sm font-medium text-white line-clamp-2">${item.title}</h3>
-                        <span class="flex-shrink-0 text-xs px-2 py-1 rounded-full" style="background: ${categoryColors[item.category]}20; color: ${categoryColors[item.category]}">${item.category}</span>
+            const container = document.getElementById('news-list');
+            container.innerHTML = '';
+            
+            // 按热度排序
+            const sortedNews = [...newsData.news].sort((a, b) => b.heat - a.heat);
+            
+            sortedNews.forEach(news => {
+                const item = document.createElement('div');
+                item.className = 'news-item';
+                item.innerHTML = `
+                    <div class="news-header">
+                        <div class="news-title">${news.title}</div>
+                        <span class="news-heat">🔥 ${news.heat}</span>
                     </div>
-                    <p class="text-xs text-slate-400 mt-2 line-clamp-2">${item.summary}</p>
-                    <div class="flex items-center justify-between mt-3 text-xs">
-                        <div class="flex items-center gap-3">
-                            <span class="text-slate-500">${item.source}</span>
-                            <span class="flex items-center gap-1">
-                                <svg class="w-3 h-3 text-orange-400" fill="currentColor" viewBox="0 0 20 20"><path d="M12.395 2.553a1 1 0 00-1.45-.385c-.345.23-.614.558-.822.88-.214.33-.403.713-.57 1.116-.334.804-.614 1.768-.84 2.734a31.365 31.365 0 00-.613 3.58 2.64 2.64 0 01-.945-1.067c-.328-.68-.398-1.534-.398-2.654A1 1 0 005.05 6.05 6.981 6.981 0 003 11a7 7 0 1011.95-4.95c-.592-.591-.98-.985-1.348-1.467-.363-.476-.724-1.063-1.207-2.03zM12.12 15.12A3 3 0 017 13s.879.5 2.5.5c0-1 .5-4 1.25-4.5.5 1 .786 1.293 1.371 1.879A2.99 2.99 0 0113 13a2.99 2.99 0 01-.879 2.121z"/></svg>
-                                ${item.heat}
-                            </span>
+                    <div class="news-summary">${news.summary}</div>
+                    <div class="news-meta">
+                        <span class="news-source">📰 ${news.source}</span>
+                        <span class="news-category">${news.category}</span>
+                        <span class="news-time">📅 ${news.time}</span>
+                    </div>
+                    <div class="impact-bars">
+                        <div class="impact-bar" data-label="社会">
+                            <div class="impact-fill impact-social" style="width: ${news.impact.social}%"></div>
                         </div>
-                        <span class="text-xs ${item.sentiment === 'positive' ? 'text-green-400' : item.sentiment === 'negative' ? 'text-red-400' : 'text-slate-400'}">
-                            ${item.sentiment === 'positive' ? '正面' : item.sentiment === 'negative' ? '负面' : '中性'}
-                        </span>
-                    </div>
-                    <div class="flex flex-wrap gap-1 mt-2">
-                        ${item.keywords.slice(0, 3).map(kw => `<span class="text-xs px-1.5 py-0.5 rounded bg-slate-700/50 text-slate-300">${kw}</span>`).join('')}
+                        <div class="impact-bar" data-label="经济">
+                            <div class="impact-fill impact-economic" style="width: ${news.impact.economic}%"></div>
+                        </div>
+                        <div class="impact-bar" data-label="政治">
+                            <div class="impact-fill impact-political" style="width: ${news.impact.political}%"></div>
+                        </div>
+                        <div class="impact-bar" data-label="科技">
+                            <div class="impact-fill impact-tech" style="width: ${news.impact.tech}%"></div>
+                        </div>
                     </div>
                 `;
-                list.appendChild(card);
+                container.appendChild(item);
             });
         }
 
-        // Render keywords cloud
-        function renderKeywordsCloud() {
-            const cloud = document.getElementById('keywords-cloud');
-            cloud.innerHTML = '';
-
-            const keywordCounts = {};
-            newsData.news.forEach(item => {
-                item.keywords.forEach(kw => {
-                    keywordCounts[kw] = (keywordCounts[kw] || 0) + 1;
-                });
-            });
-
-            const sortedKeywords = Object.entries(keywordCounts)
-                .sort((a, b) => b[1] - a[1])
-                .slice(0, 20);
-
-            sortedKeywords.forEach(([kw, count]) => {
-                const span = document.createElement('span');
-                const size = Math.max(0.75, Math.min(1.5, count / 2));
-                span.className = 'px-3 py-1.5 rounded-full bg-slate-800 text-slate-300 hover:bg-blue-600 hover:text-white transition cursor-pointer';
-                span.style.fontSize = `${size}rem`;
-                span.textContent = kw;
-                span.onclick = () => filterNewsByKeyword(kw);
-                cloud.appendChild(span);
-            });
-        }
-
-        // Filter functions
-        function filterNews(category) {
-            currentFilter = category;
-            renderNewsList();
+        // 渲染时间线
+        function renderTimeline() {
+            const container = document.getElementById('timeline-container');
+            container.innerHTML = '';
             
-            // Update button styles
-            const buttons = document.querySelectorAll('#news-list').previousElementSibling.querySelectorAll('button');
-            buttons.forEach(btn => {
-                if ((category === 'all' && btn.textContent === '全部') || btn.textContent === category) {
-                    btn.className = 'px-3 py-1 rounded-full bg-blue-600 text-white text-sm';
-                } else {
-                    btn.className = 'px-3 py-1 rounded-full bg-slate-700 text-slate-300 text-sm hover:bg-slate-600';
-                }
-            });
-        }
-
-        function filterNewsByKeyword(keyword) {
-            const list = document.getElementById('news-list');
-            list.innerHTML = '';
+            // 按时间排序
+            const sortedNews = [...newsData.news].sort((a, b) => new Date(b.time) - new Date(a.time));
             
-            const filtered = newsData.news.filter(n => n.keywords.includes(keyword));
-            filtered.forEach(item => {
-                const card = document.createElement('div');
-                card.className = 'glass rounded-xl p-4 card-hover cursor-pointer';
-                card.onclick = () => window.open(item.url, '_blank');
-                card.innerHTML = `
-                    <div class="flex items-start justify-between gap-2">
-                        <h3 class="text-sm font-medium text-white">${item.title}</h3>
-                        <span class="flex-shrink-0 text-xs px-2 py-1 rounded-full bg-blue-600 text-white">${item.category}</span>
+            sortedNews.forEach(news => {
+                const item = document.createElement('div');
+                item.className = 'timeline-item';
+                item.innerHTML = `
+                    <div class="timeline-time">${news.time}</div>
+                    <div class="timeline-content">
+                        <strong>${news.title}</strong>
+                        <div style="color: var(--text-secondary); font-size: 0.85rem; margin-top: 4px;">
+                            ${news.category} · 热度 ${news.heat}
+                        </div>
                     </div>
-                    <p class="text-xs text-slate-400 mt-2">${item.summary}</p>
                 `;
-                list.appendChild(card);
+                container.appendChild(item);
             });
         }
 
-        function refreshData() {
-            location.reload();
-        }
-
-        // Initialize
-        document.addEventListener('DOMContentLoaded', updateDashboard);
-
-        // Handle resize
+        // 初始化
+        document.addEventListener('DOMContentLoaded', renderDashboard);
+        
+        // 响应式重绘
         window.addEventListener('resize', () => {
             renderNetworkGraph();
         });
