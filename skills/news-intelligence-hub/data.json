@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-03-03T23:17:00+08:00",
+  "timestamp": "2026-03-04T01:17:00+08:00",
   "news": [
     {
       "id": "news_001",
@@ -165,6 +165,61 @@
       "keywords": ["智能经济", "人工智能+", "两会", "新质生产力", "数字化转型"],
       "category": "国内政治",
       "time": "2026-03-03"
+    },
+    {
+      "id": "news_016",
+      "title": "马云现身杭州云谷学校 阿里核心管理层罕见聚齐谈AI",
+      "summary": "3月3日新年阿里开工第一站，马云与阿里、蚂蚁的核心管理层来到杭州云谷学校，与校长、老师们畅谈AI带来的挑战和机会。蔡崇信、吴泳铭、井贤栋等核心管理层罕见全部聚齐。",
+      "source": "新浪科技",
+      "heat": 81,
+      "impact": {"social": 75, "economic": 80, "political": 60, "tech": 90},
+      "keywords": ["马云", "阿里巴巴", "AI教育", "云谷学校", "蚂蚁集团"],
+      "category": "科技",
+      "time": "2026-03-03"
+    },
+    {
+      "id": "news_017",
+      "title": "谷歌员工呼吁限制AI军事应用 近900人签署公开信",
+      "summary": "在美国对伊朗实施打击、五角大楼将Anthropic的AI模型列入黑名单后，谷歌、OpenAI科技工作者传阅公开信，呼吁为雇主与军方合作设定更明确界限。近900人签名，其中近800名来自谷歌。",
+      "source": "新浪财经",
+      "heat": 79,
+      "impact": {"social": 70, "economic": 55, "political": 85, "tech": 88},
+      "keywords": ["谷歌", "AI伦理", "军事应用", "OpenAI", "科技伦理"],
+      "category": "科技",
+      "time": "2026-03-03"
+    },
+    {
+      "id": "news_018",
+      "title": "智元机器人进军德国市场 与敏实集团签署战略合作",
+      "summary": "智元机器人在德国慕尼黑举办发布会，正式宣布进入德国市场。发布面向德国市场的全系列通用具身机器人产品矩阵，并与全球领先汽车外饰制造商敏实集团签署专项战略合作协议。",
+      "source": "上观新闻",
+      "heat": 75,
+      "impact": {"social": 60, "economic": 78, "political": 55, "tech": 92},
+      "keywords": ["智元机器人", "出海", "德国市场", "人形机器人", "国际合作"],
+      "category": "科技",
+      "time": "2026-03-03"
+    },
+    {
+      "id": "news_019",
+      "title": "美团光年之外首款AI原生浏览器Tabbit进入公测",
+      "summary": "美团旗下光年之外团队宣布，其全新产品Tabbit AI浏览器进入公测。作为专为上班族、在校学生及内容创作者打造的AI原生浏览器，将网页浏览、全网搜索、AI对话与复杂任务执行融为一体。",
+      "source": "科创板日报",
+      "heat": 73,
+      "impact": {"social": 70, "economic": 72, "political": 45, "tech": 88},
+      "keywords": ["美团", "AI浏览器", "光年之外", "Tabbit", "AI应用"],
+      "category": "科技",
+      "time": "2026-03-03"
+    },
+    {
+      "id": "news_020",
+      "title": "WTI原油期货大涨6.28% 油价突破71美元",
+      "summary": "国际原油期货结算价大幅收涨超6%。WTI原油期货4月合约收涨6.28%，报71.23美元/桶；布伦特原油期货5月合约收涨6.68%，报77.74美元/桶。中东局势升级推动油价飙升。",
+      "source": "环球市场播报",
+      "heat": 87,
+      "impact": {"social": 65, "economic": 95, "political": 80, "tech": 35},
+      "keywords": ["原油期货", "WTI", "布伦特原油", "油价上涨", "能源市场"],
+      "category": "经济金融",
+      "time": "2026-03-03"
     }
   ],
   "relations": [
@@ -172,35 +227,43 @@
     {"source": "news_001", "target": "news_006", "type": "市场影响", "strength": 0.92},
     {"source": "news_001", "target": "news_010", "type": "行业催化", "strength": 0.90},
     {"source": "news_001", "target": "news_012", "type": "避险联动", "strength": 0.88},
+    {"source": "news_001", "target": "news_020", "type": "价格传导", "strength": 0.94},
     {"source": "news_002", "target": "news_015", "type": "政策关联", "strength": 0.85},
     {"source": "news_002", "target": "news_011", "type": "提案关联", "strength": 0.80},
     {"source": "news_004", "target": "news_005", "type": "产业链", "strength": 0.75},
     {"source": "news_004", "target": "news_011", "type": "技术协同", "strength": 0.70},
+    {"source": "news_004", "target": "news_018", "type": "行业竞争", "strength": 0.72},
     {"source": "news_005", "target": "news_007", "type": "AI基础设施", "strength": 0.80},
     {"source": "news_005", "target": "news_008", "type": "算力需求", "strength": 0.78},
     {"source": "news_007", "target": "news_008", "type": "技术互补", "strength": 0.72},
     {"source": "news_007", "target": "news_009", "type": "英伟达生态", "strength": 0.75},
     {"source": "news_010", "target": "news_006", "type": "市场联动", "strength": 0.85},
+    {"source": "news_010", "target": "news_020", "type": "能源板块", "strength": 0.82},
     {"source": "news_012", "target": "news_001", "type": "避险反应", "strength": 0.88},
     {"source": "news_013", "target": "news_010", "type": "投资推荐", "strength": 0.65},
     {"source": "news_014", "target": "news_004", "type": "航天科技", "strength": 0.60},
     {"source": "news_015", "target": "news_004", "type": "政策支持", "strength": 0.82},
-    {"source": "news_015", "target": "news_007", "type": "AI战略", "strength": 0.78}
+    {"source": "news_015", "target": "news_007", "type": "AI战略", "strength": 0.78},
+    {"source": "news_016", "target": "news_015", "type": "AI生态", "strength": 0.70},
+    {"source": "news_017", "target": "news_001", "type": "军事AI", "strength": 0.75},
+    {"source": "news_018", "target": "news_004", "type": "具身智能", "strength": 0.80},
+    {"source": "news_019", "target": "news_016", "type": "AI应用", "strength": 0.65},
+    {"source": "news_020", "target": "news_012", "type": "通胀预期", "strength": 0.70}
   ],
   "stats": {
-    "total": 15,
-    "highImpact": 10,
+    "total": 20,
+    "highImpact": 12,
     "categories": {
       "国际政治": 3,
       "国内政治": 2,
-      "科技": 6,
-      "经济金融": 4
+      "科技": 9,
+      "经济金融": 6
     },
     "impactDistribution": {
-      "social": {"avg": 69.3, "max": 90, "min": 50},
-      "economic": {"avg": 85.1, "max": 98, "min": 70},
-      "political": {"avg": 70.3, "max": 99, "min": 40},
-      "tech": {"avg": 76.7, "max": 98, "min": 30}
+      "social": {"avg": 69.5, "max": 90, "min": 50},
+      "economic": {"avg": 83.2, "max": 98, "min": 55},
+      "political": {"avg": 69.5, "max": 99, "min": 40},
+      "tech": {"avg": 79.8, "max": 98, "min": 30}
     }
   }
 }
